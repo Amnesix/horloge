@@ -1,0 +1,56 @@
+import time
+
+import presto
+from picovector import ANTIALIAS_BEST, PicoVector, Transform
+
+from myapp.calendar import Calendar
+from myapp.flip_clock import Flip_Clock
+from myapp.horloge import Horloge
+from myapp.switches import Switches
+from myapp.temperatures import Temperatures
+from myapp.utils import (
+    TZ,
+    Color,
+    Log,
+    get_all_states,
+    update_time,
+    wifi_connect,
+)
+from myapp.version import __title__, __version__
+
+# Initialisation générale
+presto = presto.Presto(full_res=True)
+display = presto.display
+touch = presto.touch
+vector = PicoVector(display)
+t = Transform()
+vector.set_transform(t)
+vector.set_antialiasing(ANTIALIAS_BEST)
+Color.init(display)
+loggin = Log(presto, display, vector, f"{__title__} - {__version__}")
+loggin.log("Lancement application")
+loggin.log("Connexion Wifi en cours...")
+
+# bg = Color.BLACK
+# fg = Color.WHITE
+
+# Connection / Mise à l'heure
+local = wifi_connect(presto, loggin)
+update_time(loggin)
+TZ.init(loggin)
+s = time.time()
+offset = 3600 * TZ.get_offset(s)
+y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
+loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
+
+# Initialistion des objets
+calendar = Calendar(presto, display, vector, touch)
+states = get_all_states()
+temperatures = Temperatures(presto, display, vector, touch, loggin, states)
+switches = Switches(presto, display, vector, touch, states)
+flip = Flip_Clock(presto, display, vector, touch)
+horloge = Horloge(presto, display, vector, t, touch, flip, temperatures,
+                  switches, calendar, loggin, local)
+
+# Lancement de l'affichage principal
+horloge.affiche()
