@@ -54,29 +54,28 @@ PRISES = {
     "Buandrie": "sapin_socket_1",
     "Douche": "sonoff_s60zbtpf",
 }
-"""
-CAPTEURS = {
-    "sensor.th_dehors_temperature": "Extérieur",
-    "sensor.th_bureau_temperature": "Bureau",
-    "sensor.ewelink_th01_temperature": "Chambre Cyril",
-    "sensor.th_arriere_cuisine_temperature": "Arrière cuisine",
-    "sensor.th_cuisine_temperature": "Cuisine",
-    "sensor.th_diane_temperature": "Chambre Diane",
-    "sensor.th_parent_temperature": "Chambre parents",
-    "sensor.th_salon_temperature": "Salon",
+
+SENSOR_to_CAPTEURS = {
+    "sensor.th_dehors_temperature": "_dehors",
+    "sensor.th_bureau_temperature": "bureau",
+    "sensor.ewelink_th01_temperature": "cyril",
+    "sensor.th_arriere_cuisine_temperature": "buandrie",
+    "sensor.th_cuisine_temperature": "cuisine",
+    "sensor.th_diane_temperature": "diane",
+    "sensor.th_parent_temperature": "parents",
+    "sensor.th_salon_temperature": "salon",
 }
 
 # Dictionnaires de PRISES connectées
 # Les libellés sont ceux affichés et sont succeptibles de changer.
-PRISES = {
-    "Ventilo": "switch.antela_prise_intelligente_2_socket_1",
-    "RPi": "switch.pipmc_net_194_socket_1",
-    "Multimédia": "switch.multimedia_salon_socket_1",
-    "Cuisine": "switch.prise_connectee",
-    "Buandrie": "switch.sapin_socket_1",
-    "Douche": "switch.sonoff_s60zbtpf",
+SWITCH_to_PRISES = {
+    "switch.antela_prise_intelligente_2_socket_1": "Ventilo",
+    "switch.pipmc_net_194_socket_1": "RPi",
+    "switch.multimedia_salon_socket_1": "Multimédia",
+    "switch.prise_connectee": "Cuisine",
+    "switch.sapin_socket_1": "Buandrie",
+    "switch.sonoff_s60zbtpf": "Douche"
 }
-"""
 
 template_temperatures = """
 [
