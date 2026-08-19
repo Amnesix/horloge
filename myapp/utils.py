@@ -54,6 +54,53 @@ PRISES = {
     "Buandrie": "sapin_socket_1",
     "Douche": "sonoff_s60zbtpf",
 }
+"""
+CAPTEURS = {
+    "sensor.th_dehors_temperature": "Extérieur",
+    "sensor.th_bureau_temperature": "Bureau",
+    "sensor.ewelink_th01_temperature": "Chambre Cyril",
+    "sensor.th_arriere_cuisine_temperature": "Arrière cuisine",
+    "sensor.th_cuisine_temperature": "Cuisine",
+    "sensor.th_diane_temperature": "Chambre Diane",
+    "sensor.th_parent_temperature": "Chambre parents",
+    "sensor.th_salon_temperature": "Salon",
+}
+
+# Dictionnaires de PRISES connectées
+# Les libellés sont ceux affichés et sont succeptibles de changer.
+PRISES = {
+    "Ventilo": "switch.antela_prise_intelligente_2_socket_1",
+    "RPi": "switch.pipmc_net_194_socket_1",
+    "Multimédia": "switch.multimedia_salon_socket_1",
+    "Cuisine": "switch.prise_connectee",
+    "Buandrie": "switch.sapin_socket_1",
+    "Douche": "switch.sonoff_s60zbtpf",
+}
+"""
+
+template_temperatures = """
+[
+{% for s in states.sensor
+   if s.attributes.device_class == 'temperature' %}
+  {
+    "entity_id": {{ s.entity_id | tojson }},
+    "state": {{ s.state | tojson }},
+    "attributes": {{ s.attributes | tojson }}
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
+]
+"""
+template_switch = """
+[
+{% for s in states.switch %}
+  {
+    "entity_id": {{ s.entity_id | tojson }},
+    "state": {{ s.state | tojson }},
+    "attributes": {{ s.attributes | tojson }}
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
+]
+"""
 
 FILTRES = []
 
@@ -142,7 +189,8 @@ def get_all_states():
         response = get(api + "states", headers=headers, timeout=5.0)
         lst = response.json()
         states = {
-            s["entity_id"]: s["state"]
+            s["entity_id"]:
+            '-1000.' if s["state"] == 'unavailable' else s["state"]
             for s in lst if s["entity_id"] in FILTRES
         }
         try:
@@ -152,6 +200,41 @@ def get_all_states():
     except Exception as e:
         print(f"Lecture states erreur {e} ({type(e)})")
     return states
+
+
+def get_states(template):
+    states = {}
+    try:
+        response = get(api + "template",
+                       headers=headers,
+                       json=["template:", template])
+        response.raise_for_status()
+        state = response.json()
+        try:
+            response.close()
+        except Exception:
+            pass
+    except Exception:
+        pass
+    return states
+
+
+def get_temperatures():
+    result = {}
+    states = get_states(template_temperatures)
+    for state in states:
+        result[state['entity_id']] = float(state['state'])
+    return result
+
+
+def get_swtiches():
+    result = {}
+    states = get_states(template_switch)
+    for state in states:
+        entity = state['entity_id']
+        if entity in PRISES.values():
+            result[entity] = state['state'] == 'on'
+    return result
 
 
 def update_time(loggin, show_log=True):

@@ -11,7 +11,6 @@ ASK_ALL_TEMP = True
 
 class Temperatures:
     temps = {}
-    sensors = []
 
     def __init__(self, presto, display, vector, touch, loggin,
                  initiale_states):
@@ -27,7 +26,6 @@ class Temperatures:
         self.t_orange = display.create_pen(132, 92, 32)
         self.t_rouge = display.create_pen(132, 32, 32)
         self.t_violet = display.create_pen(132, 32, 132)
-        self.sensors = ["sensor." + w[1] for w in CAPTEURS.values()]
         try:
             self.temps = {
                 k: float(initiale_states["sensor." + v[1]])
@@ -92,8 +90,10 @@ class Temperatures:
         return f"{self.temps[capteur]:.1f}°C"
 
     def get_temp_color(self, temp):
+        ret = True
         if temp == -1000:
             self.display.set_pen(Color.GREY)
+            ret = False
         elif temp < 6:
             self.display.set_pen(self.t_cyan)
         elif 6 <= temp < 19:
@@ -108,6 +108,7 @@ class Temperatures:
             self.display.set_pen(self.t_rouge)
         else:
             self.display.set_pen(self.t_violet)
+        return ret
 
     def affiche(self):
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
@@ -149,16 +150,19 @@ class Temperatures:
                 h = 1
                 for name in sorted(self.temps.keys()):
                     temp = self.temps[name]
-                    self.get_temp_color(temp)
+                    ok = self.get_temp_color(temp)
                     self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
-                    self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
-                    if temp < self.tendance[name]:
-                        s = f"-{self.tendance[name] - temp:.1f}°C"
-                    elif temp > self.tendance[name]:
-                        s = f"+{temp - self.tendance[name]:.1f}°C"
+                    if ok:
+                        self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
+                        if temp < self.tendance[name]:
+                            s = f"-{self.tendance[name] - temp:.1f}°C"
+                        elif temp > self.tendance[name]:
+                            s = f"+{temp - self.tendance[name]:.1f}°C"
+                        else:
+                            s = "="
+                        self.vector.text(s, 380, h * 40 + 80)
                     else:
-                        s = "="
-                    self.vector.text(s, 380, h * 40 + 80)
+                        self.vector.text("indisponible", 256, h * 40 + 80)
                     h += 1
                 self.presto.update()
 
