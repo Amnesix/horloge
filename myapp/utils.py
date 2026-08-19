@@ -151,14 +151,21 @@ def wifi_connect(presto, loggin=None):
     global net_config
 
     def test_connexion():
+        # Pourquoi ça tombe régulièrement en timeout ?
+        if not presto.wifi.isconnected():
+            if loggin:
+                loggin.log("Non connecté !")
+            return False
         try:
             response = get(api, headers=headers, timeout=5.0)
             if loggin:
                 loggin.log(response.text)
+            return True
         except Exception as e:
             if loggin:
                 loggin.log(f"Exception ({e})")
             print(f"Exception ({e})")
+        return False
 
     indice = net_config
     while True:
@@ -173,7 +180,11 @@ def wifi_connect(presto, loggin=None):
             """print(
                 f"Configuration :\n\t- Connexion sur {CONFIG[indice][0]}\n\t- API : {api}"
             )"""
-            test_connexion()
+            if loggin is not None:
+                loggin.log(f"IP : {presto.wifi.ipv4()}")
+            if not test_connexion():
+                # En cas d'erreur, on retente une fois
+                test_connexion()
             return CONFIG[indice][3]
         if loggin is not None:
             loggin.log(f" * SSID={CONFIG[indice][0]} : NOK", nl=False)
@@ -331,6 +342,7 @@ class Color:
     ORANGE = None
     CYAN = None
     LIGHTYELLOW = None
+    LIGHTGREY = None
     DARKGREY = None
 
     @classmethod
@@ -349,5 +361,6 @@ class Color:
         cls.ORANGE = display.create_pen(127, 39, 5)
         cls.CYAN = display.create_pen(0, 127, 127)
         cls.LIGHTYELLOW = display.create_pen(126, 130, 94)
+        cls.LIGHTGREY = display.create_pen(96, 96, 96)
         cls.DARKGREY = display.create_pen(64, 64, 64)
         cls._ready = True

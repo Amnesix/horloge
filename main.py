@@ -21,6 +21,9 @@ from myapp.version import __title__, __version__
 # Initialisation générale
 presto = presto.Presto(full_res=True)
 display = presto.display
+display.set_pen(display.create_pen(0, 0, 0))
+display.clear()
+presto.update()
 touch = presto.touch
 vector = PicoVector(display)
 t = Transform()
