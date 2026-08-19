@@ -129,10 +129,13 @@ class Log:
         self.ligne = 0
         self.msg = []
 
+    def set_title(self, title):
+        self.title = title
+
     def log(self, msg, nl=True):
         if nl:
             self.msg.append(msg)
-            if len(self.msg) >= 20:
+            if len(self.msg) >= 19:
                 self.msg.pop(0)
         else:
             self.msg[-1] = msg
@@ -219,9 +222,11 @@ def get_states(template):
     try:
         response = post(api + "template",
                         headers=headers,
-                        json=["template:", template])
+                        json={"template": template})
         if response.status_code == 200:
             states = response.json()
+        else:
+            print(f"status_code = {response.status_code}")
         try:
             response.close()
         except Exception:
@@ -234,19 +239,20 @@ def get_states(template):
 def get_temperatures():
     result = {}
     states = get_states(template_temperatures)
-    print(states)
     for state in states:
-        result[state['entity_id']] = float(state['state'])
+        temp = state['state']
+        result[state[
+            'entity_id']] = "Non valide" if temp == "unavailable" else float(
+                temp)
     return result
 
 
 def get_switches():
     result = {}
     states = get_states(template_switch)
-    print(states)
     for state in states:
         entity = state['entity_id']
-        if entity in PRISES.values():
+        if entity.split('.')[1] in PRISES.values():
             result[entity] = state['state'] == 'on'
     return result
 
@@ -255,6 +261,39 @@ def get_all_states_t():
     states = get_temperatures()
     states |= get_switches()
     return states
+
+
+class Test_Recup:
+
+    def __init__(self, presto, display, vector, touch, loggin):
+        self.presto = presto
+        self.display = display
+        self.vector = vector
+        self.loggin = Log(presto, display, vector, "TEST RECUP.")
+        self.touch = touch
+
+    def affiche(self):
+        states = {}
+        while True:
+            self.touch.poll()
+            if self.touch.state:
+                while True:
+                    self.touch.poll()
+                    if not self.touch.state:
+                        break
+                if self.touch.y > 380:
+                    return
+                start = time.ticks_ms()
+                if self.touch.x < 240:
+                    states = get_temperatures()
+                else:
+                    states = get_switches()
+                delai = time.ticks_ms() - start
+                self.loggin.log(f"Récupération en {delai}ms")
+                for k, v in states.items():
+                    self.loggin.log(f"{k}: {v}")
+            self.presto.update()
+            time.sleep(.1)
 
 
 def update_time(loggin, show_log=True):

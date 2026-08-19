@@ -42,6 +42,7 @@ class Horloge:
         calendar,
         loggin,
         local,
+        tests,
     ):
         self.presto = presto
         self.display = display
@@ -54,6 +55,7 @@ class Horloge:
         self.calendar = calendar
         self.loggin = loggin
         self.local = local
+        self.tests = tests
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.titre = f"{__title__} - Version {__version__}"
         len = int(self.vector.measure_text(self.titre)[2])
@@ -118,6 +120,7 @@ class Horloge:
         self.b_temp_box = Polygon()
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 45, HEIGHT // 2 - 18, 90,
                                   36)
+        self.btn_test = Button(*self.e_temp_box.bounds())
 
         self.switch_btn = Polygon()
         self.switch_btn.circle(32, 40, 20, stroke=2)
@@ -175,6 +178,9 @@ class Horloge:
                 ret = True
             elif self.btn_date.is_pressed():
                 self.calendar.affiche()
+                ret = True
+            elif self.btn_test.is_pressed():
+                self.tests.affiche()
                 ret = True
         return ret
 

@@ -12,6 +12,7 @@ from myapp.utils import (
     TZ,
     Color,
     Log,
+    Test_Recup,
     get_all_states,
     update_time,
     wifi_connect,
@@ -53,8 +54,9 @@ states = get_all_states()
 temperatures = Temperatures(presto, display, vector, touch, loggin, states)
 switches = Switches(presto, display, vector, touch, states)
 flip = Flip_Clock(presto, display, vector, touch)
+tests = Test_Recup(presto, display, vector, touch, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, temperatures,
-                  switches, calendar, loggin, local)
+                  switches, calendar, loggin, local, tests)
 
 # Lancement de l'affichage principal
 horloge.affiche()
