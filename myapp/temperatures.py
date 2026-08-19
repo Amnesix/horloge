@@ -92,7 +92,7 @@ class Temperatures:
     def get_temp_color(self, temp):
         ret = True
         if temp == -1000:
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.DARKGREY)
             ret = False
         elif temp < 6:
             self.display.set_pen(self.t_cyan)

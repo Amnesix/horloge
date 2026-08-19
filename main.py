@@ -46,6 +46,7 @@ loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 # Initialistion des objets
 calendar = Calendar(presto, display, vector, touch)
 states = get_all_states()
+# print(states)
 temperatures = Temperatures(presto, display, vector, touch, loggin, states)
 switches = Switches(presto, display, vector, touch, states)
 flip = Flip_Clock(presto, display, vector, touch)

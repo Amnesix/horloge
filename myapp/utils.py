@@ -2,7 +2,7 @@ import datetime
 import time
 
 import ntptime
-from requests import get
+from requests import get, post
 
 from myapp.secret import APIHA, CONFIG, headers
 
@@ -152,10 +152,12 @@ def wifi_connect(presto, loggin=None):
 
     def test_connexion():
         try:
-            response = get(api, headers=headers, timeout=2.0)
-            loggin.log(response.text)
+            response = get(api, headers=headers, timeout=5.0)
+            if loggin:
+                loggin.log(response.text)
         except Exception as e:
-            loggin.log(f"Exception ({e})")
+            if loggin:
+                loggin.log(f"Exception ({e})")
             print(f"Exception ({e})")
 
     indice = net_config
@@ -204,36 +206,44 @@ def get_all_states():
 def get_states(template):
     states = {}
     try:
-        response = get(api + "template",
-                       headers=headers,
-                       json=["template:", template])
-        response.raise_for_status()
-        state = response.json()
+        response = post(api + "template",
+                        headers=headers,
+                        json=["template:", template])
+        if response.status_code == 200:
+            states = response.json()
         try:
             response.close()
         except Exception:
             pass
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Exception template : {e}")
     return states
 
 
 def get_temperatures():
     result = {}
     states = get_states(template_temperatures)
+    print(states)
     for state in states:
         result[state['entity_id']] = float(state['state'])
     return result
 
 
-def get_swtiches():
+def get_switches():
     result = {}
     states = get_states(template_switch)
+    print(states)
     for state in states:
         entity = state['entity_id']
         if entity in PRISES.values():
             result[entity] = state['state'] == 'on'
     return result
+
+
+def get_all_states_t():
+    states = get_temperatures()
+    states |= get_switches()
+    return states
 
 
 def update_time(loggin, show_log=True):
