@@ -60,7 +60,6 @@ class Horloge:
         len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(self.titre, (WIDTH - len) // 2)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
-        self.loggin.log("Initialisation horloge...")
         self.fg = Color.GREY
 
         self.next_update_time = time.time() + 12 * 60 * 60
@@ -154,7 +153,6 @@ class Horloge:
             self.pos_jours.append(
                 int((WIDTH - self.vector.measure_text(txt)[2]) / 2))
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
-        self.loggin.log("Lancement de la boucle d'affichage")
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         self.display.set_pen(self.fg_contour)
