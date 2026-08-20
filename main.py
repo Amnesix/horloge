@@ -39,7 +39,7 @@ loggin.log("Connexion Wifi en cours...")
 # fg = Color.WHITE
 
 # Connection / Mise à l'heure
-local = wifi_connect(presto, loggin)
+wifi_connect(presto, loggin)
 update_time(loggin)
 TZ.init(loggin)
 s = time.time()
@@ -58,7 +58,7 @@ temperatures = Temperatures(presto, display, vector, touch, loggin, states)
 switches = Switches(presto, display, vector, touch, states)
 flip = Flip_Clock(presto, display, vector, touch)
 horloge = Horloge(presto, display, vector, t, touch, flip, temperatures,
-                  switches, calendar, loggin, local, tests)
+                  switches, calendar, loggin, tests)
 
 # Lancement de l'affichage principal
 horloge.affiche()

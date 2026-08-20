@@ -41,7 +41,6 @@ class Horloge:
         switches,
         calendar,
         loggin,
-        local,
         tests,
     ):
         self.presto = presto
@@ -54,7 +53,7 @@ class Horloge:
         self.switches = switches
         self.calendar = calendar
         self.loggin = loggin
-        self.local = local
+        self.local = True
         self.tests = tests
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.titre = f"{__title__} - Version {__version__}"

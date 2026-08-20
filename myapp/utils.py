@@ -185,10 +185,8 @@ def wifi_connect(presto, loggin=None):
             )"""
             if loggin is not None:
                 loggin.log(f"IP : {presto.wifi.ipv4()}")
-            if not test_connexion():
-                # En cas d'erreur, on retente une fois
-                test_connexion()
-            return CONFIG[indice][3]
+            test_connexion()
+            return
         if loggin is not None:
             loggin.log(f" * SSID={CONFIG[indice][0]} : NOK", nl=False)
         indice = (indice + 1) % len(CONFIG)

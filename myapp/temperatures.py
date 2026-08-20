@@ -4,9 +4,12 @@ import time
 from requests import get
 
 from myapp.secret import headers
-from myapp.utils import CAPTEURS, TZ, Color, get_api
+from myapp.utils import CAPTEURS, TZ, Color, get_api, get_temperatures
 
 ASK_ALL_TEMP = True
+ASK_VIA_TEMPLATE = True
+# Demande température toutes les X mn
+DEMANDE = 5
 
 
 class Temperatures:
@@ -55,27 +58,38 @@ class Temperatures:
     def get_all_temp(self):
         # Récupération de tous les états
         # Cette solution est peut-être plus lente. À vérifier.
+        response = None
         try:
             # t_start = time.ticks_ms()
-            response = get(self.api + "states", headers=headers, timeout=5.0)
-            all_states = response.json()
-            # Extraction des températures
-            temperatures = {
-                s["entity_id"]: s["state"]
-                for s in all_states if s["entity_id"] in
-                ["sensor." + w[1] for w in CAPTEURS.values()]
-            }
+            if ASK_VIA_TEMPLATE:
+                temperatures = get_temperatures()
+            else:
+                response = get(self.api + "states",
+                               headers=headers,
+                               timeout=5.0)
+                all_states = response.json()
+                # Extraction des températures
+                temperatures = {
+                    s["entity_id"]: s["state"]
+                    for s in all_states if s["entity_id"] in
+                    ["sensor." + w[1] for w in CAPTEURS.values()]
+                }
             # t_end = time.ticks_ms()
             # delai = t_end - t_start
             # print(f"get_all_temp() ok en {delai}ms")
             # Mise à jour de la table
             for key in self.temps:
-                s = temperatures["sensor." + CAPTEURS[key][1]]
-                self.temps[key] = float(s)
-            try:
-                response.close()
-            except Exception as e:
-                print(f"Erreur de fermeture réponse : {e} ({type(e)})")
+                try:
+                    s = temperatures["sensor." + CAPTEURS[key][1]]
+                    self.temps[key] = float(s)
+                except ValueError:
+                    self.temps[key] = -1000.
+            if not ASK_VIA_TEMPLATE:
+                try:
+                    if response:
+                        response.close()
+                except Exception as e:
+                    print(f"Erreur de fermeture réponse : {e} ({type(e)})")
         except Exception as e:
             print(f"Lecture températures erreur {e} ({type(e)})")
 
@@ -135,8 +149,9 @@ class Temperatures:
             if last_time == s:
                 time.sleep(0.1)
                 continue
+            last_time = s
             _, _, _, hour, minute, second, _, _ = time.gmtime(s + offset)
-            if (minute % 15) == 0 and second == 0 or first:
+            if (minute % DEMANDE) == 0 and second == 0 or first:
                 first = False
                 for k, v in self.temps.items():
                     self.tendance[k] = v
