@@ -7,7 +7,7 @@ from requests import get, post
 from touch import Button
 
 from myapp.secret import headers
-from myapp.utils import PRISES, Color, get_api
+from myapp.utils import PRISES, Color, get_api, get_switches
 
 OFFSET = 70
 
@@ -76,8 +76,11 @@ class Switch:
         except Exception:
             pass
 
-    def display_switch(self):
-        self.state = self.get_state(True)
+    def display_switch(self, state=None):
+        if state is None:
+            self.state = self.get_state(True)
+        else:
+            self.state = state
         self.display.set_pen(Color.GREY)
         self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
         self.display.set_pen(Color.GREEN if self.state else Color.GREY)
@@ -119,7 +122,7 @@ class Switches:
         ligne = 0
         for label, name in sorted(PRISES.items()):
             try:
-                state = initiale_state["switch." + name] == "on"
+                state = initiale_state["switch." + name]
             except KeyError:
                 state = None
             self.switches[label] = Switch(display, vector, label, ligne, state)
@@ -169,8 +172,10 @@ class Switches:
     def update_screen(self):
         self.display.set_pen(Color.BLACK)
         self.display.clear()
+        states = get_switches()
         for switch in self.switches:
-            self.switches[switch].display_switch()
+            self.switches[switch].display_switch(states["switch." +
+                                                        PRISES[switch]])
         self.display.set_pen(Color.CYAN)
         self.vector.draw(self.btn_exit)
         self.display.set_pen(Color.BLACK)
@@ -183,7 +188,7 @@ class Switches:
         self.update_screen()
         cmpt = 1
         while True:
-            # t_start = time.ticks_ms()
+            t_start = time.ticks_ms()
             self.touch.poll()
             if self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)
@@ -193,5 +198,5 @@ class Switches:
                 self.update_screen()
             cmpt += 1
             time.sleep(0.1)
-            # t_end = time.ticks_ms()
-            # print(f"Boucle : {t_end - t_start}ms")
+            t_delai = time.ticks_ms() - t_start
+            print(f"Boucle : {t_delai}ms")

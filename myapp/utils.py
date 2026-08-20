@@ -194,7 +194,7 @@ def wifi_connect(presto, loggin=None):
         indice = (indice + 1) % len(CONFIG)
 
 
-def get_all_states():
+def get_all_states_old():
     global FILTRES
     FILTRES = ["sensor." + v[1] for v in CAPTEURS.values()]
     FILTRES += ["switch." + v for v in PRISES.values()]
@@ -257,7 +257,7 @@ def get_switches():
     return result
 
 
-def get_all_states_t():
+def get_all_states():
     states = get_temperatures()
     states |= get_switches()
     return states

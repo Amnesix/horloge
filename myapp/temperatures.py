@@ -26,13 +26,15 @@ class Temperatures:
         self.t_orange = display.create_pen(132, 92, 32)
         self.t_rouge = display.create_pen(132, 32, 32)
         self.t_violet = display.create_pen(132, 32, 132)
-        try:
-            self.temps = {
-                k: float(initiale_states["sensor." + v[1]])
-                for k, v in CAPTEURS.items()
-            }
-        except KeyError:
-            self.temps = {k: -1000. for k in CAPTEURS}
+        for k, v in CAPTEURS.items():
+            try:
+                self.temps[k] = float(initiale_states["sensor." + v[1]])
+            except KeyError:
+                self.temps = {k: -1000. for k in CAPTEURS}
+            except ValueError:
+                self.temps[k] = -1000.
+            except Exception as e:
+                print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
         self.tendance = {k: v for k, v in self.temps.items()}
 
