@@ -166,7 +166,6 @@ class Switches:
             except Exception:
                 pass
         except Exception:
-            # print(f"Erreur get : {err}")
             result = None
 
     def update_screen(self):
@@ -188,7 +187,6 @@ class Switches:
         self.update_screen()
         cmpt = 1
         while True:
-            t_start = time.ticks_ms()
             self.touch.poll()
             if self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)
@@ -198,5 +196,3 @@ class Switches:
                 self.update_screen()
             cmpt += 1
             time.sleep(0.1)
-            t_delai = time.ticks_ms() - t_start
-            print(f"Boucle : {t_delai}ms")

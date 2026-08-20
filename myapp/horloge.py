@@ -165,6 +165,9 @@ class Horloge:
         ret = False
         self.touch.poll()
         if self.touch.state:
+            # On attend le relaché...
+            while self.touch.state:
+                self.touch.poll()
             x, y = self.touch.x, self.touch.y
             if 0 <= x < 64 and 0 <= y < 64:
                 self.switches.affiche()
@@ -194,7 +197,6 @@ class Horloge:
             offset = 3600 * TZ.get_offset(s)
             year, month, day, hour, minute, second, wd, _ = time.gmtime(s +
                                                                         offset)
-
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue

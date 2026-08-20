@@ -135,7 +135,7 @@ class Calendar:
         self.month = self.nm
         self.mday = d  # Utilisé pour la surbrillance de la date courante
         self.calendar = monthly_calendar(self.year, self.month)
-        self.color_we = display.create_pen(108, 108, 108)
+        self.color_we = display.create_pen(118, 118, 118)
         # Initialisation de l'affichage
 
     def set_year(self, year):
@@ -154,7 +154,6 @@ class Calendar:
         self.display.rectangle(12, 70, 460, 354)
         self.display.rectangle(13, 71, 458, 352)
         self.display.set_pen(Color.GREY)
-        #self.display.rectangle(14, 72, 456, 350)
         self.display.rectangle(14, 72, 355, 350)
         self.display.set_pen(self.color_we)
         self.display.rectangle(356, 72, 114, 350)
@@ -193,7 +192,7 @@ class Calendar:
                         else:
                             self.display.set_pen(Color.BLACK)
                     else:
-                        self.display.set_pen(Color.DARKGREY)
+                        self.display.set_pen(Color.LIGHTGREY)
                 l = int((50 - self.vector.measure_text(s)[2]) // 2)
                 self.vector.text(s, x + l, y)
                 x += 57
