@@ -160,26 +160,34 @@ class Horloge:
         # self.calendar.affiche()
 
     def gere_touch(self):
+
+        def wait_for_release():
+            while self.touch.state:
+                self.touch.poll()
+
         ret = False
         self.touch.poll()
         if self.touch.state:
             # On attend le relaché...
-            while self.touch.state:
-                self.touch.poll()
             x, y = self.touch.x, self.touch.y
             if 0 <= x < 64 and 0 <= y < 64:
+                wait_for_release()
                 self.switches.affiche()
                 ret = True
             elif 416 <= x < 480 and 0 <= y < 64:
+                wait_for_release()
                 self.temperatures.affiche()
                 ret = True
             elif 200 <= x <= 280 and 200 <= y <= 280:
+                wait_for_release()
                 self.flip.affiche()
                 ret = True
             elif self.btn_date.is_pressed():
+                wait_for_release()
                 self.calendar.affiche()
                 ret = True
             elif self.btn_test.is_pressed():
+                wait_for_release()
                 self.tests.affiche()
                 ret = True
         return ret
@@ -207,7 +215,8 @@ class Horloge:
             self.display.clear()
             self.display.set_pen(Color.CYAN)
             self.vector.draw(self.contour)
-            if hour == 11 and minute == 59 and second in (40, 42, 44):
+            if ((hour == 11 and minute == 59) or
+                (hour == 17 and minute == 14)) and second in (40, 42, 44):
                 self.display.set_pen(Color.RED)
             else:
                 self.display.set_pen(Color.LIGHTYELLOW)
