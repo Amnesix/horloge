@@ -77,7 +77,7 @@ class Switch:
             pass
 
     def display_switch(self, state=None):
-        if state is None:
+        if state is None or state:
             self.state = self.get_state(True)
         else:
             self.state = state
