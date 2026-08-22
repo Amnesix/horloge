@@ -230,7 +230,9 @@ class Calendar:
             if last_time == s:
                 time.sleep(0.1)
                 continue
-            _, _, _, hour, minute, second, _, _ = time.gmtime(s + offset)
+            self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(
+                s + offset)
+            self.mday = d
             heure = f"{hour:02d}:{minute:02d}:{second:02d}"
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(96, 430, 304, 479)
