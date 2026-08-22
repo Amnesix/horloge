@@ -6,6 +6,7 @@ import time
 from picovector import Polygon
 from touch import Button
 
+from myapp.mqtt import check_msg
 from myapp.utils import (
     CAPTEURS,
     JOURS,
@@ -37,6 +38,7 @@ class Horloge:
         tr,
         touch,
         flip,
+        mqtt,
         temperatures,
         switches,
         calendar,
@@ -49,6 +51,7 @@ class Horloge:
         self.tr = tr
         self.touch = touch
         self.flip = flip
+        self.mqtt = mqtt
         self.temperatures = temperatures
         self.switches = switches
         self.calendar = calendar
@@ -207,8 +210,11 @@ class Horloge:
                 time.sleep_ms(10)
                 continue
             self.last_second = second
-            if (minute % 15) == 0 and second == 0:
-                self.temperatures.maj_temp()
+            # if (minute % 15) == 0 and second == 0:
+            #     self.temperatures.maj_temp()
+
+            # self.mqtt.check_msg()
+            check_msg()
 
             self.tr.reset()
             self.display.set_pen(Color.BLACK)
@@ -314,8 +320,7 @@ class Horloge:
             ok = True
             for key in self.key_sw:
                 if ok:
-                    state = self.switches.get_state(key, second
-                                                    in (1, 16, 31, 46))
+                    state = self.switches.get_state(key, False)
                 else:
                     state = None
                 if state is None:

@@ -6,6 +6,7 @@ from picovector import Polygon
 from requests import get, post
 from touch import Button
 
+from myapp.mqtt import set_callback
 from myapp.secret import headers
 from myapp.utils import PRISES, Color, get_api, get_switches
 
@@ -18,7 +19,7 @@ class Switch:
         self.display = display
         self.vector = vector
         self.label = label
-        self.api = get_api()
+        self.api = get_api()[0]
         self.switch = PRISES[label]
         self.capteur = "switch." + self.switch
         self.ligne = ligne
@@ -63,6 +64,9 @@ class Switch:
                 pass
         except Exception:
             pass
+
+    def update_state(self, state):
+        self.state = state == 'on'
 
     def toggle(self):
         url = self.api + "services/switch/toggle"
@@ -114,7 +118,7 @@ class Switches:
         self.display = display
         self.vector = vector
         self.touch = touch
-        self.api = get_api()
+        self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
         self.btn_exit = Polygon()
         self.btn_exit.rectangle(*self.btnReturn.bounds,
@@ -128,6 +132,7 @@ class Switches:
             self.switches[label] = Switch(display, vector, label, ligne, state)
             self.capteurs.append(self.switches[label].capteur)
             ligne += 1
+        set_callback(self.update_state)
 
     def on_click(self):
         """Retourne True si au moins un bouton cliqué"""
@@ -135,6 +140,9 @@ class Switches:
         for switch in self.switches:
             ok |= self.switches[switch].on_click()
         return ok
+
+    def update_state(self, switch, state):
+        self.switches[switch].update_state(state)
 
     def get_state(self, switch, last):
         return self.switches[switch].get_state(last)

@@ -1,10 +1,11 @@
 import datetime
+import math
 import time
 
 import ntptime
 from requests import get, post
 
-from myapp.secret import APIHA, CONFIG, headers
+from myapp.secret import APIHA, CONFIG, MQTT_DISTANT, headers
 
 RETRAITE = datetime.date(2029, 7, 1)
 
@@ -36,7 +37,7 @@ MOIS = (
 CAPTEURS = {
     "_dehors": ("Extérieur", "th_dehors_temperature"),
     "bureau": ("Bureau", "th_bureau_temperature"),
-    "cyril": ("Chambre Cyril", "ewelink_th01_temperature"),
+    "cyril": ("Chambre Cyril", "th_cyril_temperature"),
     "buandrie": ("Arrière cuisine", "th_arriere_cuisine_temperature"),
     "cuisine": ("Cuisine", "th_cuisine_temperature"),
     "diane": ("Chambre Diane", "th_diane_temperature"),
@@ -58,7 +59,7 @@ PRISES = {
 SENSOR_to_CAPTEURS = {
     "sensor.th_dehors_temperature": "_dehors",
     "sensor.th_bureau_temperature": "bureau",
-    "sensor.ewelink_th01_temperature": "cyril",
+    "sensor.th_cyril_temperature": "cyril",
     "sensor.th_arriere_cuisine_temperature": "buandrie",
     "sensor.th_cuisine_temperature": "cuisine",
     "sensor.th_diane_temperature": "diane",
@@ -105,15 +106,17 @@ FILTRES = []
 
 net_config = 0
 api = APIHA
+mqtt = MQTT_DISTANT
 
 
 def set_api(indice):
-    global api
+    global api, mqtt
     api = CONFIG[indice][2]
+    mqtt = CONFIG[indice][3]
 
 
 def get_api():
-    return api
+    return (api, mqtt)
 
 
 class Log:
@@ -292,6 +295,28 @@ class Test_Recup:
                     self.loggin.log(f"{k}: {v}")
             self.presto.update()
             time.sleep(.1)
+
+
+def get_touch(touch) -> (int, int):
+    touch.poll()
+    if touch.state:
+        xs, ys = touch.x, touch.y
+        while touch.state:
+            touch.poll()
+        dx, dy = xs - touch.x, ys - touch.y
+        if math.sqrt(dx * dx + dy * dy) > 100:
+            if abs(dx) < abs(dy):
+                if dy > 0:
+                    return (0, 1)
+                else:
+                    return (0, -1)
+            else:
+                if dx > 0:
+                    return (1, 0)
+                else:
+                    return (-1, 0)
+        else:
+            return (xs, ys)
 
 
 def update_time(loggin, show_log=True):

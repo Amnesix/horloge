@@ -3,6 +3,7 @@ import time
 
 from requests import get
 
+from myapp.mqtt import set_callback
 from myapp.secret import headers
 from myapp.utils import CAPTEURS, TZ, Color, get_api, get_temperatures
 
@@ -21,7 +22,7 @@ class Temperatures:
         self.display = display
         self.vector = vector
         self.touch = touch
-        self.api = get_api()
+        self.api = get_api()[0]
         self.t_cyan = display.create_pen(28, 132, 132)
         self.t_bleu = display.create_pen(28, 92, 132)
         self.t_vert = display.create_pen(28, 132, 32)
@@ -40,6 +41,7 @@ class Temperatures:
                 print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
         self.tendance = {k: v for k, v in self.temps.items()}
+        set_callback(self.update_temp)
 
     def get_temp(self, capteur: str) -> float:
         try:
@@ -54,6 +56,14 @@ class Temperatures:
         except Exception:
             ret = -1000.
         return ret
+
+    def update_temp(self, room, value):
+        """Mise à jour de la température via MQTT"""
+        try:
+            if room in self.temps:
+                self.temps[room] = float(value)
+        except ValueError:
+            self.temps[room] = -1000.
 
     def get_all_temp(self):
         # Récupération de tous les états
