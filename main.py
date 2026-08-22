@@ -6,7 +6,7 @@ from picovector import ANTIALIAS_BEST, PicoVector, Transform
 from myapp.calendar import Calendar
 from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
-from myapp.mqtt import mqtt_connect
+from myapp.mqtt import MQTT
 from myapp.switches import Switches
 from myapp.temperatures import Temperatures
 from myapp.utils import (
@@ -56,11 +56,11 @@ states = get_all_states()
 # Tests accessibles depuis le 'bouton' température extérieur
 tests = Test_Recup(presto, display, vector, touch, loggin)
 broker, port = get_api()[1]
-# mqtt = MQTT(broker, port, loggin)
-mqtt = mqtt_connect(broker, port, loggin)
+mqtt = MQTT(broker, port, loggin)
 # Création des différents objets
-temperatures = Temperatures(presto, display, vector, touch, loggin, states)
-switches = Switches(presto, display, vector, touch, states)
+temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
+                            states)
+switches = Switches(presto, display, vector, touch, mqtt, states)
 flip = Flip_Clock(presto, display, vector, touch)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, tests)

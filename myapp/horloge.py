@@ -6,7 +6,6 @@ import time
 from picovector import Polygon
 from touch import Button
 
-from myapp.mqtt import check_msg
 from myapp.utils import (
     CAPTEURS,
     JOURS,
@@ -206,15 +205,14 @@ class Horloge:
             offset = 3600 * TZ.get_offset(s)
             year, month, day, hour, minute, second, wd, _ = time.gmtime(s +
                                                                         offset)
+            self.mqtt.check_msg()
+
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue
             self.last_second = second
             # if (minute % 15) == 0 and second == 0:
             #     self.temperatures.maj_temp()
-
-            # self.mqtt.check_msg()
-            check_msg()
 
             self.tr.reset()
             self.display.set_pen(Color.BLACK)

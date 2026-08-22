@@ -6,7 +6,7 @@ from picovector import Polygon
 from requests import get, post
 from touch import Button
 
-from myapp.mqtt import set_callback
+# from myapp.mqtt import set_callback
 from myapp.secret import headers
 from myapp.utils import PRISES, Color, get_api, get_switches
 
@@ -113,11 +113,12 @@ class Switches:
     switches = {}
     capteurs = []
 
-    def __init__(self, presto, display, vector, touch, initiale_state):
+    def __init__(self, presto, display, vector, touch, mqtt, initiale_state):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
+        self.mqtt = mqtt
         self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
         self.btn_exit = Polygon()
@@ -132,7 +133,7 @@ class Switches:
             self.switches[label] = Switch(display, vector, label, ligne, state)
             self.capteurs.append(self.switches[label].capteur)
             ligne += 1
-        set_callback(self.update_state)
+        self.mqtt.set_callback(self.update_state)
 
     def on_click(self):
         """Retourne True si au moins un bouton cliqué"""
@@ -142,7 +143,8 @@ class Switches:
         return ok
 
     def update_state(self, switch, state):
-        self.switches[switch].update_state(state)
+        if switch in self.switches:
+            self.switches[switch].update_state(state)
 
     def get_state(self, switch, last):
         return self.switches[switch].get_state(last)
@@ -195,6 +197,7 @@ class Switches:
         self.update_screen()
         cmpt = 1
         while True:
+            self.mqtt.check_msg()
             self.touch.poll()
             if self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)

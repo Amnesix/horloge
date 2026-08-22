@@ -3,7 +3,6 @@ import time
 
 from requests import get
 
-from myapp.mqtt import set_callback
 from myapp.secret import headers
 from myapp.utils import CAPTEURS, TZ, Color, get_api, get_temperatures
 
@@ -16,12 +15,13 @@ DEMANDE = 5
 class Temperatures:
     temps = {}
 
-    def __init__(self, presto, display, vector, touch, loggin,
+    def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_states):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
+        self.mqtt = mqtt
         self.api = get_api()[0]
         self.t_cyan = display.create_pen(28, 132, 132)
         self.t_bleu = display.create_pen(28, 92, 132)
@@ -41,7 +41,7 @@ class Temperatures:
                 print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
         self.tendance = {k: v for k, v in self.temps.items()}
-        set_callback(self.update_temp)
+        self.mqtt.set_callback(self.update_temp)
 
     def get_temp(self, capteur: str) -> float:
         try:
@@ -61,6 +61,7 @@ class Temperatures:
         """Mise à jour de la température via MQTT"""
         try:
             if room in self.temps:
+                self.tendance[room] = self.temps[room]
                 self.temps[room] = float(value)
         except ValueError:
             self.temps[room] = -1000.
@@ -142,11 +143,11 @@ class Temperatures:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 28)
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
-        first = True
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         self.presto.update()
         fg = Color.GREY
+        self.maj_temp()
         while True:
             # t_start = time.ticks_ms()
             self.touch.poll()
@@ -156,42 +157,35 @@ class Temperatures:
                 return
             s = time.time()
             offset = 3600 * TZ.get_offset(s)
+            self.mqtt.check_msg()
             if last_time == s:
                 time.sleep(0.1)
                 continue
             last_time = s
             _, _, _, hour, minute, second, _, _ = time.gmtime(s + offset)
-            if (minute % DEMANDE) == 0 and second == 0 or first:
-                first = False
-                for k, v in self.temps.items():
-                    self.tendance[k] = v
-                self.maj_temp()
-                self.display.set_pen(Color.BLACK)
-                self.display.clear()
-                self.display.set_pen(fg)
-                self.vector.set_font("Roboto-Medium-With-Material-Symbols.af",
-                                     48)
-                self.vector.text("Températures", (480 - w) // 2, 50)
-                self.vector.set_font("Roboto-Medium-With-Material-Symbols.af",
-                                     32)
-                h = 1
-                for name in sorted(self.temps.keys()):
-                    temp = self.temps[name]
-                    ok = self.get_temp_color(temp)
-                    self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
-                    if ok:
-                        self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
-                        if temp < self.tendance[name]:
-                            s = f"-{self.tendance[name] - temp:.1f}°C"
-                        elif temp > self.tendance[name]:
-                            s = f"+{temp - self.tendance[name]:.1f}°C"
-                        else:
-                            s = "="
-                        self.vector.text(s, 380, h * 40 + 80)
+            self.display.set_pen(Color.BLACK)
+            self.display.clear()
+            self.display.set_pen(fg)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
+            self.vector.text("Températures", (480 - w) // 2, 50)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+            h = 1
+            for name in sorted(self.temps.keys()):
+                temp = self.temps[name]
+                ok = self.get_temp_color(temp)
+                self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
+                if ok:
+                    self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
+                    if temp < self.tendance[name]:
+                        s = f"-{self.tendance[name] - temp:.1f}°C"
+                    elif temp > self.tendance[name]:
+                        s = f"+{temp - self.tendance[name]:.1f}°C"
                     else:
-                        self.vector.text("indisponible", 256, h * 40 + 80)
-                    h += 1
-                self.presto.update()
+                        s = "="
+                    self.vector.text(s, 380, h * 40 + 80)
+                else:
+                    self.vector.text("indisponible", 256, h * 40 + 80)
+                h += 1
 
             self.display.set_pen(fg)
             self.display.line(0, 70, 479, 70)
