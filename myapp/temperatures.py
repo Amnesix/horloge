@@ -40,7 +40,8 @@ class Temperatures:
             except Exception as e:
                 print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
-        self.tendance = {k: v for k, v in self.temps.items()}
+        s = time.time()
+        self.tendance = {k: [v, s] for k, v in self.temps.items()}
         self.mqtt.set_callback(self.update_temp)
 
     def get_temp(self, capteur: str) -> float:
@@ -61,7 +62,7 @@ class Temperatures:
         """Mise à jour de la température via MQTT"""
         try:
             if room in self.temps:
-                self.tendance[room] = self.temps[room]
+                self.tendance[room] = [self.temps[room], time.time()]
                 self.temps[room] = float(value)
         except ValueError:
             self.temps[room] = -1000.
@@ -105,8 +106,9 @@ class Temperatures:
             print(f"Lecture températures erreur {e} ({type(e)})")
 
     def maj_temp(self):
+        s = time.time()
         for k, v in self.temps.items():
-            self.tendance[k] = v
+            self.tendance[k] = [v, s]
         if ASK_ALL_TEMP:
             self.get_all_temp()
         else:
@@ -176,13 +178,15 @@ class Temperatures:
                 self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
                 if ok:
                     self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
-                    if temp < self.tendance[name]:
-                        s = f"-{self.tendance[name] - temp:.1f}°C"
-                    elif temp > self.tendance[name]:
-                        s = f"+{temp - self.tendance[name]:.1f}°C"
+                    if s - self.tendance[name][1] > 60:
+                        self.tendance[name][0] = temp
+                    if temp < self.tendance[name][0]:
+                        d = f"-{self.tendance[name][0] - temp:.1f}°C"
+                    elif temp > self.tendance[name][0]:
+                        d = f"+{temp - self.tendance[name][0]:.1f}°C"
                     else:
-                        s = "="
-                    self.vector.text(s, 380, h * 40 + 80)
+                        d = "="
+                    self.vector.text(d, 380, h * 40 + 80)
                 else:
                     self.vector.text("indisponible", 256, h * 40 + 80)
                 h += 1
