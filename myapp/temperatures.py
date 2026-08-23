@@ -209,7 +209,7 @@ class Temperatures:
                         d = "="
                     self.vector.text(d, 380, h * 40 + 80)
                     """
-                    self.vector.text(f"{int(self.humidity[name])}%", 380,
+                    self.vector.text(f"{self.humidity[name]:.0f}%", 380,
                                      h * 40 + 80)
                 else:
                     self.vector.text("indisponible", 256, h * 40 + 80)
