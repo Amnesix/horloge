@@ -15,6 +15,7 @@ DEMANDE = 5
 class Temperatures:
     temps = {}
     humidity = {}
+    maj = {}
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_states):
@@ -31,7 +32,9 @@ class Temperatures:
         self.t_orange = display.create_pen(132, 92, 32)
         self.t_rouge = display.create_pen(132, 32, 32)
         self.t_violet = display.create_pen(132, 32, 132)
+        s = time.time()
         for k, v in CAPTEURS.items():
+            self.maj[k] = s
             try:
                 self.temps[k] = float(initiale_states["sensor." + v[1]])
             except KeyError:
@@ -73,6 +76,7 @@ class Temperatures:
         if "temp" not in topic:
             return
         room = self.mqtt.get_room(topic)
+        self.maj[room] = time.time()
         try:
             if room in self.temps:
                 self.tendance[room] = [self.temps[room], time.time()]
@@ -85,6 +89,7 @@ class Temperatures:
         if "humidity" not in topic:
             return
         room = self.mqtt.get_room(topic)
+        self.maj[room] = time.time()
         try:
             if room in self.humidity:
                 self.humidity[room] = float(value)
@@ -191,28 +196,33 @@ class Temperatures:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
             self.vector.text("Températures", (480 - w) // 2, 50)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-            h = 1
+            h = 3
             for name in sorted(self.temps.keys()):
                 temp = self.temps[name]
                 ok = self.get_temp_color(temp)
-                self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
+                if s - self.maj[name] < 10:
+                    self.display.circle(10, h * 40 - 10, 6)
+                self.vector.text(CAPTEURS[name][0], 30, h * 40)
                 if ok:
-                    self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
+                    self.vector.text(f"{temp:.1f}°C", 270, h * 40)
                     if s - self.tendance[name][1] > 120:
                         self.tendance[name][0] = temp
-                    """
                     if temp < self.tendance[name][0]:
-                        d = f"-{self.tendance[name][0] - temp:.1f}°C"
+                        # d = f"-{self.tendance[name][0] - temp:.1f}°C"
+                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10)
+                        self.display.line(370, h * 40 - 10, 380, h * 40)
                     elif temp > self.tendance[name][0]:
-                        d = f"+{temp - self.tendance[name][0]:.1f}°C"
+                        # d = f"+{temp - self.tendance[name][0]:.1f}°C"
+                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10)
+                        self.display.line(370, h * 40 - 10, 380, h * 40 - 20)
                     else:
-                        d = "="
-                    self.vector.text(d, 380, h * 40 + 80)
-                    """
-                    self.vector.text(f"{self.humidity[name]:.0f}%", 380,
-                                     h * 40 + 80)
+                        # d = "="
+                        self.display.line(360, h * 40 - 10, 380, h * 40 - 10)
+                    # self.vector.text(d, 380, h * 40)
+                    hu = self.humidity[name]
+                    self.vector.text(f"{hu:.0f}%", 400, h * 40)
                 else:
-                    self.vector.text("indisponible", 256, h * 40 + 80)
+                    self.vector.text("indisponible", 256, h * 40)
                 h += 1
 
             self.display.set_pen(fg)
