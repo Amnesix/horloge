@@ -4,14 +4,23 @@ from umqtt.simple import MQTTClient
 
 SOUSCRIPTIONS = {
     # Températures
-    "home/temps/dehors": "_dehors",
+    "home/temp/dehors": "_dehors",
     "home/temp/buandrie": "buandrie",
     "home/temp/bureau": "bureau",
     "home/temp/cuisine": "cuisine",
     "home/temp/cyril": "cyril",
-    "home/temps/diane": "diane",
-    "home/temps/parent": "parents",
+    "home/temp/douche": "douche",
+    "home/temp/parent": "parents",
     "home/temp/salon": "salon",
+    # Humidité
+    "home/humidity/dehors": "_dehors",
+    "home/humidity/buandrie": "buandrie",
+    "home/humidity/bureau": "bureau",
+    "home/humidity/cuisine": "cuisine",
+    "home/humidity/cyril": "cyril",
+    "home/humidity/douche": "douche",
+    "home/humidity/parent": "parents",
+    "home/humidity/salon": "salon",
     # IUnterrupteurs
     "home/switch/ventilo": "Ventilo",
     "home/switch/pipmcnet": "RPi",
@@ -46,7 +55,7 @@ class MQTT:
 
     def mqtt_callback(self, topic, msg):
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
-        topic = SOUSCRIPTIONS[topic.decode()]
+        topic = topic.decode()
         msg = msg.decode('utf-8')
         # print(f"Received message on topic {topic}: {msg}")
         for fct in self.callbacks:
@@ -54,6 +63,9 @@ class MQTT:
                 fct(topic, msg)
             except Exception as e:
                 print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
+
+    def get_room(self, topic):
+        return SOUSCRIPTIONS[topic]
 
     def check_msg(self):
         try:

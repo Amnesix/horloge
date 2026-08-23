@@ -51,7 +51,7 @@ loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 
 # Initialistion des objets
 calendar = Calendar(presto, display, vector, touch)
-states = get_all_states()
+initiale_states = get_all_states()
 # print(states)
 # Tests accessibles depuis le 'bouton' température extérieur
 tests = Test_Recup(presto, display, vector, touch, loggin)
@@ -59,8 +59,8 @@ broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
-                            states)
-switches = Switches(presto, display, vector, touch, mqtt, states)
+                            initiale_states)
+switches = Switches(presto, display, vector, touch, mqtt, initiale_states)
 flip = Flip_Clock(presto, display, vector, touch)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, tests)

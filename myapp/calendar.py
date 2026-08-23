@@ -128,15 +128,17 @@ class Calendar:
         self.display = display
         self.vector = vector
         self.touch = touch
-        s = time.time()
-        offset = 3600 * TZ.get_offset(s)
-        self.ny, self.nm, d, _, _, _, _, _ = time.gmtime(s + offset)
+        self.color_we = display.create_pen(118, 118, 118)
+        # Initialisation de l'affichage
+        self.init_calendar(time.time())
+
+    def init_calendar(self, s):
+        self.offset = 3600 * TZ.get_offset(s)
+        self.ny, self.nm, d, _, _, _, _, _ = time.gmtime(s + self.offset)
         self.year = self.ny
         self.month = self.nm
         self.mday = d  # Utilisé pour la surbrillance de la date courante
         self.calendar = monthly_calendar(self.year, self.month)
-        self.color_we = display.create_pen(118, 118, 118)
-        # Initialisation de l'affichage
 
     def set_year(self, year):
         self.year = year
@@ -202,6 +204,7 @@ class Calendar:
     def affiche(self):
         while self.touch.state:
             self.touch.poll()
+            self.init_date()
         self.draw_calendar()
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
@@ -226,13 +229,15 @@ class Calendar:
                         self.set_month(self.month - 1)
                 self.draw_calendar()
             s = time.time()
-            offset = 3600 * TZ.get_offset(s)
+            self.offset = 3600 * TZ.get_offset(s)
             if last_time == s:
                 time.sleep(0.1)
                 continue
             self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(
-                s + offset)
-            self.mday = d
+                s + self.offset)
+            if self.mday != d:
+                self.init_calendar(s)
+            # Affichage de l'heure
             heure = f"{hour:02d}:{minute:02d}:{second:02d}"
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(96, 430, 304, 479)

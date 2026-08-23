@@ -35,14 +35,16 @@ MOIS = (
 )
 
 CAPTEURS = {
-    "_dehors": ("Extérieur", "th_dehors_temperature"),
-    "bureau": ("Bureau", "th_bureau_temperature"),
-    "cyril": ("Chambre Cyril", "th_cyril_temperature"),
-    "buandrie": ("Arrière cuisine", "th_arriere_cuisine_temperature"),
-    "cuisine": ("Cuisine", "th_cuisine_temperature"),
-    "diane": ("Chambre Diane", "th_diane_temperature"),
-    "parents": ("Chambre parents", "th_parent_temperature"),
-    "salon": ("Salon", "th_salon_temperature"),
+    "_dehors": ("Extérieur", "th_dehors_temperature", "th_dehors_humidity"),
+    "bureau": ("Bureau", "th_bureau_temperature", "th_bureau_humidity"),
+    "cyril": ("Chambre Cyril", "th_cyril_temperature", "th_cyril_humidity"),
+    "buandrie": ("Arrière cuisine", "th_arriere_cuisine_temperature",
+                 "th_arriere_cuisine_humidity"),
+    "cuisine": ("Cuisine", "th_cuisine_temperature", "th_cuisine_humidity"),
+    "douche": ("Douche", "th_douche_temperature", "th_douche_humidity"),
+    "parents":
+    ("Chambre parents", "th_parent_temperature", "th_parent_humidity"),
+    "salon": ("Salon", "th_salon_temperature", "th_salon_humidity"),
 }
 
 # Dictionnaires de PRISES connectées
@@ -62,9 +64,20 @@ SENSOR_to_CAPTEURS = {
     "sensor.th_cyril_temperature": "cyril",
     "sensor.th_arriere_cuisine_temperature": "buandrie",
     "sensor.th_cuisine_temperature": "cuisine",
-    "sensor.th_diane_temperature": "diane",
+    "sensor.th_douche_temperature": "douche",
     "sensor.th_parent_temperature": "parents",
     "sensor.th_salon_temperature": "salon",
+}
+
+HUMIDITY_to_CAPTEURS = {
+    "sensor.th_dehors_humidity": "_dehors",
+    "sensor.th_bureau_humidity": "bureau",
+    "sensor.th_cyril_humidity": "cyril",
+    "sensor.th_arriere_cuisine_humidity": "buandrie",
+    "sensor.th_cuisine_humidity": "cuisine",
+    "sensor.th_douche_humidity": "douche",
+    "sensor.th_parent_humidity": "parents",
+    "sensor.th_salon_humidity": "salon",
 }
 
 # Dictionnaires de PRISES connectées
@@ -82,6 +95,18 @@ template_temperatures = """
 [
 {% for s in states.sensor
    if s.attributes.device_class == 'temperature' %}
+  {
+    "entity_id": {{ s.entity_id | tojson }},
+    "state": {{ s.state | tojson }},
+    "attributes": {{ s.attributes | tojson }}
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
+]
+"""
+template_humidities = """
+[
+{% for s in states.sensor
+   if s.attributes.device_class == 'humidity' %}
   {
     "entity_id": {{ s.entity_id | tojson }},
     "state": {{ s.state | tojson }},
@@ -238,6 +263,7 @@ def get_states(template):
 
 
 def get_temperatures():
+    """Récupération des températures"""
     result = {}
     states = get_states(template_temperatures)
     for state in states:
@@ -248,7 +274,20 @@ def get_temperatures():
     return result
 
 
+def get_humidities():
+    """Récupération des températures"""
+    result = {}
+    states = get_states(template_humidities)
+    for state in states:
+        temp = state['state']
+        result[state[
+            'entity_id']] = "Non valide" if temp == "unavailable" else float(
+                temp)
+    return result
+
+
 def get_switches():
+    """Récupération de l'état des switches"""
     result = {}
     states = get_states(template_switch)
     for state in states:
@@ -259,7 +298,9 @@ def get_switches():
 
 
 def get_all_states():
+    """Récupération initiale des switches et des températures"""
     states = get_temperatures()
+    states |= get_humidities()
     states |= get_switches()
     return states
 
@@ -345,6 +386,9 @@ def update_time(loggin, show_log=True):
 
 
 class TZ:
+    """Classe minimaliste permettant de connaitre le 
+    décalage horraire sur le fuseau de Paris en
+    tenant compte de l'heure d'été."""
     _ready = False
     start = None
     end = None
@@ -372,6 +416,7 @@ class TZ:
     @classmethod
     def dst_start(cls, year):
         last_sun_march = 31
+        # Rechercher le dernier dimanche du mois de mars
         for day in range(31, 24, -1):
             if (time.localtime(time.mktime(
                 (year, 3, day, 2, 0, 0, 0, 0, 0)))[6] == 6):  # dimanche
@@ -382,6 +427,7 @@ class TZ:
     @classmethod
     def dst_end(cls, year):
         last_sun_oct = 31
+        # Rechercher le dernier dimanche du mois d'octobre
         for day in range(31, 24, -1):
             if time.localtime(time.mktime(
                 (year, 10, day, 3, 0, 0, 0, 0, 0)))[6] == 6:

@@ -14,6 +14,7 @@ DEMANDE = 5
 
 class Temperatures:
     temps = {}
+    humidity = {}
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_states):
@@ -39,10 +40,19 @@ class Temperatures:
                 self.temps[k] = -1000.
             except Exception as e:
                 print(f"Exception non gérée {e}")
+            try:
+                self.humidity[k] = float(initiale_states["sensor." + v[2]])
+            except KeyError:
+                self.humidity = {k: 0 for k in CAPTEURS}
+            except ValueError:
+                self.humidity[k] = 0
+            except Exception as e:
+                print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
         s = time.time()
         self.tendance = {k: [v, s] for k, v in self.temps.items()}
         self.mqtt.set_callback(self.update_temp)
+        self.mqtt.set_callback(self.update_humidity)
 
     def get_temp(self, capteur: str) -> float:
         try:
@@ -58,8 +68,11 @@ class Temperatures:
             ret = -1000.
         return ret
 
-    def update_temp(self, room, value):
+    def update_temp(self, topic, value):
         """Mise à jour de la température via MQTT"""
+        if "temp" not in topic:
+            return
+        room = self.mqtt.get_room(topic)
         try:
             if room in self.temps:
                 self.tendance[room] = [self.temps[room], time.time()]
@@ -67,12 +80,22 @@ class Temperatures:
         except ValueError:
             self.temps[room] = -1000.
 
+    def update_humidity(self, topic, value):
+        """Mise à jour de la température via MQTT"""
+        if "humidity" not in topic:
+            return
+        room = self.mqtt.get_room(topic)
+        try:
+            if room in self.humidity:
+                self.humidity[room] = float(value)
+        except ValueError:
+            self.humidity[room] = 0
+
     def get_all_temp(self):
         # Récupération de tous les états
         # Cette solution est peut-être plus lente. À vérifier.
         response = None
         try:
-            # t_start = time.ticks_ms()
             if ASK_VIA_TEMPLATE:
                 temperatures = get_temperatures()
             else:
@@ -86,9 +109,6 @@ class Temperatures:
                     for s in all_states if s["entity_id"] in
                     ["sensor." + w[1] for w in CAPTEURS.values()]
                 }
-            # t_end = time.ticks_ms()
-            # delai = t_end - t_start
-            # print(f"get_all_temp() ok en {delai}ms")
             # Mise à jour de la table
             for key in self.temps:
                 try:
@@ -115,8 +135,8 @@ class Temperatures:
             for k in CAPTEURS:
                 self.temps[k] = self.get_temp(k)
 
-    def to_str(self, capteur):
-        return f"{self.temps[capteur]:.1f}°C"
+    """def to_str(self, capteur):
+        return f"{self.temps[capteur]:.1f}°C" """
 
     def get_temp_color(self, temp):
         ret = True
@@ -149,7 +169,7 @@ class Temperatures:
         self.display.clear()
         self.presto.update()
         fg = Color.GREY
-        self.maj_temp()
+        # self.maj_temp()
         while True:
             # t_start = time.ticks_ms()
             self.touch.poll()
@@ -178,8 +198,9 @@ class Temperatures:
                 self.vector.text(CAPTEURS[name][0], 10, h * 40 + 80)
                 if ok:
                     self.vector.text(f"{temp:.1f}°C", 256, h * 40 + 80)
-                    if s - self.tendance[name][1] > 60:
+                    if s - self.tendance[name][1] > 120:
                         self.tendance[name][0] = temp
+                    """
                     if temp < self.tendance[name][0]:
                         d = f"-{self.tendance[name][0] - temp:.1f}°C"
                     elif temp > self.tendance[name][0]:
@@ -187,6 +208,9 @@ class Temperatures:
                     else:
                         d = "="
                     self.vector.text(d, 380, h * 40 + 80)
+                    """
+                    self.vector.text(f"{int(self.humidity[name])}%", 380,
+                                     h * 40 + 80)
                 else:
                     self.vector.text("indisponible", 256, h * 40 + 80)
                 h += 1
