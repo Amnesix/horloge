@@ -205,19 +205,25 @@ class Temperatures:
                 self.vector.text(CAPTEURS[name][0], 30, h * 40)
                 if ok:
                     self.vector.text(f"{temp:.1f}°C", 270, h * 40)
-                    if s - self.tendance[name][1] > 120:
-                        self.tendance[name][0] = temp
+                    # if s - self.tendance[name][1] > 120:
+                    #     self.tendance[name][0] = temp
+                    thickness = 2
                     if temp < self.tendance[name][0]:
                         # d = f"-{self.tendance[name][0] - temp:.1f}°C"
-                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10)
-                        self.display.line(370, h * 40 - 10, 380, h * 40)
+                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10,
+                                          thickness)
+                        self.display.line(370, h * 40 - 10, 380, h * 40 - 3,
+                                          thickness)
                     elif temp > self.tendance[name][0]:
                         # d = f"+{temp - self.tendance[name][0]:.1f}°C"
-                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10)
-                        self.display.line(370, h * 40 - 10, 380, h * 40 - 20)
+                        self.display.line(360, h * 40 - 10, 370, h * 40 - 10,
+                                          thickness)
+                        self.display.line(370, h * 40 - 10, 380, h * 40 - 17,
+                                          thickness)
                     else:
                         # d = "="
-                        self.display.line(360, h * 40 - 10, 380, h * 40 - 10)
+                        self.display.line(360, h * 40 - 10, 380, h * 40 - 10,
+                                          thickness)
                     # self.vector.text(d, 380, h * 40)
                     hu = self.humidity[name]
                     self.vector.text(f"{hu:.0f}%", 400, h * 40)
