@@ -142,7 +142,8 @@ class Switches:
             ok |= self.switches[switch].on_click()
         return ok
 
-    def update_state(self, switch, state):
+    def update_state(self, topic, state):
+        switch = self.mqtt.get_room(topic)
         if switch in self.switches:
             self.switches[switch].update_state(state)
 
