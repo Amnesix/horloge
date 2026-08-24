@@ -396,12 +396,14 @@ def update_time(loggin, show_log=True):
 
 
 class Page:
+    """Gestion des pages"""
     page = 'horloge'
 
     @classmethod
     def set_page(cls, page):
         if page in ('horloge', 'calendrier', 'flip', 'switches',
-                    'temperatures', 'tests'):
+                    'temperatures', 'tests', 'exit'):
+            print(f"Reconnaissance commande : {page}")
             cls.page = page
 
 

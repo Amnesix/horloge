@@ -188,16 +188,17 @@ class Temperatures:
         while True:
             # t_start = time.ticks_ms()
             verifier_connexion(self.presto, self.loggin)
+            self.mqtt.check_msg()
             if Page.page != "temperatures":
                 return
             self.touch.poll()
             if self.touch.state and self.touch.y > 64:
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
+                Page.set_page('horloge')
                 return
             s = time.time()
             offset = 3600 * TZ.get_offset(s)
-            self.mqtt.check_msg()
             if last_time == s:
                 time.sleep(0.1)
                 continue

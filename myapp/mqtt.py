@@ -2,7 +2,7 @@ import time
 
 from umqtt.simple import MQTTClient
 
-from myapp.utils import Page
+from myapp.utils import Color, Page, verifier_connexion
 
 SOUSCRIPTIONS = {
     # Températures
@@ -60,11 +60,14 @@ class MQTT:
     def set_callback(self, fct):
         self.callbacks.append(fct)
 
+    def remove_callback(self, fct):
+        self.callbacks.remove(fct)
+
     def mqtt_callback(self, topic, msg):
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
-        # print(f"Received message on topic {topic}: {msg}")
+        print(f"Received message on topic {topic}: {msg}")
         for fct in self.callbacks:
             try:
                 fct(topic, msg)
@@ -73,7 +76,7 @@ class MQTT:
 
     def mqtt_commandes(self, topic, msg):
         if 'command' in topic:
-            print(f"Réception topic={topic} msg='{msg}'")
+            # print(f"Réception topic={topic} msg='{msg}'")
             if msg in ('calendrier', 'flip', 'switches', 'temperatures',
                        'tests', 'exit', 'horloge'):
                 Page.set_page(msg)
@@ -89,3 +92,38 @@ class MQTT:
             self.connect()
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")
+
+
+class MQTTLog:
+
+    def __init__(self, presto, display, vector, touch, mqtt, loggin):
+        self.presto = presto
+        self.display = display
+        self.vector = vector
+        self.touch = touch
+        self.mqtt = mqtt
+        self.loggin = loggin
+        self.display.set_pen(Color.BLACK)  # Black background
+        self.display.clear()
+        self.presto.update()
+
+    def cb(self, topic, msg):
+        self.loggin.log(f"Reception : {topic} / {msg}")
+
+    def affiche(self):
+        print("Enter tests")
+        self.mqtt.set_callback(self.cb)
+        while True:
+            verifier_connexion(self.presto, self.loggin)
+            self.mqtt.check_msg()
+            if Page.page != 'tests':
+                self.mqtt.remove_callback(self.cb)
+                return
+            try:
+                # Wait for MQTT messages (non-blocking check)
+                self.mqtt.check_msg()
+
+            except Exception as e:
+                print(f"Error while waiting for MQTT messages: {e}")
+
+            time.sleep(.5)

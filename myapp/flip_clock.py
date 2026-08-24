@@ -31,11 +31,12 @@ class Flip_Clock:
     CX, CY = 240, 240
     dark = False
 
-    def __init__(self, presto, display, vector, touch):
+    def __init__(self, presto, display, vector, touch, mqtt):
         self.display = display
         self.presto = presto
         self.vector = vector
         self.touch = touch
+        self.mqtt = mqtt
 
         # Make background as a button (so you can tap anywhere), used to switch between dark/light mode
         self.bg = Button(0, 360, self.WIDTH, self.HEIGHT)
@@ -230,12 +231,14 @@ class Flip_Clock:
     def affiche(self):
         time.sleep(1)
         while True:
+            self.mqtt.check_msg()
             if Page.page != 'flip':
                 return
             self.touch.poll()
             if self.bg.is_pressed():
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
+                Page.set_page('horloge')
                 return
             self.draw()
             time.sleep(1)

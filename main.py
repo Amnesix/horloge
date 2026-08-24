@@ -6,7 +6,7 @@ from picovector import ANTIALIAS_BEST, PicoVector, Transform
 from myapp.calendar import Calendar
 from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
-from myapp.mqtt import MQTT
+from myapp.mqtt import MQTT, MQTTLog
 from myapp.switches import Switches
 from myapp.temperatures import Temperatures
 from myapp.utils import (
@@ -14,7 +14,6 @@ from myapp.utils import (
     Color,
     Log,
     Page,
-    Test_Recup,
     get_all_states,
     get_api,
     update_time,
@@ -51,29 +50,26 @@ y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
 loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 
 # Initialistion des objets
-calendar = Calendar(presto, display, vector, touch, loggin)
-initiale_states = get_all_states()
-# print(states)
-# Tests accessibles depuis le 'bouton' température extérieur
-tests = Test_Recup(presto, display, vector, touch, loggin)
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
-#mqtt.set_callback(mqtt.mqtt_commandes)
+calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
+initiale_states = get_all_states()
+tests = MQTTLog(presto, display, vector, touch, mqtt, loggin)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
                             initiale_states)
 switches = Switches(presto, display, vector, touch, mqtt, loggin,
                     initiale_states)
-flip = Flip_Clock(presto, display, vector, touch)
+flip = Flip_Clock(presto, display, vector, touch, mqtt)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, tests)
 
 # Lancement de l'affichage principal
 while True:
-    print(Page.page)
+    print(f"> {Page.page}")
     if Page.page == 'horloge':
         horloge.affiche()
-    if Page.page == 'calendrier':
+    elif Page.page == 'calendrier':
         calendar.affiche()
     elif Page.page == 'flip':
         flip.affiche()
@@ -86,5 +82,9 @@ while True:
     elif Page.page == 'exit':
         break
 
+print("The end")
+display.set_pen(Color.BLACK)
+display.clear()
+presto.update()
 mqtt.disconnect()
-presto.wifi.diconnect()
+# presto.wifi.disconnect()

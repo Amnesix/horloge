@@ -123,11 +123,12 @@ def monthly_calendar(year, month):
 
 class Calendar:
 
-    def __init__(self, presto, display, vector, touch, loggin):
+    def __init__(self, presto, display, vector, touch, mqtt, loggin):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
+        self.mqtt = mqtt
         self.loggin = loggin
         self.color_we = display.create_pen(118, 118, 118)
         # Initialisation de l'affichage
@@ -211,11 +212,13 @@ class Calendar:
         last_time = 0
         while True:
             verifier_connexion(self.presto, self.loggin)
+            self.mqtt.check_msg()
             if Page.page != 'calendrier':
                 return
             self.touch.poll()
             if self.touch.state:
                 if self.touch.y > 400:
+                    Page.set_page('horloge')
                     return
                 xs, ys = self.touch.x, self.touch.y
                 while self.touch.state:

@@ -176,29 +176,30 @@ class Horloge:
             x, y = self.touch.x, self.touch.y
             if 0 <= x < 64 and 0 <= y < 64:
                 wait_for_release()
-                self.switches.affiche()
+                Page.set_page('switches')
                 ret = True
             elif 416 <= x < 480 and 0 <= y < 64:
                 wait_for_release()
-                self.temperatures.affiche()
+                Page.set_page('temperatures')
                 ret = True
             elif 200 <= x <= 280 and 200 <= y <= 280:
                 wait_for_release()
-                self.flip.affiche()
+                Page.set_page('flip')
                 ret = True
             elif self.btn_date.is_pressed():
                 wait_for_release()
-                self.calendar.affiche()
+                Page.set_page('calendrier')
                 ret = True
             elif self.btn_test.is_pressed():
                 wait_for_release()
-                self.tests.affiche()
+                Page.set_page('tests')
                 ret = True
         return ret
 
     def affiche(self):
         while True:
             verifier_connexion(self.presto, self.loggin)
+            self.mqtt.check_msg()
             if Page.page != 'horloge':
                 return
             if self.gere_touch():
@@ -210,8 +211,6 @@ class Horloge:
             offset = 3600 * TZ.get_offset(s)
             year, month, day, hour, minute, second, wd, _ = time.gmtime(s +
                                                                         offset)
-            self.mqtt.check_msg()
-
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue
