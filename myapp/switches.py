@@ -8,7 +8,7 @@ from touch import Button
 
 # from myapp.mqtt import set_callback
 from myapp.secret import headers
-from myapp.utils import PRISES, Color, get_api, get_switches
+from myapp.utils import PRISES, Color, get_api
 
 OFFSET = 70
 
@@ -61,9 +61,9 @@ class Switch:
             try:
                 response.close()
             except Exception:
-                pass
+                self.state = None
         except Exception:
-            pass
+            self.state = None
 
     def update_state(self, state):
         self.state = state == 'on'
@@ -76,15 +76,11 @@ class Switch:
             try:
                 response.close()
             except Exception:
-                pass
+                self.state = None
         except Exception:
-            pass
+            self.state = None
 
-    def display_switch(self, state=None):
-        if state is None or state:
-            self.state = self.get_state(True)
-        else:
-            self.state = state
+    def display_switch(self):
         self.display.set_pen(Color.GREY)
         self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
         self.display.set_pen(Color.GREEN if self.state else Color.GREY)
@@ -182,10 +178,8 @@ class Switches:
     def update_screen(self):
         self.display.set_pen(Color.BLACK)
         self.display.clear()
-        states = get_switches()
         for switch in self.switches:
-            self.switches[switch].display_switch(states["switch." +
-                                                        PRISES[switch]])
+            self.switches[switch].display_switch()
         self.display.set_pen(Color.CYAN)
         self.vector.draw(self.btn_exit)
         self.display.set_pen(Color.BLACK)
