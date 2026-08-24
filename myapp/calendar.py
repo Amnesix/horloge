@@ -202,9 +202,9 @@ class Calendar:
         self.presto.update()
 
     def affiche(self):
+        self.init_calendar(time.time())
         while self.touch.state:
             self.touch.poll()
-            self.init_date()
         self.draw_calendar()
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
