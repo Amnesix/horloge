@@ -2,9 +2,11 @@
 
 Cette application utilise HomeAssistant pour récupérer des informations de température et gérer des interrupteurs connectés. Affichage par défaut d'une horloge analogique avec date et température extérieur et intérieur ainsi que le nombre de jours restant avant ma retraite.
 
-J'ai démarré ce code à partir d'un exemple d'horloge récupéré sur le github du presto et tout redéfini sous forme de classes.
+J'ai démarré ce code à partir d'un exemple d'horloge récupéré sur le github du pimoroni presto et tout redéfini sous forme de classes.
 
 La date sert de bouton pour afficher le calendrier et le centre de l'horloge pour afficher une autre forme d'horloge. C'est basique mais bien pratique pour le moment. Cela devrait évoluer plus tard.
+
+Les états (températures, switches) sont récupérés via des messages MQTT. Il est donc nécessaire d'installer un broker MQTT. Je suis parti sur Mosquitto installé dans un docker. Cf [Eclipse Mosquitto](https://mosquitto.org) / [docker eclipse-mosquitto](https://hub.docker.com/_/eclipse-mosquitto/)
 
 ## Configuration
 Créer le fichier `myapp/secret.py` avec le contenu suivant :
