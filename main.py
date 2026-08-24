@@ -13,6 +13,7 @@ from myapp.utils import (
     TZ,
     Color,
     Log,
+    Page,
     Test_Recup,
     get_all_states,
     get_api,
@@ -50,20 +51,40 @@ y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
 loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 
 # Initialistion des objets
-calendar = Calendar(presto, display, vector, touch)
+calendar = Calendar(presto, display, vector, touch, loggin)
 initiale_states = get_all_states()
 # print(states)
 # Tests accessibles depuis le 'bouton' température extérieur
 tests = Test_Recup(presto, display, vector, touch, loggin)
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
+#mqtt.set_callback(mqtt.mqtt_commandes)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
                             initiale_states)
-switches = Switches(presto, display, vector, touch, mqtt, initiale_states)
+switches = Switches(presto, display, vector, touch, mqtt, loggin,
+                    initiale_states)
 flip = Flip_Clock(presto, display, vector, touch)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, tests)
 
 # Lancement de l'affichage principal
-horloge.affiche()
+while True:
+    print(Page.page)
+    if Page.page == 'horloge':
+        horloge.affiche()
+    if Page.page == 'calendrier':
+        calendar.affiche()
+    elif Page.page == 'flip':
+        flip.affiche()
+    elif Page.page == 'switches':
+        switches.affiche()
+    elif Page.page == 'temperatures':
+        temperatures.affiche()
+    elif Page.page == 'tests':
+        tests.affiche()
+    elif Page.page == 'exit':
+        break
+
+mqtt.disconnect()
+presto.wifi.diconnect()

@@ -4,7 +4,7 @@ import time
 from picovector import Polygon
 from touch import Button
 
-from myapp.utils import TZ, Color
+from myapp.utils import TZ, Color, Page
 
 # Constants
 MONTHS = (
@@ -22,7 +22,8 @@ MONTHS = (
     "NOVE",
     "DECE",
 )
-DAYS = ("LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE")
+DAYS = ("LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI",
+        "DIMANCHE")
 
 
 class Flip_Clock:
@@ -109,7 +110,8 @@ class Flip_Clock:
         )
 
         self.month_box_width = 200
-        self.day_box_x = (self.WIDTH - self.small_box_size - self.month_box_width) // 2
+        self.day_box_x = (self.WIDTH - self.small_box_size -
+                          self.month_box_width) // 2
         self.day_box_y = self.week_day_box_y + self.small_box_size + margin * 2
         self.day_box = Polygon()
         self.day_box.rectangle(
@@ -162,8 +164,7 @@ class Flip_Clock:
 
         s = time.time()
         _, month, day, hour, minute, _, week_day, _ = time.localtime(
-            s + TZ.get_offset(s) * 3600
-        )
+            s + TZ.get_offset(s) * 3600)
 
         self.display.set_pen(Color.BLACK)
         self.vector.set_font("Roboto-Bold.af", 150)
@@ -173,15 +174,16 @@ class Flip_Clock:
         hour_text = f"{hour}"
         _, _, hour_text_width, _ = self.vector.measure_text(hour_text)
         hour_text_x = self.hour_box_x + (
-            (self.big_box_size - int(hour_text_width)) // 2
-        )
-        self.vector.text(hour_text, hour_text_x, self.hour_box_y + text_offset_y)
+            (self.big_box_size - int(hour_text_width)) // 2)
+        self.vector.text(hour_text, hour_text_x,
+                         self.hour_box_y + text_offset_y)
 
         minute_text = f"{minute:02d}"
         _, _, minute_text_width, _ = self.vector.measure_text(minute_text)
         self.vector.text(
             minute_text,
-            self.minute_box_x + ((self.big_box_size - int(minute_text_width)) // 2),
+            self.minute_box_x +
+            ((self.big_box_size - int(minute_text_width)) // 2),
             self.minute_box_y + text_offset_y,
         )
 
@@ -192,8 +194,8 @@ class Flip_Clock:
         _, _, week_day_text_width, _ = self.vector.measure_text(week_day_text)
         self.vector.text(
             week_day_text,
-            self.week_day_box_x
-            + ((self.week_day_box_width - int(week_day_text_width)) // 2),
+            self.week_day_box_x +
+            ((self.week_day_box_width - int(week_day_text_width)) // 2),
             self.week_day_box_y + text_offset_y,
         )
 
@@ -201,7 +203,8 @@ class Flip_Clock:
         _, _, day_text_width, _ = self.vector.measure_text(day_text)
         self.vector.text(
             day_text,
-            self.day_box_x + ((self.small_box_size - int(day_text_width)) // 2),
+            self.day_box_x +
+            ((self.small_box_size - int(day_text_width)) // 2),
             self.day_box_y + text_offset_y,
         )
 
@@ -209,7 +212,8 @@ class Flip_Clock:
         _, _, month_text_width, _ = self.vector.measure_text(month_text)
         self.vector.text(
             month_text,
-            self.month_box_x + ((self.month_box_width - int(month_text_width)) // 2),
+            self.month_box_x +
+            ((self.month_box_width - int(month_text_width)) // 2),
             self.month_box_y + text_offset_y,
         )
 
@@ -226,6 +230,8 @@ class Flip_Clock:
     def affiche(self):
         time.sleep(1)
         while True:
+            if Page.page != 'flip':
+                return
             self.touch.poll()
             if self.bg.is_pressed():
                 self.display.set_pen(Color.BLACK)

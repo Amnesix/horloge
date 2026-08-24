@@ -1,6 +1,6 @@
 import time
 
-from myapp.utils import MOIS, TZ, Color
+from myapp.utils import MOIS, TZ, Color, Page, verifier_connexion
 
 
 def is_leap_year(year):
@@ -123,11 +123,12 @@ def monthly_calendar(year, month):
 
 class Calendar:
 
-    def __init__(self, presto, display, vector, touch):
+    def __init__(self, presto, display, vector, touch, loggin):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
+        self.loggin = loggin
         self.color_we = display.create_pen(118, 118, 118)
         # Initialisation de l'affichage
         self.init_calendar(time.time())
@@ -209,6 +210,9 @@ class Calendar:
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
         while True:
+            verifier_connexion(self.presto, self.loggin)
+            if Page.page != 'calendrier':
+                return
             self.touch.poll()
             if self.touch.state:
                 if self.touch.y > 400:

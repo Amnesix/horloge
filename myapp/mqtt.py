@@ -2,6 +2,8 @@ import time
 
 from umqtt.simple import MQTTClient
 
+from myapp.utils import Page
+
 SOUSCRIPTIONS = {
     # Températures
     "home/temp/dehors": "_dehors",
@@ -21,13 +23,15 @@ SOUSCRIPTIONS = {
     "home/humidity/douche": "douche",
     "home/humidity/parent": "parents",
     "home/humidity/salon": "salon",
-    # IUnterrupteurs
+    # Interrupteurs
     "home/switch/ventilo": "Ventilo",
     "home/switch/pipmcnet": "RPi",
     "home/switch/sapin": "Buandrie",
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
+    # Tests
+    "home/commandes": "-"
 }
 
 
@@ -38,6 +42,7 @@ class MQTT:
         self.client_id = f"MQTT-HA-{time.time() % 10**6}"
         self.client = MQTTClient(self.client_id, broker, port=port)
         self.client.set_callback(self.mqtt_callback)
+        self.set_callback(self.mqtt_commandes)
         self.connect()
         loggin.log(f"Connected to MQTT at {broker}.")
 
@@ -65,6 +70,13 @@ class MQTT:
                 fct(topic, msg)
             except Exception as e:
                 print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
+
+    def mqtt_commandes(self, topic, msg):
+        if 'command' in topic:
+            print(f"Réception topic={topic} msg='{msg}'")
+            if msg in ('calendrier', 'flip', 'switches', 'temperatures',
+                       'tests', 'exit', 'horloge'):
+                Page.set_page(msg)
 
     def get_room(self, topic):
         return SOUSCRIPTIONS[topic]

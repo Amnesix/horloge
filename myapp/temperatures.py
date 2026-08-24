@@ -4,7 +4,15 @@ import time
 from requests import get
 
 from myapp.secret import headers
-from myapp.utils import CAPTEURS, TZ, Color, get_api, get_temperatures
+from myapp.utils import (
+    CAPTEURS,
+    TZ,
+    Color,
+    Page,
+    get_api,
+    get_temperatures,
+    verifier_connexion,
+)
 
 ASK_ALL_TEMP = True
 ASK_VIA_TEMPLATE = True
@@ -24,6 +32,7 @@ class Temperatures:
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.loggin = loggin
         self.api = get_api()[0]
         self.t_cyan = display.create_pen(28, 132, 132)
         self.t_bleu = display.create_pen(28, 92, 132)
@@ -178,6 +187,9 @@ class Temperatures:
         # self.maj_temp()
         while True:
             # t_start = time.ticks_ms()
+            verifier_connexion(self.presto, self.loggin)
+            if Page.page != "temperatures":
+                return
             self.touch.poll()
             if self.touch.state and self.touch.y > 64:
                 self.display.set_pen(Color.BLACK)

@@ -181,7 +181,7 @@ class Log:
 def wifi_connect(presto, loggin=None):
     global net_config
 
-    def test_connexion():
+    def teste_connexion():
         # Pourquoi ça tombe régulièrement en timeout ?
         if not presto.wifi.isconnected():
             if loggin:
@@ -213,11 +213,21 @@ def wifi_connect(presto, loggin=None):
             )"""
             if loggin is not None:
                 loggin.log(f"IP : {presto.wifi.ipv4()}")
-            test_connexion()
+            teste_connexion()
             return
         if loggin is not None:
             loggin.log(f" * SSID={CONFIG[indice][0]} : NOK", nl=False)
         indice = (indice + 1) % len(CONFIG)
+
+
+def verifier_connexion(presto, loggin):
+    """En cas de perte de connexion, tentative de reconnexion"""
+    if not presto.wifi.isconnected():
+        loggin.log("Perte de connexion !")
+        loggin.log("Nouvelle tentative de connexion...")
+        wifi_connect(presto, loggin)
+        return True
+    return False
 
 
 def get_all_states_old():
@@ -383,6 +393,16 @@ def update_time(loggin, show_log=True):
                 s += " : OK"
                 loggin.log(s, nl=False)
             return
+
+
+class Page:
+    page = 'horloge'
+
+    @classmethod
+    def set_page(cls, page):
+        if page in ('horloge', 'calendrier', 'flip', 'switches',
+                    'temperatures', 'tests'):
+            cls.page = page
 
 
 class TZ:

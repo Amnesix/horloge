@@ -8,7 +8,7 @@ from touch import Button
 
 # from myapp.mqtt import set_callback
 from myapp.secret import headers
-from myapp.utils import PRISES, Color, get_api
+from myapp.utils import PRISES, Color, Page, get_api, verifier_connexion
 
 OFFSET = 70
 
@@ -109,12 +109,14 @@ class Switches:
     switches = {}
     capteurs = []
 
-    def __init__(self, presto, display, vector, touch, mqtt, initiale_state):
+    def __init__(self, presto, display, vector, touch, mqtt, loggin,
+                 initiale_state):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.loggin = loggin
         self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
         self.btn_exit = Polygon()
@@ -192,6 +194,9 @@ class Switches:
         self.update_screen()
         cmpt = 1
         while True:
+            verifier_connexion(self.presto, self.loggin)
+            if Page.page != 'switches':
+                return
             self.mqtt.check_msg()
             self.touch.poll()
             if self.btnReturn.is_pressed():
