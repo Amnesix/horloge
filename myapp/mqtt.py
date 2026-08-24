@@ -32,7 +32,6 @@ SOUSCRIPTIONS = {
 
 
 class MQTT:
-    """ Je ne comprend pas pourquoi, mais avec la classe cela ne fonctionne pas"""
     callbacks = []
 
     def __init__(self, broker, port, loggin):
@@ -49,6 +48,9 @@ class MQTT:
                 self.client.subscribe(k)
         except OSError as e:
             print(f"Erreur de connexion : {e}")
+
+    def disconnect(self):
+        self.client.disconnect()
 
     def set_callback(self, fct):
         self.callbacks.append(fct)
@@ -72,6 +74,6 @@ class MQTT:
             self.client.check_msg()
         except OSError:
             print("Déconnexion MQTT")
-            self.connec()
+            self.connect()
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")

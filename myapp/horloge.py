@@ -14,6 +14,7 @@ from myapp.utils import (
     TZ,
     Color,
     update_time,
+    wifi_connect,
 )
 from myapp.version import __title__, __version__
 
@@ -196,6 +197,10 @@ class Horloge:
 
     def affiche(self):
         while True:
+            if not self.presto.wifi.isconnected():
+                self.loggin.log("Perte de connexion !")
+                self.loggin.log("Nouvelle tentative de connexion...")
+                wifi_connect(self.presto, self.loggin)
             if self.gere_touch():
                 continue
             t_start = time.ticks_ms()
