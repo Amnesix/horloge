@@ -16,10 +16,17 @@ headers ={
     "content-type": "application/json",
 }
 
+MQTT_LOCAL = ("IP_LOCALE", 1883)
+MQTT_DISTANT = ("IP_DISTANTE", xxxxx)
+
+# Autant d'entrée que l'on veut
 CONFIG = {
-    0: ("SSID1", "MDP1", APIHA_LOCAL, True),
-    1: ("SSID2", "MDP2", APIHA, True),
-    2: ("SSID3", "MDP3", APIHA, False),
+    0: ("SSID1", "MDP1", APIHA_LOCAL, MQTT_LOCAL),
+    1: ("SSID2", "MDP2", APIHA, MQTT_DISTANT),
+    2: ("SSID3", "MDP3", APIHA, FalseMQTT_DISTANT),
 }
 ```
-La clé d'authorisation de l'API est à générer sur HomeAssistant.
+La clé d'authorisation de l'API est à générer sur HomeAssistant : 
+ - Dans profile utilisateur (en bas à gauche, clic sur utilisateur) ;
+ - Onglet Sécurité ;
+ - En bas de page, clic sur Créer un jeton.
