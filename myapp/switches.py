@@ -15,9 +15,10 @@ OFFSET = 70
 
 class Switch:
 
-    def __init__(self, display, vector, label, ligne, initiale_state):
+    def __init__(self, display, vector, mqtt, label, ligne, initiale_state):
         self.display = display
         self.vector = vector
+        self.mqtt = mqtt
         self.label = label
         self.api = get_api()[0]
         self.switch = PRISES[label]
@@ -69,6 +70,9 @@ class Switch:
         self.state = state == 'on'
 
     def toggle(self):
+        """print(f"toggle {self.label}")
+        self.mqtt.send_msg(self.label, "")
+        """
         url = self.api + "services/switch/toggle"
         data = {"entity_id": "switch." + self.switch}
         try:
@@ -94,6 +98,9 @@ class Switch:
             time.sleep(0.1)
 
     def on_click(self):
+        """self.toggle()
+        return True
+        """
         if self.on.is_pressed() and not self.state:
             self.set_state(True)
             # self.wait_for_status(True)
@@ -128,7 +135,8 @@ class Switches:
                 state = initiale_state["switch." + name]
             except KeyError:
                 state = None
-            self.switches[label] = Switch(display, vector, label, ligne, state)
+            self.switches[label] = Switch(display, vector, mqtt, label, ligne,
+                                          state)
             self.capteurs.append(self.switches[label].capteur)
             ligne += 1
         self.mqtt.set_callback(self.update_state)

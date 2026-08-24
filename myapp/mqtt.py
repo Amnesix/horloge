@@ -34,6 +34,15 @@ SOUSCRIPTIONS = {
     "home/commandes": "-"
 }
 
+TOGGLE = {
+    "RPi": "home/toggle/ventilo",
+    "Bouche": "home/toggle/ventilo",
+    "Cuisine": "home/toggle/ventilo",
+    "Ventilo": "home/toggle/ventilo",
+    "Buandrie": "home/toggle/ventilo",
+    "Multimedia": "home/toggle/ventilo",
+}
+
 
 class MQTT:
     callbacks = []
@@ -57,6 +66,10 @@ class MQTT:
     def disconnect(self):
         self.client.disconnect()
 
+    def send_msg(self, what, msg):
+        print(f"Send {what}")
+        self.client.publish(TOGGLE[what], msg)
+
     def set_callback(self, fct):
         self.callbacks.append(fct)
 
@@ -75,11 +88,10 @@ class MQTT:
                 print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
 
     def mqtt_commandes(self, topic, msg):
-        if 'command' in topic:
-            # print(f"Réception topic={topic} msg='{msg}'")
-            if msg in ('calendrier', 'flip', 'switches', 'temperatures',
-                       'tests', 'exit', 'horloge'):
-                Page.set_page(msg)
+        if 'command' in topic and msg in ('calendrier', 'flip', 'switches',
+                                          'temperatures', 'tests', 'exit',
+                                          'horloge'):
+            Page.set_page(msg)
 
     def get_room(self, topic):
         return SOUSCRIPTIONS[topic]
