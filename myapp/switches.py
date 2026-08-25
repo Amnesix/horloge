@@ -15,9 +15,11 @@ OFFSET = 70
 
 class Switch:
 
-    def __init__(self, display, vector, mqtt, label, ligne, initiale_state):
+    def __init__(self, display, vector, touch, mqtt, label, ligne,
+                 initiale_state):
         self.display = display
         self.vector = vector
+        self.touch = touch
         self.mqtt = mqtt
         self.label = label
         self.api = get_api()[0]
@@ -70,9 +72,6 @@ class Switch:
         self.state = state == 'on'
 
     def toggle(self):
-        """print(f"toggle {self.label}")
-        self.mqtt.send_msg(self.label, "")
-        """
         url = self.api + "services/switch/toggle"
         data = {"entity_id": "switch." + self.switch}
         try:
@@ -98,18 +97,18 @@ class Switch:
             time.sleep(0.1)
 
     def on_click(self):
-        """self.toggle()
-        return True
-        """
-        if self.on.is_pressed() and not self.state:
-            self.set_state(True)
-            # self.wait_for_status(True)
-            return True
-        if self.off.is_pressed() and self.state:
-            self.set_state(False)
-            # self.wait_for_status(False)
-            return True
-        return False
+        ret = False
+        if self.on.is_pressed():  # and not self.state:
+            print(f'on_click(on) : {ret}')
+            self.mqtt.send_msg(self.label, "")
+            # self.set_state(True)
+            ret = True
+        elif self.off.is_pressed():  # and self.state:
+            print(f'on_click(off) : {ret}')
+            self.mqtt.send_msg(self.label, "")
+            # self.set_state(False)
+            ret = True
+        return ret
 
 
 class Switches:
@@ -135,8 +134,8 @@ class Switches:
                 state = initiale_state["switch." + name]
             except KeyError:
                 state = None
-            self.switches[label] = Switch(display, vector, mqtt, label, ligne,
-                                          state)
+            self.switches[label] = Switch(display, vector, touch, mqtt, label,
+                                          ligne, state)
             self.capteurs.append(self.switches[label].capteur)
             ligne += 1
         self.mqtt.set_callback(self.update_state)
@@ -146,6 +145,9 @@ class Switches:
         ok = False
         for switch in self.switches:
             ok |= self.switches[switch].on_click()
+        while self.touch.state:
+            time.sleep(.1)
+            self.touch.poll()
         return ok
 
     def update_state(self, topic, state):

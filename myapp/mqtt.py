@@ -34,13 +34,13 @@ SOUSCRIPTIONS = {
     "home/commandes": "-"
 }
 
-TOGGLE = {
-    "RPi": "home/toggle/ventilo",
-    "Bouche": "home/toggle/ventilo",
-    "Cuisine": "home/toggle/ventilo",
+TOPIC_MSG = {
+    "RPi": "home/toggle/rpi",
+    "Douche": "home/toggle/douche",
+    "Cuisine": "home/toggle/cuisine",
     "Ventilo": "home/toggle/ventilo",
-    "Buandrie": "home/toggle/ventilo",
-    "Multimedia": "home/toggle/ventilo",
+    "Buandrie": "home/toggle/buandrie",
+    "Multimédia": "home/toggle/multimedia",
 }
 
 
@@ -67,8 +67,11 @@ class MQTT:
         self.client.disconnect()
 
     def send_msg(self, what, msg):
-        print(f"Send {what}")
-        self.client.publish(TOGGLE[what], msg)
+        print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
+        try:
+            self.client.publish(TOPIC_MSG[what], msg)
+        except KeyError:
+            print(f"Erreur de clé send_msg({what}, {msg})")
 
     def set_callback(self, fct):
         self.callbacks.append(fct)

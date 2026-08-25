@@ -1,0 +1,124 @@
+Automation:
+  # Publication des changements de température
+  - alias: Pubier température via MQTT
+    description: ""
+    triggers:
+      - entity_id:
+          - sensor.th_arriere_cuisine_temperature
+          - sensor.th_bureau_temperature
+          - sensor.th_cuisine_temperature
+          - sensor.th_cyril_temperature
+          - sensor.th_dehors_temperature
+          - sensor.th_douche_temperature
+          - sensor.th_parent_temperature
+          - sensor.th_salon_temperature
+        trigger: state
+    actions:
+      - data:
+          topic: >-
+            {% if trigger.entity_id == 'sensor.th_arriere_cuisine_temperature' %}
+            home/temp/buandrie {% elif trigger.entity_id ==
+            'sensor.th_bureau_temperature' %} home/temp/bureau {% elif
+            trigger.entity_id == 'sensor.th_cuisine_temperature' %}
+            home/temp/cuisine {% elif trigger.entity_id ==
+            'sensor.th_cyril_temperature' %} home/temp/cyril {% elif
+            trigger.entity_id == 'sensor.th_dehors_temperature' %} home/temp/dehors
+            {% elif trigger.entity_id == 'sensor.th_douche_temperature' %}
+            home/temp/douche {% elif trigger.entity_id ==
+            'sensor.th_parent_temperature' %} home/temp/parent {% elif
+            trigger.entity_id == 'sensor.th_salon_temperature' %} home/temp/salon {%
+            endif %}
+          payload: "{{ states(trigger.entity_id)\_}}"
+          retain: true
+        action: mqtt.publish
+    mode: parallel
+
+  # Publication des changements d'humidité
+  - alias: Publier humidité via MQTT
+    description: ""
+    triggers:
+      - entity_id:
+          - sensor.th_bureau_humidity
+          - sensor.th_cuisine_humidity
+          - sensor.th_arriere_cuisine_humidity
+          - sensor.th_cyril_humidity
+          - sensor.th_dehors_humidity
+          - sensor.th_douche_humidity
+          - sensor.th_parent_humidity
+          - sensor.th_salon_humidity
+        trigger: state
+    conditions: []
+    actions:
+      - data:
+          topic: >-
+            {% if trigger.entity_id == 'sensor.th_arriere_cuisine_humidity' %} home/humidity/buandrie
+            {% elif trigger.entity_id == 'sensor.th_bureau_humidity' %} home/humidity/bureau
+            {% elif trigger.entity_id == 'sensor.th_cuisine_humidity' %} home/humidity/cuisine
+            {% elif trigger.entity_id == 'sensor.th_cyril_humidity' %} home/humidity/cyril
+            {% elif trigger.entity_id == 'sensor.th_dehors_humidity' %} home/humidity/dehors
+            {% elif trigger.entity_id == 'sensor.th_douche_humidity' %} home/humidity/douche
+            {% elif trigger.entity_id == 'sensor.th_parent_humidity' %} home/humidity/parent
+            {% elif trigger.entity_id == 'sensor.th_salon_humidity' %} home/humidity/salon
+            {% endif %}
+          payload: "{{ states(trigger.entity_id) }}"
+          retain: true
+        action: mqtt.publish
+    mode: parallel
+
+  # Publication de l'état des switches
+  - alias: Publier état des switches via MQTT
+    description: ""
+    triggers:
+      - entity_id:
+          - switch.pipmc_net_194_socket_1
+          - switch.antela_prise_intelligente_2_socket_1
+          - switch.sapin_socket_1
+          - switch.multimedia_salon_socket_1
+          - switch.prise_connectee
+          - switch.sonoff_s60zbtpf
+        trigger: state
+    actions:
+      - data:
+          topic: >-
+            {% if trigger.entity_id == 'switch.pipmc_net_194_socket_1' %} home/switch/pipmcnet
+            {% elif trigger.entity_id == 'switch.antela_prise_intelligente_2_socket_1' %} home/switch/ventilo
+            {% elif trigger.entity_id == 'switch.sapin_socket_1' %} home/switch/sapin
+            {% elif trigger.entity_id == 'switch.multimedia_salon_socket_1' %} home/switch/multimedia
+            {% elif trigger.entity_id == 'switch.prise_connectee' %} home/switch/cuisine
+            {% elif trigger.entity_id == 'switch.sonoff_s60zbtpf' %} home/switch/douche
+            {% endif %}
+          payload: "{{ states(trigger.entity_id) }}"
+          retain: true
+        action: mqtt.publish
+    mode: parallel
+
+  # Commandes des switches
+  - alias: Bascule interrupteurs via MQTT
+    description: Commandes des interrupteurs connectés
+    triggers:
+      - trigger: mqtt
+        topic: home/toggle/ventilo
+      - trigger: mqtt
+        topic: home/toggle/rpi
+      - trigger: mqtt
+        topic: home/toggle/multimedia
+      - trigger: mqtt
+        topic: home/toggle/cuisine
+      - trigger: mqtt
+        topic: home/toggle/douche
+      - trigger: mqtt
+        topic: home/toggle/buandrie
+    actions:
+      - action: switch.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: >-
+            {% if trigger.topic == home/toggle/ventilo %} switch.antela_prise_intelligente_2_socket_1
+            {% elif trigger.topic == home/toggle/rpi %} switch.pipmc_net_194_socket_1
+            {% elif trigger.topic == home/toggle/multimedia %} switch.multimedia_salon_socket_1
+            {% elif trigger.topic == home/toggle/cuisine %} switch.prise_connectee
+            {% elif trigger.topic == home/toggle/douche %} switch.sonoff_s60zbtpf
+            {% elif trigger.topic == home/toggle/buandrie %} switch.sapin_socket_1
+            {% endif %}
+    mode: parallel
