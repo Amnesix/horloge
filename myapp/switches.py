@@ -99,13 +99,11 @@ class Switch:
     def on_click(self):
         ret = False
         if self.on.is_pressed():  # and not self.state:
-            print(f'on_click(on) : {ret}')
-            self.mqtt.send_msg(self.label, "")
+            self.mqtt.send_msg(self.label, "on")
             # self.set_state(True)
             ret = True
         elif self.off.is_pressed():  # and self.state:
-            print(f'on_click(off) : {ret}')
-            self.mqtt.send_msg(self.label, "")
+            self.mqtt.send_msg(self.label, "off")
             # self.set_state(False)
             ret = True
         return ret

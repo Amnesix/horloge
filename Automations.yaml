@@ -92,7 +92,7 @@ Automation:
         action: mqtt.publish
     mode: parallel
 
-  # Commandes des switches
+  # Commandes des switches - Ne fonctionne pas. Pourquoi ?
   - alias: Bascule interrupteurs via MQTT
     description: Commandes des interrupteurs connectés
     triggers:
@@ -122,3 +122,30 @@ Automation:
             {% elif trigger.topic == home/toggle/buandrie %} switch.sapin_socket_1
             {% endif %}
     mode: parallel
+
+# Commandes individuelles des switch - Exemple pour buandrie :
+alias: Buandrie on
+description: ""
+triggers:
+  - trigger: mqtt
+    topic: home/toggle/buandrie
+    payload: "on"
+conditions: []
+actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.sapin_socket_1
+mode: single
+---
+alias: Buandrie off
+description: ""
+triggers:
+  - trigger: mqtt
+    topic: home/toggle/buandrie
+    payload: "off"
+conditions: []
+actions:
+  - action: switch.turn_off
+    target:
+      entity_id: switch.sapin_socket_1
+mode: single
