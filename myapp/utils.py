@@ -403,7 +403,6 @@ class Page:
     def set_page(cls, page):
         if page in ('horloge', 'calendrier', 'flip', 'switches',
                     'temperatures', 'tests', 'exit'):
-            print(f"Reconnaissance commande : {page}")
             cls.page = page
 
 
