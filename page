@@ -1,0 +1,1 @@
+mosquitto_pub -h 36cny6j6.fbxos.fr -p 51883 -t home/commandes -m $1

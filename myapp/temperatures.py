@@ -211,7 +211,9 @@ class Temperatures:
             self.vector.text("Températures", (480 - w) // 2, 50)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
             h = 3
-            for name in sorted(self.temps.keys()):
+            for name in sorted(self.temps.keys(),
+                               key=lambda a: self.temps[a],
+                               reverse=True):
                 temp = self.temps[name]
                 ok = self.get_temp_color(temp)
                 if s - self.maj[name] < 10:
