@@ -152,7 +152,7 @@ class MQTTLog:
             verifier_connexion(self.presto, self.loggin)
             data = get_touch(self.touch)
             if data is not None:
-                dx, dy = data
+                dx, _ = data
                 if dx < 0:
                     Page.set_page('horloge')
                     return
@@ -160,12 +160,12 @@ class MQTTLog:
                 if Page.page != 'mqttlogs':
                     # self.mqtt.remove_callback(self.cb)
                     return
-                try:
-                    # Wait for MQTT messages (non-blocking check)
-                    self.mqtt.check_msg()
+            try:
+                # Wait for MQTT messages (non-blocking check)
+                self.mqtt.check_msg()
 
-                except Exception as e:
-                    print(f"Error while waiting for MQTT messages: {e}")
+            except Exception as e:
+                print(f"Error while waiting for MQTT messages: {e}")
 
             time.sleep(.1)
             self.display.set_pen(Color.BLACK)
