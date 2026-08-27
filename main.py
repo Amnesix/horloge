@@ -34,7 +34,6 @@ vector.set_transform(t)
 vector.set_antialiasing(ANTIALIAS_BEST)
 Color.init(display)
 loggin = Log(presto, display, vector, f"{__title__} - {__version__}")
-loggin.log("Lancement application")
 loggin.log("Connexion Wifi en cours...")
 
 # bg = Color.BLACK
@@ -52,9 +51,9 @@ loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 # Initialistion des objets
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
+mqttlogs = MQTTLog(presto, display, vector, touch, mqtt)
 calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
 initiale_states = get_all_states()
-mqttlogs = MQTTLog(presto, display, vector, touch, mqtt)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
                             initiale_states)
@@ -65,6 +64,7 @@ horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, mqttlogs)
 
 # Lancement de l'affichage principal
+loggin.log("Lancement boucle de traitement")
 while True:
     if Page.page == 'horloge':
         horloge.affiche()

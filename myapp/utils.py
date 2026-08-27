@@ -163,13 +163,20 @@ class Log:
     def set_title(self, title):
         self.title = title
 
-    def log(self, msg, nl=True):
+    def log(self, msg, color=None, nl=True, aff=True):
+        if color is None:
+            color = Color.GREY
         if nl:
-            self.msg.append(msg)
+            self.msg.append((msg, color))
             if len(self.msg) >= 19:
                 self.msg.pop(0)
         else:
-            self.msg[-1] = msg
+            # Remplace le dernier message
+            self.msg[-1] = (msg, color)
+        if aff:
+            self.update_screen()
+
+    def update_screen(self):
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         self.display.set_pen(Color.GREY)
@@ -177,7 +184,8 @@ class Log:
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         for line in range(len(self.msg)):
-            self.vector.text(self.msg[line], 0, (line + 2) * 25)
+            self.display.set_pen(self.msg[line][1])
+            self.vector.text(self.msg[line][0], 0, (line + 2) * 25)
         self.presto.update()
 
 
@@ -406,6 +414,8 @@ class Page:
     def set_page(cls, page):
         if page in PAGES:
             cls.page = page
+        elif page == 'next':
+            cls.page = PAGE[(PAGE.index(cls.page) + 1) % len(PAGE)]
 
 
 class TZ:

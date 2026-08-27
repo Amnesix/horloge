@@ -60,11 +60,11 @@ class Horloge:
         self.local = True
         self.mqttlogs = mqttlogs
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-        self.titre = f"{__title__} - Version {__version__}"
-        len = int(self.vector.measure_text(self.titre)[2])
-        self.loggin.log(self.titre, (WIDTH - len) // 2)
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         self.fg = Color.GREY
+        self.titre = f"{__title__} - Version {__version__}"
+        # len = int(self.vector.measure_text(self.titre)[2])
+        self.loggin.log(self.titre)  # , (WIDTH - len) // 2)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
 
         self.next_update_time = time.time() + 12 * 60 * 60
 

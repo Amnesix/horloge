@@ -2,7 +2,7 @@ import time
 
 from umqtt.simple import MQTTClient
 
-from myapp.utils import Color, Log, Page, verifier_connexion
+from myapp.utils import TZ, Color, Log, Page, verifier_connexion
 
 SOUSCRIPTIONS = {
     # Températures
@@ -107,6 +107,7 @@ class MQTT:
 
 
 class MQTTLog:
+    nb_msg = 0
 
     def __init__(self, presto, display, vector, touch, mqtt):
         self.presto = presto
@@ -115,13 +116,33 @@ class MQTTLog:
         self.touch = touch
         self.mqtt = mqtt
         self.loggin = Log(presto, display, vector, "Messages MQTT")
+        self.start = time.time()
+        self.mqtt.set_callback(self.cb)
 
     def cb(self, topic, msg):
         _, _, _, h, m, s, _, _ = time.gmtime(time.time())
-        self.loggin.log(f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}")
+        if 'temp' in topic:
+            color = Color.GREEN
+        elif 'humidity' in topic:
+            color = Color.CYAN
+        else:
+            color = Color.GREY
+        self.loggin.log(
+            f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",
+            color=color,
+            aff=(Page.page == 'mqttlogs')
+        )
+        self.nb_msg += 1
+        since = (time.time() - self.start) / 60.
+        self.display.set_pen(Color.BLACK)
+        self.display.rectangle(360, 0, 479, 28)
+        self.display.set_pen(Color.GREY)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
+        string = f"{self.nb_msg / since:.1f} msg/mn"
+        length = int(self.vector.measure_text(string)[2])
+        self.vector.text(string, 479 - length, 22)
 
     def affiche(self):
-        self.mqtt.set_callback(self.cb)
         self.display.set_pen(Color.BLACK)  # Black background
         self.display.clear()
         self.presto.update()
@@ -129,7 +150,7 @@ class MQTTLog:
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
             if Page.page != 'mqttlogs':
-                self.mqtt.remove_callback(self.cb)
+                # self.mqtt.remove_callback(self.cb)
                 return
             try:
                 # Wait for MQTT messages (non-blocking check)
@@ -138,4 +159,13 @@ class MQTTLog:
             except Exception as e:
                 print(f"Error while waiting for MQTT messages: {e}")
 
-            time.sleep(.5)
+            time.sleep(.1)
+            self.display.set_pen(Color.BLACK)
+            self.display.rectangle(0, 0, 120, 28)
+            s = time.time()
+            offset = 3600 * TZ.get_offset(s)
+            _, _, _, h, m, s, _, _ = time.gmtime(s + offset)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
+            self.display.set_pen(Color.GREY)
+            self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 0, 24)
+            self.presto.update()
