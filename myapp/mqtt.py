@@ -156,16 +156,14 @@ class MQTTLog:
                 if dx < 0:
                     Page.set_page('horloge')
                     return
-                self.mqtt.check_msg()
-                if Page.page != 'mqttlogs':
-                    # self.mqtt.remove_callback(self.cb)
-                    return
             try:
                 # Wait for MQTT messages (non-blocking check)
                 self.mqtt.check_msg()
 
             except Exception as e:
                 print(f"Error while waiting for MQTT messages: {e}")
+            if Page.page != 'mqttlogs':
+                return
 
             time.sleep(.1)
             self.display.set_pen(Color.BLACK)
