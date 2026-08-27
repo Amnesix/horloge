@@ -146,6 +146,7 @@ class MQTTLog:
         self.display.set_pen(Color.BLACK)  # Black background
         self.display.clear()
         self.presto.update()
+        self.loggin.update_screen()
         while True:
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
