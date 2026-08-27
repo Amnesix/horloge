@@ -368,17 +368,18 @@ def get_touch(touch) -> (int, int):
         dx, dy = xs - touch.x, ys - touch.y
         if math.sqrt(dx * dx + dy * dy) > 100:
             if abs(dx) < abs(dy):
-                if dy > 0:
+                if dy < 0:
                     return (0, 1)
                 else:
                     return (0, -1)
             else:
-                if dx > 0:
+                if dx < 0:
                     return (1, 0)
                 else:
                     return (-1, 0)
         else:
             return (xs, ys)
+    return None
 
 
 def update_time(loggin, show_log=True):

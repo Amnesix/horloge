@@ -173,8 +173,8 @@ class Calendar:
         self.display.set_pen(Color.GREY)
         s = f"{MOIS[self.month - 1]} {self.year}"
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
-        x = int((480 - self.vector.measure_text(s)[2]) // 2)
-        self.vector.text(s, x, 48)
+        x, y = int(250 - self.vector.measure_text(s)[2] // 2), 48
+        self.vector.text(s, x, y)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.BLACK)
         y = 110

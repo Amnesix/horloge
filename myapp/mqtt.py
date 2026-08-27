@@ -2,7 +2,7 @@ import time
 
 from umqtt.simple import MQTTClient
 
-from myapp.utils import TZ, Color, Log, Page, verifier_connexion
+from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
 
 SOUSCRIPTIONS = {
     # Températures
@@ -150,16 +150,22 @@ class MQTTLog:
         self.loggin.update_screen()
         while True:
             verifier_connexion(self.presto, self.loggin)
-            self.mqtt.check_msg()
-            if Page.page != 'mqttlogs':
-                # self.mqtt.remove_callback(self.cb)
-                return
-            try:
-                # Wait for MQTT messages (non-blocking check)
+            data = get_touch(self.touch)
+            if data is not None:
+                dx, dy = data
+                if dx < 0:
+                    Page.set_page('horloge')
+                    return
                 self.mqtt.check_msg()
+                if Page.page != 'mqttlogs':
+                    # self.mqtt.remove_callback(self.cb)
+                    return
+                try:
+                    # Wait for MQTT messages (non-blocking check)
+                    self.mqtt.check_msg()
 
-            except Exception as e:
-                print(f"Error while waiting for MQTT messages: {e}")
+                except Exception as e:
+                    print(f"Error while waiting for MQTT messages: {e}")
 
             time.sleep(.1)
             self.display.set_pen(Color.BLACK)
