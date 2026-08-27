@@ -44,7 +44,7 @@ class Horloge:
         switches,
         calendar,
         loggin,
-        tests,
+        mqttlogs,
     ):
         self.presto = presto
         self.display = display
@@ -58,7 +58,7 @@ class Horloge:
         self.calendar = calendar
         self.loggin = loggin
         self.local = True
-        self.tests = tests
+        self.mqttlogs = mqttlogs
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.titre = f"{__title__} - Version {__version__}"
         len = int(self.vector.measure_text(self.titre)[2])
@@ -192,7 +192,7 @@ class Horloge:
                 ret = True
             elif self.btn_test.is_pressed():
                 wait_for_release()
-                Page.set_page('tests')
+                Page.set_page('mqttlogs')
                 ret = True
         return ret
 

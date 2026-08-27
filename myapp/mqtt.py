@@ -2,7 +2,7 @@ import time
 
 from umqtt.simple import MQTTClient
 
-from myapp.utils import Color, Page, verifier_connexion
+from myapp.utils import Color, Log, Page, verifier_connexion
 
 SOUSCRIPTIONS = {
     # Températures
@@ -83,7 +83,6 @@ class MQTT:
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
-        print(f"Received message on topic {topic}: {msg}")
         for fct in self.callbacks:
             try:
                 fct(topic, msg)
@@ -91,9 +90,7 @@ class MQTT:
                 print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
 
     def mqtt_commandes(self, topic, msg):
-        if 'command' in topic and msg in ('calendrier', 'flip', 'switches',
-                                          'temperatures', 'tests', 'exit',
-                                          'horloge'):
+        if 'command' in topic:
             Page.set_page(msg)
 
     def get_room(self, topic):
@@ -111,27 +108,27 @@ class MQTT:
 
 class MQTTLog:
 
-    def __init__(self, presto, display, vector, touch, mqtt, loggin):
+    def __init__(self, presto, display, vector, touch, mqtt):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
-        self.loggin = loggin
+        self.loggin = Log(presto, display, vector, "Messages MQTT")
+
+    def cb(self, topic, msg):
+        _, _, _, h, m, s, _, _ = time.gmtime(time.time())
+        self.loggin.log(f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}")
+
+    def affiche(self):
+        self.mqtt.set_callback(self.cb)
         self.display.set_pen(Color.BLACK)  # Black background
         self.display.clear()
         self.presto.update()
-
-    def cb(self, topic, msg):
-        self.loggin.log(f"Reception : {topic} / {msg}")
-
-    def affiche(self):
-        print("Enter tests")
-        self.mqtt.set_callback(self.cb)
         while True:
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
-            if Page.page != 'tests':
+            if Page.page != 'mqttlogs':
                 self.mqtt.remove_callback(self.cb)
                 return
             try:

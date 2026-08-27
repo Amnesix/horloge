@@ -54,7 +54,7 @@ broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
 calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
 initiale_states = get_all_states()
-tests = MQTTLog(presto, display, vector, touch, mqtt, loggin)
+mqttlogs = MQTTLog(presto, display, vector, touch, mqtt)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
                             initiale_states)
@@ -62,11 +62,10 @@ switches = Switches(presto, display, vector, touch, mqtt, loggin,
                     initiale_states)
 flip = Flip_Clock(presto, display, vector, touch, mqtt)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
-                  switches, calendar, loggin, tests)
+                  switches, calendar, loggin, mqttlogs)
 
 # Lancement de l'affichage principal
 while True:
-    print(f"> {Page.page}")
     if Page.page == 'horloge':
         horloge.affiche()
     elif Page.page == 'calendrier':
@@ -77,8 +76,8 @@ while True:
         switches.affiche()
     elif Page.page == 'temperatures':
         temperatures.affiche()
-    elif Page.page == 'tests':
-        tests.affiche()
+    elif Page.page == 'mqttlogs':
+        mqttlogs.affiche()
     elif Page.page == 'exit':
         break
 

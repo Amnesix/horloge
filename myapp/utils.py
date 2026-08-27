@@ -80,6 +80,9 @@ HUMIDITY_to_CAPTEURS = {
     "sensor.th_salon_humidity": "salon",
 }
 
+PAGES = ('calendrier', 'flip', 'switches', 'temperatures', 'mqttlogs', 'exit',
+         'horloge')
+
 # Dictionnaires de PRISES connectées
 # Les libellés sont ceux affichés et sont succeptibles de changer.
 SWITCH_to_PRISES = {
@@ -401,8 +404,7 @@ class Page:
 
     @classmethod
     def set_page(cls, page):
-        if page in ('horloge', 'calendrier', 'flip', 'switches',
-                    'temperatures', 'tests', 'exit'):
+        if page in PAGES:
             cls.page = page
 
 
