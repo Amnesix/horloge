@@ -31,7 +31,8 @@ class Flip_Clock:
     CX, CY = 240, 240
     dark = False
 
-    def __init__(self, presto, display, vector, touch, mqtt):
+    def __init__(self, presto, display, vector, touch, mqtt, loggin):
+        loggin.log("Initialisation flip clock")
         self.display = display
         self.presto = presto
         self.vector = vector

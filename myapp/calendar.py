@@ -124,6 +124,7 @@ def monthly_calendar(year, month):
 class Calendar:
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin):
+        loggin.log("Initialisation calendrier")
         self.presto = presto
         self.display = display
         self.vector = vector
@@ -240,6 +241,7 @@ class Calendar:
             if last_time == s:
                 time.sleep(0.1)
                 continue
+            last_time = s
             self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(
                 s + self.offset)
             if self.mday != d:
@@ -249,5 +251,6 @@ class Calendar:
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(96, 430, 304, 479)
             self.display.set_pen(Color.GREY)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
             self.vector.text(heure, (480 - lh[2]) // 2, 465)
             self.presto.update()

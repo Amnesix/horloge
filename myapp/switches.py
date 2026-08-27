@@ -115,6 +115,7 @@ class Switches:
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_state):
+        loggin.log("Initialisation switches")
         self.presto = presto
         self.display = display
         self.vector = vector

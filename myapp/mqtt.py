@@ -133,14 +133,15 @@ class MQTTLog:
             aff=(Page.page == 'mqttlogs')
         )
         self.nb_msg += 1
-        since = (time.time() - self.start) / 60.
-        self.display.set_pen(Color.BLACK)
-        self.display.rectangle(360, 0, 479, 28)
-        self.display.set_pen(Color.GREY)
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
-        string = f"{self.nb_msg / since:.1f} msg/mn"
-        length = int(self.vector.measure_text(string)[2])
-        self.vector.text(string, 479 - length, 22)
+        if Page.page == 'mqttlogs':
+            since = (time.time() - self.start) / 60.
+            self.display.set_pen(Color.BLACK)
+            self.display.rectangle(360, 0, 479, 28)
+            self.display.set_pen(Color.GREY)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
+            string = f"{self.nb_msg / since:.1f} msg/mn"
+            length = int(self.vector.measure_text(string)[2])
+            self.vector.text(string, 479 - length, 22)
 
     def affiche(self):
         self.display.set_pen(Color.BLACK)  # Black background

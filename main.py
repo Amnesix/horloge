@@ -59,7 +59,7 @@ temperatures = Temperatures(presto, display, vector, touch, mqtt, loggin,
                             initiale_states)
 switches = Switches(presto, display, vector, touch, mqtt, loggin,
                     initiale_states)
-flip = Flip_Clock(presto, display, vector, touch, mqtt)
+flip = Flip_Clock(presto, display, vector, touch, mqtt, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, loggin, mqttlogs)
 

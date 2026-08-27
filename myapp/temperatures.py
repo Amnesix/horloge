@@ -27,6 +27,7 @@ class Temperatures:
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_states):
+        loggin.log("Initialisation températures")
         self.presto = presto
         self.display = display
         self.vector = vector
