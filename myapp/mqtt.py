@@ -120,7 +120,9 @@ class MQTTLog:
         self.mqtt.set_callback(self.cb)
 
     def cb(self, topic, msg):
-        _, _, _, h, m, s, _, _ = time.gmtime(time.time())
+        """CallBack messages MQTT"""
+        t = time.time()
+        _, _, _, h, m, s, _, _ = time.gmtime(t + TZ.get_offset(t) * 3600)
         if 'temp' in topic:
             color = Color.GREEN
         elif 'humidity' in topic:
@@ -153,7 +155,7 @@ class MQTTLog:
             data = get_touch(self.touch)
             if data is not None:
                 dx, _ = data
-                if dx < 0:
+                if dx > 0:
                     Page.set_page('horloge')
                     return
             try:
