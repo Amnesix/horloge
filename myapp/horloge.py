@@ -14,6 +14,7 @@ from myapp.utils import (
     TZ,
     Color,
     Page,
+    get_touch,
     update_time,
     verifier_connexion,
 )
@@ -170,30 +171,40 @@ class Horloge:
                 self.touch.poll()
 
         ret = False
-        self.touch.poll()
-        if self.touch.state:
-            # On attend le relaché...
-            x, y = self.touch.x, self.touch.y
-            if 0 <= x < 64 and 0 <= y < 64:
-                wait_for_release()
-                Page.set_page('switches')
-                ret = True
-            elif 416 <= x < 480 and 0 <= y < 64:
-                wait_for_release()
-                Page.set_page('temperatures')
-                ret = True
-            elif 200 <= x <= 280 and 200 <= y <= 280:
-                wait_for_release()
-                Page.set_page('flip')
-                ret = True
-            elif self.btn_date.is_pressed():
-                wait_for_release()
-                Page.set_page('calendrier')
-                ret = True
-            elif self.btn_test.is_pressed():
-                wait_for_release()
+        data = get_touch(self.touch)
+        if data is None:
+            return False
+        if isinstance(data, str):
+            if data == 'R':
                 Page.set_page('mqttlogs')
-                ret = True
+            elif data == 'L':
+                Page.set_page('temperatures')
+            elif data == 'U':
+                Page.set_page('switches')
+            elif data == 'D':
+                Page.set_page('calendrier')
+            return True
+        x, y = data
+        if 0 <= x < 64 and 0 <= y < 64:
+            wait_for_release()
+            Page.set_page('switches')
+            ret = True
+        elif 416 <= x < 480 and 0 <= y < 64:
+            wait_for_release()
+            Page.set_page('temperatures')
+            ret = True
+        elif 200 <= x <= 280 and 200 <= y <= 280:
+            wait_for_release()
+            Page.set_page('flip')
+            ret = True
+        elif self.btn_date.is_pressed():
+            wait_for_release()
+            Page.set_page('calendrier')
+            ret = True
+        elif self.btn_test.is_pressed():
+            wait_for_release()
+            Page.set_page('mqttlogs')
+            ret = True
         return ret
 
     def affiche(self):

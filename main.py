@@ -11,6 +11,7 @@ from myapp.switches import Switches
 from myapp.temperatures import Temperatures
 from myapp.utils import (
     TZ,
+    Alerte,
     Color,
     Log,
     Page,
@@ -47,11 +48,11 @@ s = time.time()
 offset = 3600 * TZ.get_offset(s)
 y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
 loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
-
+alerte = Alerte(presto, display, vector, touch, loggin)
 # Initialistion des objets
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
-mqttlogs = MQTTLog(presto, display, vector, touch, mqtt)
+mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte)
 calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
 initiale_states = get_all_states()
 # Création des différents objets

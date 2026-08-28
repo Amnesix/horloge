@@ -30,8 +30,9 @@ SOUSCRIPTIONS = {
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
-    # Tests
-    "home/commandes": "-"
+    # Autres
+    "home/commandes": "-",
+    "home/alert": "-",
 }
 
 TOPIC_MSG = {
@@ -109,12 +110,13 @@ class MQTT:
 class MQTTLog:
     nb_msg = 0
 
-    def __init__(self, presto, display, vector, touch, mqtt):
+    def __init__(self, presto, display, vector, touch, mqtt, alerte):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.alerte = alerte
         self.loggin = Log(presto, display, vector, "Messages MQTT")
         self.start = time.time()
         self.mqtt.set_callback(self.cb)
@@ -129,11 +131,14 @@ class MQTTLog:
             color = Color.CYAN
         else:
             color = Color.GREY
-        self.loggin.log(
-            f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",
-            color=color,
-            aff=(Page.page == 'mqttlogs')
-        )
+        if 'alert' in topic:
+            self.alerte.alerte(msg)
+        else:
+            self.loggin.log(
+                f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",
+                color=color,
+                aff=(Page.page == 'mqttlogs')
+            )
         self.nb_msg += 1
         if Page.page == 'mqttlogs':
             since = (time.time() - self.start) / 60.
@@ -153,15 +158,18 @@ class MQTTLog:
         while True:
             verifier_connexion(self.presto, self.loggin)
             data = get_touch(self.touch)
-            if data is not None:
-                dx, _ = data
-                if dx > 0:
+            if data is not None and isinstance(data, str):
+                if data == 'R':
                     Page.set_page('horloge')
-                    return
+                elif data == 'L':
+                    Page.set_page('temperatures')
+                elif data == 'U':
+                    Page.set_page('switches')
+                elif data == 'D':
+                    Page.set_page('calendrier')
             try:
                 # Wait for MQTT messages (non-blocking check)
                 self.mqtt.check_msg()
-
             except Exception as e:
                 print(f"Error while waiting for MQTT messages: {e}")
             if Page.page != 'mqttlogs':

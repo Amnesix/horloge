@@ -3,6 +3,7 @@ import math
 import time
 
 import ntptime
+from picovector import Polygon
 from requests import get, post
 
 from myapp.secret import APIHA, CONFIG, MQTT_DISTANT, headers
@@ -359,7 +360,7 @@ class Test_Recup:
             time.sleep(.1)
 
 
-def get_touch(touch) -> (int, int):
+def get_touch(touch) -> tuple[int, int] | str | None:
     touch.poll()
     if touch.state:
         xs, ys = touch.x, touch.y
@@ -369,14 +370,14 @@ def get_touch(touch) -> (int, int):
         if math.sqrt(dx * dx + dy * dy) > 100:
             if abs(dx) < abs(dy):
                 if dy < 0:
-                    return (0, 1)
+                    return 'D'
                 else:
-                    return (0, -1)
+                    return 'U'
             else:
                 if dx < 0:
-                    return (1, 0)
+                    return 'L'
                 else:
-                    return (-1, 0)
+                    return 'R'
         else:
             return (xs, ys)
     return None
@@ -506,3 +507,38 @@ class Color:
         cls.LIGHTGREY = display.create_pen(96, 96, 96)
         cls.DARKGREY = display.create_pen(64, 64, 64)
         cls._ready = True
+
+
+class Alerte:
+    message = None
+
+    def __init__(self, presto, display, vector, touch, loggin):
+        loggin.log("Initialisation alertes")
+        self.presto = presto
+        self.display = display
+        self.vector = vector
+        self.touch = touch
+        self.loggin = loggin
+        self.cadre = Polygon()
+        self.cadre.rectangle(98, 78, 284, 154)
+        self.fond = Polygon()
+        self.fond.rectangle(100, 80, 280, 150)
+
+    def alerte(self, msg):
+        self.message = msg
+        self.show()
+
+    def show(self, timeout=10):
+        # Fin de l'affichage :
+        s = time.time() + timeout
+        self.display.set_pen(Color.CYAN)
+        self.vector.draw(self.cadre)
+        self.display.set_pen(Color.LIGHTYELLOW)
+        self.vector.draw(self.fond)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+        w = self.vector.measure_text(self.message)
+        self.display.set_pen(Color.RED)
+        self.vector.text(self.message, 105, 200)
+        self.presto.update()
+        while time.time() < s:
+            time.sleep(.25)
