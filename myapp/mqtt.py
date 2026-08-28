@@ -32,7 +32,7 @@ SOUSCRIPTIONS = {
     "home/switch/douche": "Douche",
     # Autres
     "home/commandes": "-",
-    "home/alert": "-",
+    "home/alerte": "-",
 }
 
 TOPIC_MSG = {

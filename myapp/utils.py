@@ -510,7 +510,7 @@ class Color:
 
 
 class Alerte:
-    message = None
+    message = []
 
     def __init__(self, presto, display, vector, touch, loggin):
         loggin.log("Initialisation alertes")
@@ -525,7 +525,19 @@ class Alerte:
         self.fond.rectangle(100, 80, 280, 150)
 
     def alerte(self, msg):
-        self.message = msg
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+        words = msg.split()
+        self.message.clear()
+        self.message.append("")
+        len_line = 0
+        while len(words):
+            word = words.pop(0)
+            w = self.vector.measure_text(word)[2]
+            if len_line + w > 230:
+                len_line = 0
+                self.message.append("")
+            len_line += w
+            self.message[-1] += " " + word
         self.show()
 
     def show(self, timeout=10):
@@ -533,12 +545,14 @@ class Alerte:
         s = time.time() + timeout
         self.display.set_pen(Color.CYAN)
         self.vector.draw(self.cadre)
-        self.display.set_pen(Color.LIGHTYELLOW)
+        self.display.set_pen(Color.RED)
         self.vector.draw(self.fond)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-        w = self.vector.measure_text(self.message)
-        self.display.set_pen(Color.RED)
-        self.vector.text(self.message, 105, 200)
+        self.display.set_pen(Color.LIGHTYELLOW)
+        pos = 0
+        for line in self.message:
+            self.vector.text(line, 100, 110 + pos * 32)
+            pos += 1
         self.presto.update()
         while time.time() < s:
             time.sleep(.25)
