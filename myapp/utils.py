@@ -169,12 +169,12 @@ class Log:
         if color is None:
             color = Color.GREY
         if nl:
-            self.msg.append((msg, color))
+            self.msg.append((time.time(), msg, color))
             if len(self.msg) >= 19:
                 self.msg.pop(0)
         else:
             # Remplace le dernier message
-            self.msg[-1] = (msg, color)
+            self.msg[-1] = (time.time(), msg, color)
         if aff:
             self.update_screen()
 
@@ -186,9 +186,18 @@ class Log:
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         for line in range(len(self.msg)):
-            self.display.set_pen(self.msg[line][1])
-            self.vector.text(self.msg[line][0], 0, (line + 2) * 25)
+            try:
+                self.display.set_pen(self.msg[line][2])
+            except IndexError:
+                print(line, self.msg[line])
+            self.vector.text(self.msg[line][1], 0, (line + 2) * 25)
         self.presto.update()
+
+    def get_time(self, index):
+        try:
+            return self.msg[index][0]
+        except IndexError:
+            return -1
 
 
 def wifi_connect(presto, loggin=None):
