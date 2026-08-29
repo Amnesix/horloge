@@ -3,6 +3,7 @@ import time
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
+from myapp.alarmes import Alarm
 from myapp.calendar import Calendar
 from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
@@ -49,10 +50,11 @@ offset = 3600 * TZ.get_offset(s)
 y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
 loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 alerte = Alerte(presto, display, vector, touch, loggin)
+alarmes = Alarm(presto, display, vector, touch, alerte, loggin)
 # Initialistion des objets
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
-mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte)
+mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
 initiale_states = get_all_states()
 # Création des différents objets
@@ -62,7 +64,7 @@ switches = Switches(presto, display, vector, touch, mqtt, loggin,
                     initiale_states)
 flip = Flip_Clock(presto, display, vector, touch, mqtt, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
-                  switches, calendar, loggin, mqttlogs)
+                  switches, calendar, alarmes, loggin, mqttlogs)
 
 # Lancement de l'affichage principal
 loggin.log("Lancement boucle de traitement")

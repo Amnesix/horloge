@@ -33,6 +33,7 @@ SOUSCRIPTIONS = {
     # Autres
     "home/commandes": "-",
     "home/alerte": "-",
+    "home/alarme": "-"
 }
 
 TOPIC_MSG = {
@@ -110,13 +111,14 @@ class MQTT:
 class MQTTLog:
     nb_msg = 0
 
-    def __init__(self, presto, display, vector, touch, mqtt, alerte):
+    def __init__(self, presto, display, vector, touch, mqtt, alerte, alarmes):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
         self.alerte = alerte
+        self.alarmes = alarmes
         self.loggin = Log(presto, display, vector, "Messages MQTT")
         self.start = time.time()
         self.mqtt.set_callback(self.cb)
@@ -133,6 +135,15 @@ class MQTTLog:
             color = Color.GREY
         if 'alert' in topic:
             self.alerte.alerte(msg)
+        elif 'alarme' in topic:
+            try:
+                cmd, h, m, s = msg.split()
+                if cmd == 'add':
+                    self.alarmes.add_alarme(int(h), int(m), int(s))
+                elif cmd == 'del':
+                    self.alarme.remove_alarme(int(h), int(m), int(s))
+            except ValueError:
+                return
         else:
             self.loggin.log(
                 f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",

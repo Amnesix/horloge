@@ -43,6 +43,7 @@ class Horloge:
         temperatures,
         switches,
         calendar,
+        alarmes,
         loggin,
         mqttlogs,
     ):
@@ -56,6 +57,7 @@ class Horloge:
         self.temperatures = temperatures
         self.switches = switches
         self.calendar = calendar
+        self.alarmes = alarmes
         self.loggin = loggin
         self.local = True
         self.mqttlogs = mqttlogs
@@ -222,8 +224,9 @@ class Horloge:
             self.display.clear()
             self.display.set_pen(Color.CYAN)
             self.vector.draw(self.contour)
-            if ((hour == 11 and minute == 59) or
-                (hour == 17 and minute == 14)) and second in (40, 42, 44):
+            h, m, s = self.alarmes.next_alarme()
+            if hour == h and minute == m and second in (s - 6, s - 4, s - 2,
+                                                        s):
                 self.display.set_pen(Color.RED)
             else:
                 self.display.set_pen(Color.LIGHTYELLOW)
