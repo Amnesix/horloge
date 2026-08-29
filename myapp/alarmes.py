@@ -33,3 +33,6 @@ class Alarm:
 
     def remove_alarme(self, hour, minute, seconde):
         self.alarmes.pop(self.alarmes.index((hour, minute, seconde)))
+
+    def get_alarmes(self):
+        return self.alarmes

@@ -137,6 +137,10 @@ class MQTTLog:
             self.alerte.alerte(msg)
         elif 'alarme' in topic:
             try:
+                if msg == 'list':
+                    for index, al in enumerate(self.alarmes.get_alarmes()):
+                        h, m, s = al
+                        print(f"Alarme #{index} : {h:2d}:{m:02d}:{s:02d}")
                 cmd, h, m, s = msg.split()
                 if cmd == 'add':
                     self.alarmes.add_alarme(int(h), int(m), int(s))
