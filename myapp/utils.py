@@ -81,8 +81,9 @@ HUMIDITY_to_CAPTEURS = {
     "sensor.th_salon_humidity": "salon",
 }
 
-PAGES = ('calendrier', 'flip', 'switches', 'temperatures', 'mqttlogs', 'exit',
+PAGES = ('calendrier', 'flip', 'switches', 'temperatures', 'mqttlogs',
          'horloge')
+COMMANDES = PAGES + ('next', 'prev', 'exit')
 
 # Dictionnaires de PRISES connectées
 # Les libellés sont ceux affichés et sont succeptibles de changer.
@@ -383,6 +384,21 @@ def get_touch(touch) -> tuple[int, int] | str | None:
     return None
 
 
+def get_page(touch) -> tuple[int, int] | bool:
+    data = get_touch(touch)
+    if data is None:
+        return False
+    if isinstance(data, (int, int)):
+        return data
+    if data == 'R':
+        print('next')
+        Page.set_page('next')
+    elif data == 'L':
+        print('prev')
+        Page.set_page('prev')
+    return True
+
+
 def update_time(loggin, show_log=True):
     # Mise à l'heure
     if show_log:
@@ -410,14 +426,23 @@ def update_time(loggin, show_log=True):
 
 class Page:
     """Gestion des pages"""
-    page = 'horloge'
+    __page = 'horloge'
 
     @classmethod
     def set_page(cls, page):
-        if page in PAGES:
-            cls.page = page
-        elif page == 'next':
-            cls.page = PAGE[(PAGE.index(cls.page) + 1) % len(PAGE)]
+        if page not in COMMANDES:
+            return
+        if page == 'next':
+            cls.__page = PAGES[(PAGES.index(cls.__page) + 1) % len(PAGES)]
+        elif page == 'prev':
+            cls.__page = PAGES[(PAGES.index(cls.__page) + len(PAGES) - 1) %
+                               len(PAGES)]
+        else:
+            cls.__page = page
+
+    @classmethod
+    def get_page(cls):
+        return cls.__page
 
 
 class TZ:

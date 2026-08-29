@@ -4,7 +4,7 @@ import time
 from picovector import Polygon
 from touch import Button
 
-from myapp.utils import TZ, Color, Page
+from myapp.utils import TZ, Color, Page, get_page
 
 # Constants
 MONTHS = (
@@ -230,16 +230,23 @@ class Flip_Clock:
         gc.collect()
 
     def affiche(self):
-        time.sleep(1)
+        # time.sleep(1)
+        s = time.time()
         while True:
+            if get_page(self.touch) or Page.get_page() != 'flip':
+                return
+            a = time.time()
+            if a == s:
+                time.sleep_ms(10)
+                continue
+            s = a
             self.mqtt.check_msg()
-            if Page.page != 'flip':
+            """if Page.get_page() != 'flip':
                 return
             self.touch.poll()
             if self.bg.is_pressed():
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
                 Page.set_page('horloge')
-                return
+                return"""
             self.draw()
-            time.sleep(1)

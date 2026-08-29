@@ -137,10 +137,10 @@ class MQTTLog:
             self.loggin.log(
                 f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",
                 color=color,
-                aff=(Page.page == 'mqttlogs')
+                aff=(Page.get_page() == 'mqttlogs')
             )
         self.nb_msg += 1
-        if Page.page == 'mqttlogs':
+        if Page.get_page() == 'mqttlogs':
             since = (time.time() - self.start) / 60.
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(360, 0, 479, 28)
@@ -172,7 +172,7 @@ class MQTTLog:
                 self.mqtt.check_msg()
             except Exception as e:
                 print(f"Error while waiting for MQTT messages: {e}")
-            if Page.page != 'mqttlogs':
+            if Page.get_page() != 'mqttlogs':
                 return
 
             time.sleep(.1)

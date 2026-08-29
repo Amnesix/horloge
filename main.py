@@ -67,19 +67,20 @@ horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
 # Lancement de l'affichage principal
 loggin.log("Lancement boucle de traitement")
 while True:
-    if Page.page == 'horloge':
+    page = Page.get_page()
+    if page == 'horloge':
         horloge.affiche()
-    elif Page.page == 'calendrier':
+    elif page == 'calendrier':
         calendar.affiche()
-    elif Page.page == 'flip':
+    elif page == 'flip':
         flip.affiche()
-    elif Page.page == 'switches':
+    elif page == 'switches':
         switches.affiche()
-    elif Page.page == 'temperatures':
+    elif page == 'temperatures':
         temperatures.affiche()
-    elif Page.page == 'mqttlogs':
+    elif page == 'mqttlogs':
         mqttlogs.affiche()
-    elif Page.page == 'exit':
+    elif page == 'exit':
         break
 
 print("The end")

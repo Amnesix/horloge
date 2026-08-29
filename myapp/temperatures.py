@@ -10,6 +10,7 @@ from myapp.utils import (
     Color,
     Page,
     get_api,
+    get_page,
     get_temperatures,
     verifier_connexion,
 )
@@ -190,14 +191,9 @@ class Temperatures:
             # t_start = time.ticks_ms()
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
-            if Page.page != "temperatures":
+            if Page.get_page() != "temperatures":
                 return
-            self.touch.poll()
-            if self.touch.state and self.touch.y > 64:
-                self.display.set_pen(Color.BLACK)
-                self.display.clear()
-                Page.set_page('horloge')
-                return
+            get_page(self.touch)
             s = time.time()
             offset = 3600 * TZ.get_offset(s)
             if last_time == s:

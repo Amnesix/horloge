@@ -204,7 +204,7 @@ class Switches:
         cmpt = 1
         while True:
             verifier_connexion(self.presto, self.loggin)
-            if Page.page != 'switches':
+            if Page.get_page() != 'switches':
                 return
             self.mqtt.check_msg()
             self.touch.poll()

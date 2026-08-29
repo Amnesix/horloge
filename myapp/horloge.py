@@ -4,7 +4,6 @@ import sys
 import time
 
 from picovector import Polygon
-from touch import Button
 
 from myapp.utils import (
     CAPTEURS,
@@ -115,7 +114,6 @@ class Horloge:
 
         self.date_box = Polygon()
         self.date_box.rectangle(WIDTH // 2 - 75, 128, 150, 35)
-        self.btn_date = Button(WIDTH // 2 - 75, 128, 150, 35)
         self.retraite_box = Polygon()
         self.retraite_box.rectangle(WIDTH // 2 - 50, 320, 100, 35)
         self.e_temp_box = Polygon()
@@ -123,8 +121,6 @@ class Horloge:
         self.b_temp_box = Polygon()
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 45, HEIGHT // 2 - 18, 90,
                                   36)
-        self.btn_test = Button(*self.e_temp_box.bounds())
-
         self.switch_btn = Polygon()
         self.switch_btn.circle(32, 40, 20, stroke=2)
         self.temps_btn = Polygon()
@@ -197,21 +193,13 @@ class Horloge:
             wait_for_release()
             Page.set_page('flip')
             ret = True
-        elif self.btn_date.is_pressed():
-            wait_for_release()
-            Page.set_page('calendrier')
-            ret = True
-        elif self.btn_test.is_pressed():
-            wait_for_release()
-            Page.set_page('mqttlogs')
-            ret = True
         return ret
 
     def affiche(self):
         while True:
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
-            if Page.page != 'horloge':
+            if Page.get_page() != 'horloge':
                 return
             if self.gere_touch():
                 continue

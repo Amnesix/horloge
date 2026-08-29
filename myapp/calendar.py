@@ -214,7 +214,7 @@ class Calendar:
         while True:
             verifier_connexion(self.presto, self.loggin)
             self.mqtt.check_msg()
-            if Page.page != 'calendrier':
+            if Page.get_page() != 'calendrier':
                 return
             self.touch.poll()
             if self.touch.state:
