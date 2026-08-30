@@ -224,10 +224,16 @@ class Horloge:
             self.display.clear()
             self.display.set_pen(Color.CYAN)
             self.vector.draw(self.contour)
-            h, m, s = self.alarmes.next_alarme()
-            if hour == h and minute == m and second in (s - 6, s - 4, s - 2,
-                                                        s):
+            index = self.alarmes.next_alarme()
+            h, m, s = self.alarmes.get_alarme(index).get_time()
+            # TODO: si s < 6 il faut tester m-1 !
+            if hour == h and minute == m and second in ((s - 6) % 60,
+                                                        (s - 4) % 60,
+                                                        (s - 2) % 60, s):
                 self.display.set_pen(Color.RED)
+                if second == s and self.alarmes.get_alarme(
+                        index).get_oneshot():
+                    self.alarmes.remove_alarme(index)
             else:
                 self.display.set_pen(Color.LIGHTYELLOW)
             self.vector.draw(self.face)

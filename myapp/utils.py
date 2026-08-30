@@ -134,6 +134,7 @@ template_switch = """
 
 FILTRES = []
 NB_MAX_HISTO = 100
+NB_MAX_DISPLAY = 18
 
 net_config = 0
 api = APIHA
@@ -162,6 +163,7 @@ class Log:
         self.title_coord = (int(480 - len[2]) // 2, 25)
         self.ligne = 0
         self.msg = []
+        self.new_message = True
 
     def set_title(self, title):
         self.title = title
@@ -176,6 +178,7 @@ class Log:
         else:
             # Remplace le dernier message
             self.msg[-1] = (time.time(), msg, color)
+        self.new_message = True
         if aff:
             self.update_screen()
 
@@ -186,13 +189,14 @@ class Log:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
-        for index, data in enumerate(self.msg[-(NB_MAX_HISTO + 1)::]):
+        for index, data in enumerate(self.msg[-NB_MAX_DISPLAY::]):
             try:
                 self.display.set_pen(data[2])
             except IndexError:
                 print(data)
             self.vector.text(data[1], 0, (index + 2) * 25)
         self.presto.update()
+        self.new_message = False
 
     def get_stat(self):
         """Nombre de message par minutes sur les len(msg) derniers messages"""

@@ -142,9 +142,7 @@ class MQTTLog:
                 if msg == 'list':
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
-                            ha, ma, sa = al
-                            print(
-                                f"Alarme #{index} : {ha:2d}:{ma:02d}:{sa:02d}")
+                            print(f"Alarme #{index} : {al}")
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
@@ -161,7 +159,10 @@ class MQTTLog:
                         f"{h:02d}:{m:02d}:{s:02d} : A : DEL Alarm at {ha:2d}:{ma:02d}:{sa:02d}",
                         aff=Page.get_page() == 'mqttlogs',
                         color=Color.ORANGE)
-                    self.alarmes.remove_alarme(ha, ma, sa)
+                    for index, alarme in enumerate(self.alarmes.get_alarmes()):
+                        if (ha, ma, sa) == alarme.get_time():
+                            self.alarmes.remove_alarme(index)
+                            break
             except ValueError as e:
                 print(f"Alarme ValueError : {e}")
                 return
@@ -188,7 +189,7 @@ class MQTTLog:
         self.display.set_pen(Color.BLACK)  # Black background
         self.display.clear()
         self.presto.update()
-        self.loggin.update_screen()
+        self.loggin.new_message = True  # forcer le premier affichage
         while True:
             if self.alarmes.check_alarm():
                 self.alerte.alerte("C'est l'heure !")
@@ -219,4 +220,6 @@ class MQTTLog:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
             self.display.set_pen(Color.GREY)
             self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 0, 24)
+            if self.loggin.new_message:
+                self.loggin.update_screen()
             self.presto.update()

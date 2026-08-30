@@ -3,7 +3,7 @@ import time
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
-from myapp.alarmes import Alarm
+from myapp.alarmes import Alarmes
 from myapp.calendar import Calendar
 from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
@@ -50,7 +50,7 @@ offset = 3600 * TZ.get_offset(s)
 y, m, d, H, M, S, _, _ = time.gmtime(s + offset)
 loggin.log(f"{y}/{m:02d}/{d:02d} {H:02d}:{M:02d}:{S:02d}")
 alerte = Alerte(presto, display, vector, touch, loggin)
-alarmes = Alarm(presto, display, vector, touch, alerte, loggin)
+alarmes = Alarmes(presto, display, vector, touch, alerte, loggin)
 # Initialistion des objets
 broker, port = get_api()[1]
 mqtt = MQTT(broker, port, loggin)
