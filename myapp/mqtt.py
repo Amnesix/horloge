@@ -90,6 +90,7 @@ class MQTT:
                 fct(topic, msg)
             except Exception as e:
                 print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
+                print(fct.__name__)
 
     def mqtt_commandes(self, topic, msg):
         if 'command' in topic:
@@ -136,38 +137,52 @@ class MQTTLog:
         if 'alert' in topic:
             self.alerte.alerte(msg)
         elif 'alarme' in topic:
+            print(f'Alame : {msg}')
             try:
                 if msg == 'list':
                     for index, al in enumerate(self.alarmes.get_alarmes()):
-                        h, m, s = al
-                        print(f"Alarme #{index} : {h:2d}:{m:02d}:{s:02d}")
-                cmd, h, m, s = msg.split()
+                        try:
+                            ha, ma, sa = al
+                            print(
+                                f"Alarme #{index} : {ha:2d}:{ma:02d}:{sa:02d}")
+                        except ValueError:
+                            print(f"List alarmes ValueError : {al}")
+                    return
+                cmd, ha, ma, sa = msg.split()
+                ha, ma, sa = map(int, (ha, ma, sa))
                 if cmd == 'add':
-                    self.alarmes.add_alarme(int(h), int(m), int(s))
+                    self.loggin.log(
+                        f"{h:02d}:{m:02d}:{s:02d} : A : ADD Alarm at {ha:d}:{ma:02d}:{sa:02d}",
+                        aff=Page.get_page() == 'mqttlogs',
+                        color=Color.ORANGE)
+                    self.alarmes.add_alarme(ha, ma, sa)
                 elif cmd == 'del':
-                    self.alarme.remove_alarme(int(h), int(m), int(s))
-            except ValueError:
+                    self.loggin.log(
+                        f"{h:02d}:{m:02d}:{s:02d} : A : DEL Alarm at {ha:2d}:{ma:02d}:{sa:02d}",
+                        aff=Page.get_page() == 'mqttlogs',
+                        color=Color.ORANGE)
+                    self.alarmes.remove_alarme(ha, ma, sa)
+            except ValueError as e:
+                print(f"Alarme ValueError : {e}")
                 return
+            except Exception as e:
+                print(f"Alarme exception {e}")
         else:
             self.loggin.log(
-                f"{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}",
+                f'{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}',
                 color=color,
-                aff=(Page.get_page() == 'mqttlogs')
-            )
+                aff=(Page.get_page() == 'mqttlogs'))
         self.nb_msg += 1
-        if Page.get_page() == 'mqttlogs' or True:
-            # since = (time.time() - self.start) / 60.
-            start = self.loggin.get_time(0)
-            since = (time.time() - start) / 60.
+        if Page.get_page() == 'mqttlogs':
+            stat = self.loggin.get_stat()
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(360, 0, 479, 28)
             self.display.set_pen(Color.GREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
-            if since > 0:
-                string = f"{self.nb_msg / since:.1f} msg/mn"
-                length = int(self.vector.measure_text(string)[2])
-                self.vector.text(string, 479 - length, 22)
-                self.presto.update()
+            string = f"{stat:.1f} msg/mn"
+            length = int(self.vector.measure_text(string)[2])
+            self.vector.text(string, 479 - length, 22)
+            self.presto.update()
 
     def affiche(self):
         self.display.set_pen(Color.BLACK)  # Black background
@@ -175,6 +190,8 @@ class MQTTLog:
         self.presto.update()
         self.loggin.update_screen()
         while True:
+            if self.alarmes.check_alarm():
+                self.alerte.alerte("C'est l'heure !")
             verifier_connexion(self.presto, self.loggin)
             data = get_touch(self.touch)
             if data is not None and isinstance(data, str):

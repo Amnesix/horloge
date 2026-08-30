@@ -133,6 +133,7 @@ template_switch = """
 """
 
 FILTRES = []
+NB_MAX_HISTO = 100
 
 net_config = 0
 api = APIHA
@@ -170,7 +171,7 @@ class Log:
             color = Color.GREY
         if nl:
             self.msg.append((time.time(), msg, color))
-            if len(self.msg) >= 19:
+            if len(self.msg) > NB_MAX_HISTO:
                 self.msg.pop(0)
         else:
             # Remplace le dernier message
@@ -185,19 +186,21 @@ class Log:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
-        for line in range(len(self.msg)):
+        for index, data in enumerate(self.msg[-(NB_MAX_HISTO + 1)::]):
             try:
-                self.display.set_pen(self.msg[line][2])
+                self.display.set_pen(data[2])
             except IndexError:
-                print(line, self.msg[line])
-            self.vector.text(self.msg[line][1], 0, (line + 2) * 25)
+                print(data)
+            self.vector.text(data[1], 0, (index + 2) * 25)
         self.presto.update()
 
-    def get_time(self, index):
-        try:
-            return self.msg[index][0]
-        except IndexError:
-            return -1
+    def get_stat(self):
+        """Nombre de message par minutes sur les len(msg) derniers messages"""
+        if len(self.msg) > 0:
+            delai = (time.time() - self.msg[0][0]) / 60.
+            if delai > 0.:
+                return len(self.msg) / delai
+        return 0
 
 
 def wifi_connect(presto, loggin=None):
