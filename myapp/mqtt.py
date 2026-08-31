@@ -68,6 +68,10 @@ class MQTT:
     def disconnect(self):
         self.client.disconnect()
 
+    def reconnect(self):
+        self.client.diconnect()
+        self.client.connect()
+
     def send_msg(self, what, msg):
         print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
         try:

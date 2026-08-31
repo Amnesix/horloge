@@ -189,7 +189,8 @@ class Temperatures:
         # self.maj_temp()
         while True:
             # t_start = time.ticks_ms()
-            verifier_connexion(self.presto, self.loggin)
+            if verifier_connexion(self.presto, self.loggin):
+                self.mqtt.reconnect()
             self.mqtt.check_msg()
             if Page.get_page() != "temperatures":
                 return

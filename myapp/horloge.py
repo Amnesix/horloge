@@ -199,7 +199,8 @@ class Horloge:
 
     def affiche(self):
         while True:
-            verifier_connexion(self.presto, self.loggin)
+            if verifier_connexion(self.presto, self.loggin):
+                self.mqtt.reconnect()
             self.mqtt.check_msg()
             if Page.get_page() != 'horloge':
                 return

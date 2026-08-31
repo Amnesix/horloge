@@ -1,5 +1,6 @@
 import time
 
+import machine
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
@@ -91,3 +92,4 @@ display.clear()
 presto.update()
 mqtt.disconnect()
 # presto.wifi.disconnect()
+machine.reset()

@@ -203,7 +203,8 @@ class Switches:
         self.update_screen()
         cmpt = 1
         while True:
-            verifier_connexion(self.presto, self.loggin)
+            if verifier_connexion(self.presto, self.loggin):
+                self.mqtt.reconnect()
             if Page.get_page() != 'switches':
                 return
             self.mqtt.check_msg()

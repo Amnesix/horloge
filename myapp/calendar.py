@@ -212,7 +212,8 @@ class Calendar:
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
         while True:
-            verifier_connexion(self.presto, self.loggin)
+            if verifier_connexion(self.presto, self.loggin):
+                self.mqtt.reconnect()
             self.mqtt.check_msg()
             if Page.get_page() != 'calendrier':
                 return

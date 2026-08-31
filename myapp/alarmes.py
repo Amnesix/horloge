@@ -22,8 +22,8 @@ class Alarme:
     def get_oneshot(self):
         return self.oneshot
 
-    def dump(self) -> list(int, int, int, int, bool):
-        return [self.heure, self.minute, self.seconde, self.jour, self.oneshot]
+    def dump(self) -> tuple[int, int, int, int, bool]:
+        return (self.heure, self.minute, self.seconde, self.jour, self.oneshot)
 
     def _t(self):
         return self.jour * 86400 + self.heure * 3600 + self.minute * 60 + self.seconde
@@ -76,7 +76,7 @@ class Alarmes:
         self.alarmes.sort()
         self.save_alarmes()
 
-    def next_alarme(self) -> tuple(int, int, int):
+    def next_alarme(self) -> int:
         t = time.time()
         t += TZ.get_offset(t) * 3600
         _, _, _, h, m, s, d, _ = time.gmtime(t)
@@ -98,7 +98,7 @@ class Alarmes:
     def get_alarme(self, index):
         return self.alarmes[index]
 
-    def get_alarmes(self) -> list(Alarme):
+    def get_alarmes(self) -> list[Alarme]:
         return self.alarmes
 
     def check_alarm(self) -> bool:
@@ -128,7 +128,8 @@ class Alarmes:
             self.alarmes.clear()
             for al in data:
                 t, d, o = al
-                self.alarmes.append(Alarme(*t, d, o))
+                h, m, s = t
+                self.alarmes.append(Alarme(h, m, s, d, o))
 
     def affiche(self):
         pass
