@@ -69,7 +69,9 @@ class MQTT:
         self.client.disconnect()
 
     def reconnect(self):
-        self.client.diconnect()
+        print("Déconnexion client MQTT")
+        self.client.disconnect()
+        print("Connexion client MQTT")
         self.client.connect()
 
     def send_msg(self, what, msg):
