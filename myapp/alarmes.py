@@ -5,6 +5,10 @@ from myapp.utils import JOURS, TZ
 
 
 class Alarme:
+    """
+    Définition d'une alame. Paramètres :
+    heure, minute[, seconde]
+    """
 
     def __init__(self, heure, minute, seconde=0, jour=-1, oneshot=True):
         self.heure = heure
@@ -58,7 +62,7 @@ class Alarmes:
     ]
 
     def __init__(self, presto, display, vector, touch, alerte, loggin):
-        loggin.log("Initialisation Alames")
+        loggin.log("Initialisation Alarmes")
         self.presto = presto
         self.display = display
         self.vector = vector

@@ -1,5 +1,7 @@
+import binascii
 import time
 
+import machine
 from umqtt.simple import MQTTClient
 
 from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
@@ -33,7 +35,8 @@ SOUSCRIPTIONS = {
     # Autres
     "home/commandes": "-",
     "home/alerte": "-",
-    "home/alarme": "-"
+    "home/alarme": "-",
+    "home/debug": "print('OK, je suis là')",
 }
 
 TOPIC_MSG = {
@@ -50,14 +53,18 @@ class MQTT:
     callbacks = []
 
     def __init__(self, broker, port, loggin):
-        self.client_id = f"MQTT-HA-{time.time() % 10**6}"
-        self.client = MQTTClient(self.client_id, broker, port=port)
-        self.client.set_callback(self.mqtt_callback)
-        self.set_callback(self.mqtt_commandes)
+        loggin.log("Initialisation MQTT")
+        self.broker = broker
+        self.port = port
+        unique = str(binascii.hexlify(machine.unique_id()))
+        self.client_id = f'{unique}'
         self.connect()
-        loggin.log(f"Connected to MQTT at {broker}.")
+        loggin.log(f"Connected to MQTT at {broker}:{port}.")
 
     def connect(self):
+        self.client = MQTTClient(self.client_id, self.broker, port=self.port)
+        self.client.set_callback(self.mqtt_callback)
+        self.set_callback(self.mqtt_commandes)
         try:
             self.client.connect()
             for k in SOUSCRIPTIONS:
@@ -66,18 +73,22 @@ class MQTT:
             print(f"Erreur de connexion : {e}")
 
     def disconnect(self):
-        self.client.disconnect()
+        if self.client is not None:
+            self.client.disconnect()
+        self.client = None
 
     def reconnect(self):
         print("Déconnexion client MQTT")
-        self.client.disconnect()
+        if self.client is not None:
+            self.client.disconnect()
         print("Connexion client MQTT")
-        self.client.connect()
+        self.connect()
 
     def send_msg(self, what, msg):
         print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
         try:
-            self.client.publish(TOPIC_MSG[what], msg)
+            if self.client is not None:
+                self.client.publish(TOPIC_MSG[what], msg)
         except KeyError:
             print(f"Erreur de clé send_msg({what}, {msg})")
 
@@ -107,7 +118,8 @@ class MQTT:
 
     def check_msg(self):
         try:
-            self.client.check_msg()
+            if self.client is not None:
+                self.client.check_msg()
         except OSError:
             print("Déconnexion MQTT")
             self.connect()
@@ -142,6 +154,8 @@ class MQTTLog:
             color = Color.GREY
         if 'alert' in topic:
             self.alerte.alerte(msg)
+        elif 'debug' in topic:
+            print(eval(msg))
         elif 'alarme' in topic:
             print(f'Alame : {msg}')
             try:
