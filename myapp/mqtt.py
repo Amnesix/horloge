@@ -155,7 +155,7 @@ class MQTTLog:
         if 'alert' in topic:
             self.alerte.alerte(msg)
         elif 'debug' in topic:
-            print(eval(msg))
+            print(exec(msg))
         elif 'alarme' in topic:
             print(f'Alame : {msg}')
             try:
