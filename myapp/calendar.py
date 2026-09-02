@@ -151,7 +151,7 @@ class Calendar:
         self.month = month
         self.calendar = monthly_calendar(self.year, self.month)
 
-    def draw_calendar(self):
+    def draw_calendar(self, maj):
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         # Dessin du calendrier
@@ -177,6 +177,9 @@ class Calendar:
         self.vector.text(s, x, y)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.BLACK)
+        self.presto.update()
+        if maj:
+            self.init_calendar(time.time())
         y = 110
         i = 0
         for line in self.calendar:
@@ -205,10 +208,9 @@ class Calendar:
         self.presto.update()
 
     def affiche(self):
-        self.init_calendar(time.time())
         while self.touch.state:
             self.touch.poll()
-        self.draw_calendar()
+        self.draw_calendar(True)
         lh = list(map(int, self.vector.measure_text("##:##:##")))
         last_time = 0
         while True:
@@ -236,7 +238,7 @@ class Calendar:
                         self.set_month(self.month + 1)
                     else:
                         self.set_month(self.month - 1)
-                self.draw_calendar()
+                self.draw_calendar(False)
             s = time.time()
             self.offset = 3600 * TZ.get_offset(s)
             if last_time == s:

@@ -10,8 +10,8 @@ from myapp.utils import (
     Color,
     Page,
     get_api,
-    get_page,
     get_temperatures,
+    get_touch,
     verifier_connexion,
 )
 
@@ -194,7 +194,8 @@ class Temperatures:
             self.mqtt.check_msg()
             if Page.get_page() != "temperatures":
                 return
-            get_page(self.touch)
+            if get_touch(self.touch) == 'R':
+                return
             s = time.time()
             offset = 3600 * TZ.get_offset(s)
             if last_time == s:

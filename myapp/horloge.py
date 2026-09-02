@@ -123,10 +123,6 @@ class Horloge:
         self.b_temp_box = Polygon()
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 45, HEIGHT // 2 - 18, 90,
                                   36)
-        self.switch_btn = Polygon()
-        self.switch_btn.circle(32, 40, 20, stroke=2)
-        self.temps_btn = Polygon()
-        self.temps_btn.circle(447, 40, 20, stroke=2)
         self.sw = {k: Polygon() for k in PRISES.keys()}
         x, y = 5, 5
         for k in self.sw.keys():
@@ -172,30 +168,8 @@ class Horloge:
         data = get_touch(self.touch)
         if data is None:
             return False
-        if isinstance(data, str):
-            if data == 'R':
-                Page.set_page('mqttlogs')
-            elif data == 'L':
-                Page.set_page('temperatures')
-            elif data == 'U':
-                Page.set_page('switches')
-            elif data == 'D':
-                Page.set_page('calendrier')
-            return True
-        x, y = data
-        if 0 <= x < 64 and 0 <= y < 64:
-            wait_for_release()
-            Page.set_page('switches')
-            ret = True
-        elif 416 <= x < 480 and 0 <= y < 64:
-            wait_for_release()
-            Page.set_page('temperatures')
-            ret = True
-        elif 200 <= x <= 280 and 200 <= y <= 280:
-            wait_for_release()
-            Page.set_page('flip')
-            ret = True
-        return ret
+        return isinstance(data, str) and data == 'R'
+        return False
 
     def affiche(self):
         while True:
@@ -205,7 +179,7 @@ class Horloge:
             if Page.get_page() != 'horloge':
                 return
             if self.gere_touch():
-                continue
+                return
             t_start = time.ticks_ms()
             s = time.time()
             if s == self.next_update_time:
@@ -276,9 +250,6 @@ class Horloge:
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
-            self.display.set_pen(Color.CYAN)
-            self.vector.draw(self.switch_btn)
-            self.vector.draw(self.temps_btn)
             self.display.set_pen(Color.GREY)
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
@@ -308,9 +279,6 @@ class Horloge:
                     HEIGHT // 2 + 10,
                 )
             self.display.set_pen(Color.GREY)
-            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 42)
-            self.vector.text("S", 22, 53)
-            self.vector.text("T", 437, 55)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
             self.vector.text(__title__ + " - " + __version__, 380, 475)
             self.vector.text(__python__, 10, 475)

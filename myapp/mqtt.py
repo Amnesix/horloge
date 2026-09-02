@@ -214,16 +214,8 @@ class MQTTLog:
             if self.alarmes.check_alarm():
                 self.alerte.alerte("C'est l'heure !")
             verifier_connexion(self.presto, self.loggin)
-            data = get_touch(self.touch)
-            if data is not None and isinstance(data, str):
-                if data == 'R':
-                    Page.set_page('horloge')
-                elif data == 'L':
-                    Page.set_page('temperatures')
-                elif data == 'U':
-                    Page.set_page('switches')
-                elif data == 'D':
-                    Page.set_page('calendrier')
+            if get_touch(self.touch) == 'R':
+                return
             try:
                 # Wait for MQTT messages (non-blocking check)
                 self.mqtt.check_msg()

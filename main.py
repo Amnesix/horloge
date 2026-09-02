@@ -7,6 +7,7 @@ from myapp.alarmes import Alarmes
 from myapp.calendar import Calendar
 from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
+from myapp.menu import Menu
 from myapp.mqtt import MQTT, MQTTLog
 from myapp.switches import Switches
 from myapp.temperatures import Temperatures
@@ -38,9 +39,6 @@ Color.init(display)
 loggin = Log(presto, display, vector, f"{__title__} - {__version__}")
 loggin.log("Connexion Wifi en cours...")
 
-# bg = Color.BLACK
-# fg = Color.WHITE
-
 # Connection / Mise à l'heure
 wifi_connect(presto, loggin)
 update_time(loggin)
@@ -65,11 +63,13 @@ switches = Switches(presto, display, vector, touch, mqtt, loggin,
 flip = Flip_Clock(presto, display, vector, touch, mqtt, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, alarmes, loggin, mqttlogs)
+menu = Menu(presto, display, touch, loggin)
 
 # Lancement de l'affichage principal
 loggin.log("Lancement boucle de traitement")
 while True:
-    page = Page.get_page()
+    page = menu.affiche()
+    Page.set_page(page)
     if page == 'horloge':
         horloge.affiche()
     elif page == 'calendrier':
@@ -82,7 +82,7 @@ while True:
         temperatures.affiche()
     elif page == 'mqttlogs':
         mqttlogs.affiche()
-    elif page == 'exit':
+    elif Page.get_page() == 'exit':
         break
 
 print("The end")

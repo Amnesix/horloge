@@ -212,7 +212,6 @@ class Switches:
             if self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
-                Page.set_page('horloge')
                 return
             elif self.on_click() or cmpt % 15 == 0:
                 self.update_screen()
