@@ -569,16 +569,15 @@ class Alerte:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         words = msg.split()
         self.message.clear()
-        self.message.append("")
-        len_line = 0
+        self.message.append(words.pop(0))
         while len(words):
             word = words.pop(0)
-            w = self.vector.measure_text(word)[2]
-            if len_line + w > 230:
-                len_line = 0
-                self.message.append("")
-            len_line += w
-            self.message[-1] += " " + word
+            w = self.vector.measure_text(f"{self.message[-1]} {word}")[2]
+            if w > 260:
+                self.message.append(word)
+            else:
+                self.message[-1] += " " + word
+                print(f"'{self.message[-1]}' : {w}")
         self.show()
 
     def show(self, timeout=10):
@@ -590,10 +589,11 @@ class Alerte:
         self.vector.draw(self.fond)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.LIGHTYELLOW)
-        pos = 0
-        for line in self.message:
-            self.vector.text(line, 100, 110 + pos * 32)
-            pos += 1
+        for pos, line in enumerate(self.message):
+            dim = self.vector.measure_text(line)
+            offset = 130 - int(dim[2]) // 2
+            print(f"{line}: {dim} - {offset}")
+            self.vector.text(line, 110 + offset // 2, 110 + pos * 32)
         self.presto.update()
         while time.time() < s:
             time.sleep(.25)
