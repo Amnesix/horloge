@@ -157,12 +157,14 @@ class MQTTLog:
         elif 'debug' in topic:
             print(exec(msg))
         elif 'alarme' in topic:
-            print(f'Alame : {msg}')
+            print(f'Alarme : {msg}')
             try:
                 if msg == 'list':
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
-                            print(f"Alarme #{index} : {al}")
+                            s = f"Alarme #{index} : {al}"
+                            print(s)
+                            self.loggin.log(s)
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return

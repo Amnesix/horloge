@@ -50,7 +50,7 @@ class Alarme:
     def __str__(self):
         str = f"{self.heure:02d}:{self.minute:02d}:{self.seconde:02d}"
         str += f" - j:{'*' if self.jour == -1 else JOURS[self.jour]}"
-        str += f" - oneshot {('non', 'oui')[self.oneshot]}"
+        str += f" - {('', 'oneshot')[self.oneshot]}"
         return str
 
 
