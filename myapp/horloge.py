@@ -175,8 +175,8 @@ class Horloge:
             if verifier_connexion(self.presto, self.loggin):
                 self.mqtt.reconnect()
             self.mqtt.check_msg()
-            print(Page.get_page())
-            if self.gere_touch():
+            if self.gere_touch() or Page.get_page() != 'horloge':
+                print("sortie d'horloge")
                 return
             t_start = time.ticks_ms()
             s = time.time()

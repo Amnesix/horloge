@@ -114,7 +114,6 @@ class MQTT:
     def mqtt_commandes(self, topic, msg):
         if 'command' in topic:
             Page.set_page(msg)
-            print(f"Changement de page : {Page.get_page()}")
 
     def get_room(self, topic):
         return SOUSCRIPTIONS[topic]

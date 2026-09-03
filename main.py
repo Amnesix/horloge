@@ -71,7 +71,7 @@ loggin.log("Lancement boucle de traitement")
 Page.set_page('horloge')
 page = Page.get_page()
 while True:
-    Page.set_page(page)
+    # Page.set_page(page)
     if page == 'horloge':
         horloge.affiche()
     elif page == 'calendrier':
@@ -86,8 +86,11 @@ while True:
         mqttlogs.affiche()
     elif Page.get_page() == 'exit':
         break
-    #if page == Page.get_page():
-    page = menu.affiche()
+    new_page = Page.get_page()
+    if page == new_page:
+        page = menu.affiche()
+    else:
+        page = new_page
 
 print("The end")
 display.set_pen(Color.BLACK)
