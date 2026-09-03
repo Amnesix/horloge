@@ -195,6 +195,7 @@ class Temperatures:
             if Page.get_page() != "temperatures":
                 return
             if get_touch(self.touch) == 'R':
+                Page.clear()
                 return
             s = time.time()
             offset = 3600 * TZ.get_offset(s)

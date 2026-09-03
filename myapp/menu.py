@@ -62,6 +62,7 @@ class Menu:
                     if coord.test(x, y):
                         del self.img
                         gc.collect()
+                        Page.set_page(btn)
                         return btn
             time.sleep(.1)
 

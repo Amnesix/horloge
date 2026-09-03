@@ -167,7 +167,9 @@ class Horloge:
         data = get_touch(self.touch)
         if data is None:
             return False
-        return isinstance(data, str) and data == 'R'
+        if data == 'R':
+            Page.clear()
+            return True
         return False
 
     def affiche(self):
@@ -176,7 +178,6 @@ class Horloge:
                 self.mqtt.reconnect()
             self.mqtt.check_msg()
             if self.gere_touch() or Page.get_page() != 'horloge':
-                print("sortie d'horloge")
                 return
             t_start = time.ticks_ms()
             s = time.time()

@@ -219,6 +219,7 @@ class MQTTLog:
                 self.alerte.alerte("C'est l'heure !")
             verifier_connexion(self.presto, self.loggin)
             if get_touch(self.touch) == 'R':
+                Page.clear()
                 return
             try:
                 # Wait for MQTT messages (non-blocking check)

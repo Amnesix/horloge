@@ -455,6 +455,10 @@ class Page:
     def get_page(cls):
         return cls.__page
 
+    @classmethod
+    def clear(cls):
+        cls.__page = ''
+
 
 class TZ:
     """Classe minimaliste permettant de connaitre le
