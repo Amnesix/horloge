@@ -156,7 +156,6 @@ class Horloge:
         self.display.clear()
         self.display.set_pen(self.fg_contour)
         self.vector.draw(self.contour)
-        # self.calendar.affiche()
 
     def gere_touch(self):
 
@@ -176,8 +175,7 @@ class Horloge:
             if verifier_connexion(self.presto, self.loggin):
                 self.mqtt.reconnect()
             self.mqtt.check_msg()
-            if Page.get_page() != 'horloge':
-                return
+            print(Page.get_page())
             if self.gere_touch():
                 return
             t_start = time.ticks_ms()

@@ -63,12 +63,14 @@ switches = Switches(presto, display, vector, touch, mqtt, loggin,
 flip = Flip_Clock(presto, display, vector, touch, mqtt, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, alarmes, loggin, mqttlogs)
-menu = Menu(presto, display, touch, loggin)
+menu = Menu(presto, display, touch, mqtt, loggin)
 
 # Lancement de l'affichage principal
 loggin.log("Lancement boucle de traitement")
+# Page par défaut
+Page.set_page('horloge')
+page = Page.get_page()
 while True:
-    page = menu.affiche()
     Page.set_page(page)
     if page == 'horloge':
         horloge.affiche()
@@ -84,6 +86,8 @@ while True:
         mqttlogs.affiche()
     elif Page.get_page() == 'exit':
         break
+    #if page == Page.get_page():
+    page = menu.affiche()
 
 print("The end")
 display.set_pen(Color.BLACK)

@@ -3,6 +3,8 @@ import time
 
 import jpegdec
 
+from myapp.utils import Page
+
 # IMPORTANT : full_res=True pour utiliser le vrai 480x480
 # (par défaut, Presto() utilise un framebuffer 240x240 mis à l'échelle !)
 
@@ -32,10 +34,11 @@ BTN = {
 
 class Menu:
 
-    def __init__(self, presto, display, touch, loggin):
+    def __init__(self, presto, display, touch, mqtt, loggin):
         self.presto = presto
         self.display = display
         self.touch = touch
+        self.mqtt = mqtt
         if loggin is not None:
             loggin.log("Initialisation menu")
 
@@ -44,7 +47,11 @@ class Menu:
         self.img.open_file(IMG_MENU)
         self.img.decode(0, 0, jpegdec.JPEG_SCALE_FULL)
         self.presto.update()
+        page = Page.get_page()
         while True:
+            self.mqtt.check_msg()
+            if page != Page.get_page():
+                return
             self.touch.poll()
             if self.touch.state:
                 while self.touch.state:
@@ -56,6 +63,7 @@ class Menu:
                         del self.img
                         gc.collect()
                         return btn
+            time.sleep(.1)
 
 
 if __name__ == '__main__':
