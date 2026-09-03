@@ -55,7 +55,7 @@ PRISES = {
     "RPi": "pipmc_net_194_socket_1",
     "Multimédia": "multimedia_salon_socket_1",
     "Cuisine": "prise_connectee",
-    "Buandrie": "sapin_socket_1",
+    "Buandrie": "lave_linge",
     "Douche": "sonoff_s60zbtpf",
 }
 

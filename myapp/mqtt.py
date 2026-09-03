@@ -28,10 +28,11 @@ SOUSCRIPTIONS = {
     # Interrupteurs
     "home/switch/ventilo": "Ventilo",
     "home/switch/pipmcnet": "RPi",
-    "home/switch/sapin": "Buandrie",
+    "home/switch/sapin": "PC3",
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
+    "home/switch/lave_linge": "Buandrie",
     # Autres
     "home/commandes": "-",
     "home/alerte": "-",
@@ -44,7 +45,7 @@ TOPIC_MSG = {
     "Douche": "home/toggle/douche",
     "Cuisine": "home/toggle/cuisine",
     "Ventilo": "home/toggle/ventilo",
-    "Buandrie": "home/toggle/buandrie",
+    "Buandrie": "home/toggle/lave_linge",
     "Multimédia": "home/toggle/multimedia",
 }
 
