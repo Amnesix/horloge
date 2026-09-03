@@ -237,9 +237,6 @@ def wifi_connect(presto, loggin=None):
                 loggin.log(f" * SSID={CONFIG[indice][0]} : OK", nl=False)
             net_config = indice
             set_api(indice)
-            """print(
-                f"Configuration :\n\t- Connexion sur {CONFIG[indice][0]}\n\t- API : {api}"
-            )"""
             if loggin is not None:
                 loggin.log(f"IP : {presto.wifi.ipv4()}")
             teste_connexion()
@@ -407,10 +404,8 @@ def get_page(touch) -> tuple[int, int] | bool:
     if isinstance(data, (int, int)):
         return data
     if data == 'R':
-        print('next')
         Page.set_page('next')
     elif data == 'L':
-        print('prev')
         Page.set_page('prev')
     return True
 
@@ -462,7 +457,7 @@ class Page:
 
 
 class TZ:
-    """Classe minimaliste permettant de connaitre le 
+    """Classe minimaliste permettant de connaitre le
     décalage horraire sur le fuseau de Paris en
     tenant compte de l'heure d'été."""
     _ready = False
@@ -577,7 +572,6 @@ class Alerte:
                 self.message.append(word)
             else:
                 self.message[-1] += " " + word
-                print(f"'{self.message[-1]}' : {w}")
         self.show()
 
     def show(self, timeout=10):
@@ -589,11 +583,11 @@ class Alerte:
         self.vector.draw(self.fond)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.LIGHTYELLOW)
+        hp = 170 - len(self.message) * 15
         for pos, line in enumerate(self.message):
-            dim = self.vector.measure_text(line)
+            dim = self.vector.measure_text(line, x=0, y=0, angle=0)
             offset = 130 - int(dim[2]) // 2
-            print(f"{line}: {dim} - {offset}")
-            self.vector.text(line, 110 + offset // 2, 110 + pos * 32)
+            self.vector.text(line, 110 + offset, hp + pos * 32)
         self.presto.update()
         while time.time() < s:
             time.sleep(.25)

@@ -244,6 +244,8 @@ class Calendar:
             if last_time == s:
                 time.sleep(0.1)
                 continue
+            elif s - last_time > 5:
+                self.draw_calendar(False)
             last_time = s
             self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(
                 s + self.offset)
