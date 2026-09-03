@@ -223,8 +223,8 @@ def wifi_connect(presto, loggin=None):
             return True
         except Exception as e:
             if loggin:
-                loggin.log(f"Exception ({e})")
-            print(f"Exception ({e})")
+                loggin.log(f"wifi_connect():Exception ({e})")
+            print(f"wifi_connect():Exception ({e})")
         return False
 
     indice = net_config

@@ -57,6 +57,7 @@ class MQTT:
         loggin.log("Initialisation MQTT")
         self.broker = broker
         self.port = port
+        self.loggin = loggin
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
         self.connect()
@@ -79,14 +80,14 @@ class MQTT:
         self.client = None
 
     def reconnect(self):
-        print("Déconnexion client MQTT")
+        self.loggin.log("Déconnexion client MQTT")
         if self.client is not None:
             self.client.disconnect()
-        print("Connexion client MQTT")
+        self.loggin.log("Connexion client MQTT")
         self.connect()
 
     def send_msg(self, what, msg):
-        print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
+        # print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
         try:
             if self.client is not None:
                 self.client.publish(TOPIC_MSG[what], msg)
