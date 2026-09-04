@@ -152,7 +152,6 @@ class Switches:
     def update_state(self, topic, state):
         switch = self.mqtt.get_room(topic)
         if switch in self.switches:
-            print(f"Modification {switch} : {state}")
             self.switches[switch].update_state(state)
 
     def get_state(self, switch, last):
