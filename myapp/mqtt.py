@@ -196,8 +196,9 @@ class MQTTLog:
             except Exception as e:
                 print(f"Alarme exception {e}")
         else:
+            le = topic.split('/')[1][0].upper()
             self.loggin.log(
-                f'{h:02d}:{m:02d}:{s:02d} : R : {topic.replace("home", "~")} : {msg}',
+                f'{h:02d}:{m:02d}:{s:02d} : {le} : {topic.replace("home", "~")} : {msg}',
                 color=color,
                 aff=(Page.get_page() == 'mqttlogs'))
         self.nb_msg += 1
