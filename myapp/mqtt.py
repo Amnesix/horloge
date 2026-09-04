@@ -105,6 +105,7 @@ class MQTT:
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
+        print(topic, msg)
         for fct in self.callbacks:
             try:
                 fct(topic, msg)
