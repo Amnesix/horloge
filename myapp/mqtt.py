@@ -27,8 +27,8 @@ SOUSCRIPTIONS = {
     "home/humidity/salon": "salon",
     # Interrupteurs
     "home/switch/ventilo": "Ventilo",
-    "home/switch/pipmcnet": "RPi",
-    "home/switch/sapin": "PC3",
+    "home/switch/rpi": "RPi",
+    "home/switch/eth": "SwitchEth",
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
@@ -47,6 +47,7 @@ TOPIC_MSG = {
     "Ventilo": "home/toggle/ventilo",
     "Buandrie": "home/toggle/lave_linge",
     "Multimédia": "home/toggle/multimedia",
+    "SwitchEth": "home/toggle/eth",
 }
 
 

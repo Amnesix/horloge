@@ -10,7 +10,7 @@ from touch import Button
 from myapp.secret import headers
 from myapp.utils import PRISES, Color, Page, get_api, verifier_connexion
 
-OFFSET = 70
+OFFSET = 60
 
 
 class Switch:
@@ -127,8 +127,8 @@ class Switches:
         self.btn_exit = Polygon()
         self.btn_exit.rectangle(*self.btnReturn.bounds,
                                 corners=(10, 10, 10, 10))
-        ligne = 0
-        for label, name in sorted(PRISES.items()):
+        for ligne, item in enumerate(sorted(PRISES.items())):
+            label, name = item
             try:
                 state = initiale_state["switch." + name]
             except KeyError:
@@ -136,7 +136,6 @@ class Switches:
             self.switches[label] = Switch(display, vector, touch, mqtt, label,
                                           ligne, state)
             self.capteurs.append(self.switches[label].capteur)
-            ligne += 1
         self.mqtt.set_callback(self.update_state)
 
     def on_click(self):
@@ -144,6 +143,7 @@ class Switches:
         ok = False
         for switch in self.switches:
             ok |= self.switches[switch].on_click()
+        # S'assurer du relaché du bouton
         while self.touch.state:
             time.sleep(.1)
             self.touch.poll()
@@ -152,6 +152,7 @@ class Switches:
     def update_state(self, topic, state):
         switch = self.mqtt.get_room(topic)
         if switch in self.switches:
+            print(f"Modification {switch} : {state}")
             self.switches[switch].update_state(state)
 
     def get_state(self, switch, last):
