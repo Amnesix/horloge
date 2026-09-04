@@ -71,8 +71,15 @@ class Alarmes:
         self.load_alarmes()
         # Création de la page
 
-    def add_alarme(self, hour, minute, seconde, jour=-1, oneshot=True):
-        al = Alarme(hour, minute, seconde, jour, oneshot)
+    def add_alarme(self, heure, minute, seconde, jour=-1, oneshot=True):
+        if seconde == 0:
+            seconde = 59
+            minute = (minute + 59) % 60
+            if minute == 59:
+                heure = (heure + 23) % 24
+                if (heure, minute, seconde) == (23, 59, 59) and jour != -1:
+                    jour = (jour + 6) % 7
+        al = Alarme(heure, minute, seconde, jour, oneshot)
         if al in self.alarmes:
             return
         self.alarmes.append(al)

@@ -163,11 +163,12 @@ class MQTTLog:
             print(f'Alarme : {msg}')
             try:
                 if msg == 'list':
+                    aff = Page.get_page() == 'mqttlogs'
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
                             s = f"Alarme #{index} : {al}"
                             print(s)
-                            self.loggin.log(s)
+                            self.loggin.log(s, aff=aff)
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
