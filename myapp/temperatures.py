@@ -276,6 +276,7 @@ class Temperatures:
             self.display.set_pen(fg)
             self.vector.text(heure, (480 - lh[2]) // 2, 470)
             self.presto.update()
+            Page.set_redraw(False)
             gc.collect()
             # t_end = time.ticks_ms()
             # print(f"Boucle : {t_end - t_start}ms")

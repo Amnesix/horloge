@@ -177,7 +177,7 @@ class Calendar:
         self.vector.text(s, x, y)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.BLACK)
-        self.presto.update()
+        # self.presto.update()
         if maj:
             self.init_calendar(time.time())
         y = 110
@@ -205,7 +205,7 @@ class Calendar:
                 self.vector.text(s, x + l, y)
                 x += 57
             y += 50
-        self.presto.update()
+        # self.presto.update()
 
     def affiche(self):
         while self.touch.state:
@@ -222,7 +222,8 @@ class Calendar:
             self.touch.poll()
             if self.touch.state:
                 if self.touch.y > 400:
-                    Page.set_page('horloge')
+                    while self.touch.state:
+                        self.touch.poll()
                     return
                 xs, ys = self.touch.x, self.touch.y
                 while self.touch.state:
@@ -244,7 +245,7 @@ class Calendar:
             if last_time == s:
                 time.sleep(0.1)
                 continue
-            elif s - last_time > 5:
+            elif s - last_time > 5 or Page.get_redraw():
                 self.draw_calendar(False)
             last_time = s
             self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(

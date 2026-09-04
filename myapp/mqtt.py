@@ -214,30 +214,32 @@ class MQTTLog:
         self.display.set_pen(Color.BLACK)  # Black background
         self.display.clear()
         self.presto.update()
-        self.loggin.new_message = True  # forcer le premier affichage
+        # forcer le premier affichage
+        self.loggin.new_message = True
         while True:
             if self.alarmes.check_alarm():
                 self.alerte.alerte("C'est l'heure !")
             verifier_connexion(self.presto, self.loggin)
-            if get_touch(self.touch) == 'R':
-                Page.clear()
+            if get_touch(self.touch) == 'R' or Page.get_page() != 'mqttlogs':
+                if Page.get_page() == 'mqttlogs':
+                    Page.clear()
                 return
             try:
                 # Wait for MQTT messages (non-blocking check)
                 self.mqtt.check_msg()
             except Exception as e:
                 print(f"Error while waiting for MQTT messages: {e}")
-            if Page.get_page() != 'mqttlogs':
-                return
+            if self.loggin.new_message or Page.get_redraw():
+                self.loggin.update_screen()
+                Page.set_redraw(False)
             time.sleep(.1)
+            t = time.time()
+            offset = 3600 * TZ.get_offset(t)
+            _, _, _, h, m, s, _, _ = time.gmtime(t + offset)
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(0, 0, 120, 28)
-            s = time.time()
-            offset = 3600 * TZ.get_offset(s)
-            _, _, _, h, m, s, _, _ = time.gmtime(s + offset)
-            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
             self.display.set_pen(Color.GREY)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
             self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 0, 24)
-            if self.loggin.new_message:
-                self.loggin.update_screen()
             self.presto.update()
+            time.sleep(.1)

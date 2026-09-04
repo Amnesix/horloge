@@ -375,7 +375,7 @@ class Test_Recup:
             time.sleep(.1)
 
 
-def get_touch(touch) -> tuple[int, int] | str | None:
+def get_touch(touch) -> "tuple[int, int] | str | None":
     touch.poll()
     if touch.state:
         xs, ys = touch.x, touch.y
@@ -398,11 +398,11 @@ def get_touch(touch) -> tuple[int, int] | str | None:
     return None
 
 
-def get_page(touch) -> tuple[int, int] | bool:
+def get_page(touch) -> bool | tuple[int, int]:
     data = get_touch(touch)
     if data is None:
         return False
-    if isinstance(data, (int, int)):
+    if isinstance(data, tuple):
         return data
     if data == 'R':
         Page.set_page('next')
@@ -439,6 +439,7 @@ def update_time(loggin, show_log=True):
 class Page:
     """Gestion des pages"""
     __page = 'horloge'
+    __redraw = False
 
     @classmethod
     def set_page(cls, page):
@@ -459,6 +460,14 @@ class Page:
     @classmethod
     def clear(cls):
         cls.__page = ''
+
+    @classmethod
+    def set_redraw(cls, value):
+        cls.__redraw = value
+
+    @classmethod
+    def get_redraw(cls):
+        return cls.__redraw
 
 
 class TZ:
@@ -595,4 +604,7 @@ class Alerte:
             self.vector.text(line, 110 + offset, hp + pos * 32)
         self.presto.update()
         while time.time() < s:
+            if get_touch(self.touch):
+                break
             time.sleep(.25)
+        Page.set_redraw(True)
