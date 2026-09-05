@@ -173,14 +173,19 @@ class MQTTLog:
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
-                cmd, ha, ma, sa = msg.split()
-                ha, ma, sa = map(int, (ha, ma, sa))
+                cmd, ha, ma, sa, *suite = msg.split()
+                jour, oneshot = '-1', True
+                if len(suite):
+                    jour = suite.pop(0)
+                if len(suite):
+                    oneshot = suite.pop(0) in ('1', 'true', 'True')
+                ha, ma, sa, jour = map(int, (ha, ma, sa, jour))
                 if cmd == 'add':
                     self.loggin.log(
                         f"{h:02d}:{m:02d}:{s:02d} : A : ADD Alarm at {ha:d}:{ma:02d}:{sa:02d}",
                         aff=Page.get_page() == 'mqttlogs',
                         color=Color.ORANGE)
-                    self.alarmes.add_alarme(ha, ma, sa)
+                    self.alarmes.add_alarme(ha, ma, sa, jour, oneshot)
                 elif cmd == 'del':
                     self.loggin.log(
                         f"{h:02d}:{m:02d}:{s:02d} : A : DEL Alarm at {ha:2d}:{ma:02d}:{sa:02d}",

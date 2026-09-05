@@ -16,6 +16,9 @@ class Alarme:
         self.seconde = seconde
         self.jour = jour
         self.oneshot = oneshot
+        print(
+            f"Alarme ajouté {self.heure}:{self.minute}:{self.seconde} - jour {self.jour} / {'oneshot' if self.oneshot else ''}"
+        )
 
     def get_time(self):
         return self.heure, self.minute, self.seconde
@@ -96,7 +99,7 @@ class Alarmes:
             da = value.get_day()
             if (ha, ma, sa) < (h, m, s):
                 continue
-            if 0 < da != d:
+            if 0 <= da != d:
                 continue
             return index
         # Donc, la prochaine alarme est la première et ça sera pour demain
@@ -143,4 +146,4 @@ class Alarmes:
                 self.alarmes.append(Alarme(h, m, s, d, o))
 
     def affiche(self):
-        pass
+        """Affichage d'une interface de gestion"""
