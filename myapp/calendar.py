@@ -177,7 +177,7 @@ class Calendar:
         self.vector.text(s, x, y)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.BLACK)
-        # self.presto.update()
+        self.presto.update()
         if maj:
             self.init_calendar(time.time())
         y = 110
