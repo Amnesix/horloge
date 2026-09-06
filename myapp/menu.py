@@ -41,11 +41,11 @@ class MyBtn:
         self.display.set_pen(Color.LIGHTYELLOW)
         self.vector.draw(self.btn)
         self.display.set_pen(Color.BLACK)
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
-        self.vector.text(self.name, self.x1 + 10, self.y2 - 35)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 28)
+        pos = (LARGEUR - int(self.vector.measure_text(self.name)[2])) // 2
+        self.vector.text(self.name, self.x1 + pos, self.y2 - 35)
 
 
-IMG_MENU = "img/menu.jpg"
 BTN = {
     "temperatures": MyBtn(36, 60, LARGEUR, HAUTEUR, "Temperatures"),
     "horloge": MyBtn(256, 60, LARGEUR, HAUTEUR, "Horloge"),

@@ -158,7 +158,7 @@ class Calendar:
         self.display.set_pen(Color.CYAN)
         self.display.rectangle(12, 70, 460, 354)
         self.display.rectangle(13, 71, 458, 352)
-        self.display.set_pen(Color.GREY)
+        self.display.set_pen(Color.LIGHTGREY)
         self.display.rectangle(14, 72, 355, 350)
         self.display.set_pen(self.color_we)
         self.display.rectangle(356, 72, 114, 350)
@@ -170,7 +170,7 @@ class Calendar:
         for y in range(123, 374, 50):
             self.display.line(14, y, 470, y)
         # Affichage du text
-        self.display.set_pen(Color.GREY)
+        self.display.set_pen(Color.LIGHTGREY)
         s = f"{MOIS[self.month - 1]} {self.year}"
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
         x, y = int(250 - self.vector.measure_text(s)[2] // 2), 48
@@ -200,7 +200,7 @@ class Calendar:
                         else:
                             self.display.set_pen(Color.BLACK)
                     else:
-                        self.display.set_pen(Color.LIGHTGREY)
+                        self.display.set_pen(Color.GREY)
                 l = int((50 - self.vector.measure_text(s)[2]) // 2)
                 self.vector.text(s, x + l, y)
                 x += 57
@@ -256,7 +256,7 @@ class Calendar:
             heure = f"{hour:02d}:{minute:02d}:{second:02d}"
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(96, 430, 304, 479)
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
             self.vector.text(heure, (480 - lh[2]) // 2, 465)
             self.presto.update()

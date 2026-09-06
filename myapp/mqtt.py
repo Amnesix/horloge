@@ -111,7 +111,7 @@ class MQTT:
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
-        print(topic, msg)
+        # print(topic, msg)
         for fct in self.callbacks:
             try:
                 fct(topic, msg)
@@ -168,20 +168,20 @@ class MQTTLog:
             self.mqtt.lv = time.time()
             self.mqtt.puissance = msg
         else:
-            color = Color.GREY
+            color = Color.LIGHTGREY
         if 'alert' in topic:
             self.alerte.alerte(msg)
         elif 'debug' in topic:
             print(exec(msg))
         elif 'alarme' in topic:
-            print(f'Alarme : {msg}')
+            # print(f'Alarme : {msg}')
             try:
                 if msg.lower() in ('list', 'liste'):
                     aff = Page.get_page() == 'mqttlogs'
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
                             s = f"Alarme #{index} : {al}"
-                            print(s)
+                            # print(s)
                             self.loggin.log(s, aff=aff)
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
@@ -224,7 +224,7 @@ class MQTTLog:
             stat = self.loggin.get_stat()
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(360, 0, 479, 28)
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
             string = f"{stat:.1f} msg/mn"
             length = int(self.vector.measure_text(string)[2])
@@ -259,7 +259,7 @@ class MQTTLog:
             _, _, _, h, m, s, _, _ = time.gmtime(t + offset)
             self.display.set_pen(Color.BLACK)
             self.display.rectangle(0, 0, 120, 28)
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
             self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 0, 24)
             self.presto.update()

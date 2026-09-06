@@ -61,7 +61,7 @@ class Horloge:
         self.local = True
         self.mqttlogs = mqttlogs
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-        self.fg = Color.GREY
+        self.fg = Color.LIGHTGREY
         self.titre = f"{__title__} - Version {__version__}"
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
@@ -252,7 +252,7 @@ class Horloge:
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
             diff = (RETRAITE - datetime.date(year, month, day)).days
@@ -275,7 +275,7 @@ class Horloge:
                 WIDTH // 4 * 3 - 38,
                 HEIGHT // 2 + 10,
             )
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
             self.vector.text(__title__ + " - " + __version__, 380, 475)
             self.vector.text(__python__, 10, 475)
@@ -302,7 +302,7 @@ class Horloge:
                 else:
                     state = None
                 if state is None:
-                    self.display.set_pen(Color.GREY)
+                    self.display.set_pen(Color.LIGHTGREY)
                     ok = False
                 elif state:
                     self.display.set_pen(Color.GREEN)
@@ -323,7 +323,7 @@ class Horloge:
             elif not self.local and second == 1:
                 self.local = True
             self.total += 1
-            self.display.set_pen(Color.GREY)
+            self.display.set_pen(Color.LIGHTGREY)
             self.vector.text(f"{delai}ms", 10, 460)
 
             self.presto.update()

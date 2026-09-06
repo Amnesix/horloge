@@ -171,7 +171,7 @@ class Log:
 
     def log(self, msg, color=None, nl=True, aff=True):
         if color is None:
-            color = Color.GREY
+            color = Color.LIGHTGREY
         if nl:
             self.msg.append((time.time(), msg, color))
             if len(self.msg) > NB_MAX_HISTO:
@@ -186,7 +186,7 @@ class Log:
     def update_screen(self):
         self.display.set_pen(Color.BLACK)
         self.display.clear()
-        self.display.set_pen(Color.GREY)
+        self.display.set_pen(Color.LIGHTGREY)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
@@ -525,7 +525,7 @@ class Color:
     _ready = False
     BLACK = None
     WHITE = None
-    GREY = None
+    LIGHTGREY = None
     RED = None
     GREEN = None
     BLUE = None
@@ -535,7 +535,7 @@ class Color:
     ORANGE = None
     CYAN = None
     LIGHTYELLOW = None
-    LIGHTGREY = None
+    GREY = None
     DARKGREY = None
 
     @classmethod
@@ -544,7 +544,6 @@ class Color:
             return
         cls.BLACK = display.create_pen(0, 0, 0)
         cls.WHITE = display.create_pen(255, 255, 255)
-        cls.GREY = display.create_pen(127, 127, 127)
         cls.RED = display.create_pen(127, 0, 0)
         cls.GREEN = display.create_pen(0, 127, 0)
         cls.BLUE = display.create_pen(0, 0, 127)
@@ -554,8 +553,9 @@ class Color:
         cls.ORANGE = display.create_pen(127, 39, 5)
         cls.CYAN = display.create_pen(0, 127, 127)
         cls.LIGHTYELLOW = display.create_pen(126, 130, 94)
-        cls.LIGHTGREY = display.create_pen(96, 96, 96)
-        cls.DARKGREY = display.create_pen(64, 64, 64)
+        cls.GREY = display.create_pen(96, 96, 96)
+        cls.LIGHTGREY = display.create_pen(127, 127, 127)
+        cls.DARKGREY = display.create_pen(48, 48, 48)
         cls._ready = True
 
 

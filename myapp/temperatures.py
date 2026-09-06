@@ -185,7 +185,7 @@ class Temperatures:
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         self.presto.update()
-        fg = Color.GREY
+        fg = Color.LIGHTGREY
         # self.maj_temp()
         while True:
             # t_start = time.ticks_ms()

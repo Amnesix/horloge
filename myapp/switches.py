@@ -84,11 +84,12 @@ class Switch:
             self.state = None
 
     def display_switch(self):
-        self.display.set_pen(Color.GREY)
+        self.display.set_pen(Color.LIGHTGREY)
         self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
-        self.display.set_pen(Color.GREEN if self.state else Color.GREY)
+        self.display.set_pen(Color.GREEN if self.state else Color.LIGHTGREY)
         self.vector.draw(self.btn_on)
-        self.display.set_pen(Color.RED if self.state is False else Color.GREY)
+        self.display.set_pen(Color.RED if self.state is
+                             False else Color.LIGHTGREY)
         self.vector.draw(self.btn_off)
 
     def wait_for_status(self, state):
