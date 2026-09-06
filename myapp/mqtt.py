@@ -57,7 +57,7 @@ TOPIC_MSG = {
 class MQTT:
     callbacks = []
     lv = None
-    puissance = 0
+    puissance = "0.0"
 
     def __init__(self, broker, port, alerte, loggin):
         loggin.log("Initialisation MQTT")
@@ -135,8 +135,7 @@ class MQTT:
             self.connect()
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")
-        if self.lv and time.time() - self.lv > 60 and float(
-                self.puissance) == 0.0:
+        if self.lv and time.time() - self.lv > 60 and self.puissance == "0.0":
             self.alerte.alerte("Machine terminée")
             self.lv = None
 
