@@ -51,7 +51,7 @@ alerte = Alerte(presto, display, vector, touch, loggin)
 alarmes = Alarmes(presto, display, vector, touch, alerte, loggin)
 # Initialistion des objets
 broker, port = get_api()[1]
-mqtt = MQTT(broker, port, loggin)
+mqtt = MQTT(broker, port, alerte, loggin)
 mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, loggin)
 initiale_states = get_all_states()
@@ -63,7 +63,7 @@ switches = Switches(presto, display, vector, touch, mqtt, loggin,
 flip = Flip_Clock(presto, display, vector, touch, mqtt, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, alarmes, loggin, mqttlogs)
-menu = Menu(presto, display, touch, mqtt, loggin)
+menu = Menu(presto, display, vector, touch, mqtt, loggin)
 
 # Lancement de l'affichage principal
 loggin.log("Lancement boucle de traitement")

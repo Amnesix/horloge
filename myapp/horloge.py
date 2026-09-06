@@ -29,7 +29,6 @@ class Horloge:
     pos_jours = []
     last_second = 0
     total = 1
-    sup = 0
 
     def __init__(
         self,
@@ -124,14 +123,14 @@ class Horloge:
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 45, HEIGHT // 2 - 18, 90,
                                   36)
         self.sw = {k: Polygon() for k in PRISES.keys()}
-        x, y = 5, 5
+        x, y = 5, 15
         for k in self.sw.keys():
             self.sw[k].circle(x, y, 4)
             x += 10
         self.key_sw = list(self.sw.keys())
         self.id_sw = 0
         self.tmp = {k: Polygon() for k in CAPTEURS.keys()}
-        x, y = 400, 5
+        x, y = 5, 5
         for k in self.temperatures.temps.keys():
             self.tmp[k].circle(x, y, 4)
             x += 10
@@ -231,6 +230,13 @@ class Horloge:
                 self.vector.draw(self.hour_mark)
                 self.tr.reset()
 
+            self.display.set_pen(Color.DARKGREY)
+            self.vector.draw(self.date_box)
+            self.vector.draw(self.retraite_box)
+            self.vector.draw(self.b_temp_box)
+            self.vector.draw(self.e_temp_box)
+            self.display.set_pen(Color.BLACK)
+
             # Dessin des aiguilles
             self.tr.rotate(angle_minute, (x, y))
             self.tr.translate(x, y)
@@ -243,9 +249,6 @@ class Horloge:
             self.tr.reset()
 
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-            self.display.set_pen(Color.BLACK)
-            self.vector.draw(self.date_box)
-            self.vector.draw(self.retraite_box)
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
@@ -255,34 +258,29 @@ class Horloge:
             diff = (RETRAITE - datetime.date(year, month, day)).days
             self.vector.text(f"J-{diff:04d}", WIDTH // 2 - 42, 347)
             # Affichage des dates et retraite au dessus des aiguilles heures & minutes
+            self.display.set_pen(Color.BLACK)
             dehors = self.temperatures.temps["_dehors"]
             bureau = self.temperatures.temps["bureau"]
-            if dehors > -1000 and bureau > -1000:
-                self.display.set_pen(Color.BLACK)
-                self.vector.draw(self.b_temp_box)
-                self.vector.draw(self.e_temp_box)
-                self.vector.text(self.dehors[0], self.dehors[1],
-                                 self.dehors[2])
-                self.vector.text(self.bureau[0], self.bureau[1],
-                                 self.bureau[2])
-                self.temperatures.get_temp_color(dehors)
-                self.vector.text(
-                    f"{dehors:.1f}°C" if dehors > -1000 else "  ???",
-                    WIDTH // 4 - 38,
-                    HEIGHT // 2 + 10,
-                )
-                self.temperatures.get_temp_color(bureau)
-                self.vector.text(
-                    f"{bureau:.1f}°C" if bureau > -1000 else "  ???",
-                    WIDTH // 4 * 3 - 38,
-                    HEIGHT // 2 + 10,
-                )
+            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
+            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
+            self.temperatures.get_temp_color(dehors)
+            self.vector.text(
+                f"{dehors:.1f}°C" if dehors > -1000 else "  ???",
+                WIDTH // 4 - 38,
+                HEIGHT // 2 + 10,
+            )
+            self.temperatures.get_temp_color(bureau)
+            self.vector.text(
+                f"{bureau:.1f}°C" if bureau > -1000 else "  ???",
+                WIDTH // 4 * 3 - 38,
+                HEIGHT // 2 + 10,
+            )
             self.display.set_pen(Color.GREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
             self.vector.text(__title__ + " - " + __version__, 380, 475)
             self.vector.text(__python__, 10, 475)
-            self.vector.text(f"Overrun {self.sup * 100 // self.total:d}%", 400,
-                             460)
+            p = f"Lave linge {self.mqtt.puissance}W"
+            self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]), 10)
             # Aiguille des secondes au dessus de l'ensemble
             self.display.set_pen(Color.RED)
             self.tr.rotate(angle_second, (WIDTH // 2, HEIGHT // 2))
@@ -319,7 +317,6 @@ class Horloge:
             delai = t_end - t_start
             if delai > 1500:
                 # print(f"Boucle : {delai}ms")
-                self.sup += 1
                 self.local = False
             elif not self.local and second == 1:
                 self.local = True

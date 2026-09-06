@@ -1,51 +1,85 @@
 import gc
 import time
 
-import jpegdec
+from picovector import Polygon
 
-from myapp.utils import Page
+from myapp.utils import Color, Page
 
 # IMPORTANT : full_res=True pour utiliser le vrai 480x480
 # (par défaut, Presto() utilise un framebuffer 240x240 mis à l'échelle !)
 
+LARGEUR = 168
+HAUTEUR = 80
+
 
 class MyBtn:
 
-    def __init__(self, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    def __init__(self, x, y, w, h, name):
+        self.name = name
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+        self.w = w
+        self.h = h
 
-    def test(self, x, y):
+    def clicked(self, x, y):
         return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+
+    def init_display(self, presto, display, vector):
+        self.presto = presto
+        self.display = display
+        self.vector = vector
+        self.btn = Polygon()
+        self.btn.rectangle(self.x1,
+                           self.y1,
+                           self.w,
+                           self.h,
+                           corners=(10, 10, 10, 10))
+
+    def affiche(self):
+        self.display.set_pen(Color.LIGHTYELLOW)
+        self.vector.draw(self.btn)
+        self.display.set_pen(Color.BLACK)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
+        self.vector.text(self.name, self.x1 + 10, self.y2 - 35)
 
 
 IMG_MENU = "img/menu.jpg"
 BTN = {
-    "temperatures": MyBtn(36, 99, 225, 207),
-    "horloge": MyBtn(256, 99, 417, 207),
-    "switches": MyBtn(36, 226, 225, 333),
-    "flip": MyBtn(253, 226, 417, 333),
-    "mqttlogs": MyBtn(36, 359, 225, 466),
-    "calendrier": MyBtn(253, 358, 417, 466),
+    "temperatures": MyBtn(36, 60, LARGEUR, HAUTEUR, "Temperatures"),
+    "horloge": MyBtn(256, 60, LARGEUR, HAUTEUR, "Horloge"),
+    "switches": MyBtn(36, 150, LARGEUR, HAUTEUR, "Interrupteurs"),
+    "flip": MyBtn(256, 150, LARGEUR, HAUTEUR, "Flip clock"),
+    "mqttlogs": MyBtn(36, 240, LARGEUR, HAUTEUR, "Logs MQTT"),
+    "calendrier": MyBtn(256, 240, LARGEUR, HAUTEUR, "Calendrier"),
+    "alarme": MyBtn(36, 330, LARGEUR, HAUTEUR, "Alarmes"),
 }
 
 
 class Menu:
 
-    def __init__(self, presto, display, touch, mqtt, loggin):
+    def __init__(self, presto, display, vector, touch, mqtt, loggin):
         self.presto = presto
         self.display = display
+        self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
         if loggin is not None:
             loggin.log("Initialisation menu")
+        for btn in BTN.values():
+            btn.init_display(presto, display, vector)
 
     def affiche(self):
-        self.img = jpegdec.JPEG(self.display)
-        self.img.open_file(IMG_MENU)
-        self.img.decode(0, 0, jpegdec.JPEG_SCALE_FULL)
+        self.display.set_pen(Color.BLACK)
+        self.presto.clear()
+        self.display.set_pen(Color.LIGHTYELLOW)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 40)
+        txt = "Choix page"
+        lt = int(self.vector.measure_text(txt)[2])
+        self.vector.text("Choix page", 240 - lt // 2, 35)
+        for btn in BTN.values():
+            btn.affiche()
         self.presto.update()
         page = Page.get_page()
         while True:
@@ -59,18 +93,17 @@ class Menu:
                     time.sleep(.1)
                 x, y = self.touch.x, self.touch.y
                 for btn, coord in BTN.items():
-                    if coord.test(x, y):
-                        del self.img
+                    if coord.clicked(x, y):
                         gc.collect()
                         Page.set_page(btn)
                         return btn
             time.sleep(.1)
 
 
-if __name__ == '__main__':
+"""if __name__ == '__main__':
     presto = Presto(full_res=True)
     display = presto.display
     touch = presto.touch
 
     menu = Menu(presto, display, touch, None)
-    print(menu.affiche())
+    print(menu.affiche())"""

@@ -52,12 +52,12 @@ CAPTEURS = {
 # Les libellés sont ceux affichés et sont succeptibles de changer.
 PRISES = {
     "Ventilo": "antela_prise_intelligente_2_socket_1",
-    "RPi": "pipmc_net_194_socket_1",
+    "RPi": "rpi",
     "Multimédia": "multimedia_salon_socket_1",
     "Cuisine": "prise_connectee",
     "Buandrie": "lave_linge",
     "Douche": "sonoff_s60zbtpf",
-    "SwitchEth": "eth",
+    "Ethernet": "eth",
 }
 # Dictionnaires de PRISES connectées
 # Les libellés sont ceux affichés et sont succeptibles de changer.
@@ -66,7 +66,7 @@ PRISES = {
     "switch.pipmc_net_194_socket_1": "RPi",
     "switch.multimedia_salon_socket_1": "Multimédia",
     "switch.prise_connectee": "Cuisine",
-    "switch.eth": "SwitchEth",
+    "switch.eth": "Ethernet",
     "switch.sonoff_s60zbtpf": "Douche",
     "switch.lave_linge": "Buandrie",
 }"""

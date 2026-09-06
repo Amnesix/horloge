@@ -59,9 +59,9 @@ class Alarme:
 
 class Alarmes:
     alarmes = [
-        Alarme(11, 59, 40, -1, False),
-        Alarme(16, 44, 40, -1, False),
-        Alarme(17, 14, 40, 4, False)
+        # Alarme(11, 59, 40, -1, False),
+        # Alarme(16, 44, 40, -1, False),
+        # Alarme(17, 14, 40, 4, False)
     ]
 
     def __init__(self, presto, display, vector, touch, alerte, loggin):

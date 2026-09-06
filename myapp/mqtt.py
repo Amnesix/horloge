@@ -28,12 +28,15 @@ SOUSCRIPTIONS = {
     # Interrupteurs
     "home/switch/ventilo": "Ventilo",
     "home/switch/rpi": "RPi",
-    "home/switch/eth": "SwitchEth",
+    "home/switch/eth": "Ethernet",
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
     "home/switch/lave_linge": "Buandrie",
+    # Lave lave_linge
+    "home/lave_linge/puissance": "Machine",
     # Autres
+    "home/page": "-",
     "home/commandes": "-",
     "home/alerte": "-",
     "home/alarme": "-",
@@ -47,17 +50,20 @@ TOPIC_MSG = {
     "Ventilo": "home/toggle/ventilo",
     "Buandrie": "home/toggle/lave_linge",
     "Multimédia": "home/toggle/multimedia",
-    "SwitchEth": "home/toggle/eth",
+    "Ethernet": "home/toggle/eth",
 }
 
 
 class MQTT:
     callbacks = []
+    lv = None
+    puissance = 0
 
-    def __init__(self, broker, port, loggin):
+    def __init__(self, broker, port, alerte, loggin):
         loggin.log("Initialisation MQTT")
         self.broker = broker
         self.port = port
+        self.alerte = alerte
         self.loggin = loggin
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
@@ -114,7 +120,7 @@ class MQTT:
                 print(fct.__name__)
 
     def mqtt_commandes(self, topic, msg):
-        if 'command' in topic:
+        if 'page' in topic:
             Page.set_page(msg)
 
     def get_room(self, topic):
@@ -125,10 +131,14 @@ class MQTT:
             if self.client is not None:
                 self.client.check_msg()
         except OSError:
-            print("Déconnexion MQTT")
+            print("Deconnexion MQTT")
             self.connect()
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")
+        if self.lv and time.time() - self.lv > 60 and float(
+                self.puissance) == 0.0:
+            self.alerte.alerte("Machine terminée")
+            self.lv = None
 
 
 class MQTTLog:
@@ -154,6 +164,10 @@ class MQTTLog:
             color = Color.GREEN
         elif 'humidity' in topic:
             color = Color.CYAN
+        elif 'puissance' in topic:
+            color = Color.LIGHTYELLOW
+            self.mqtt.lv = time.time()
+            self.mqtt.puissance = msg
         else:
             color = Color.GREY
         if 'alert' in topic:
@@ -163,7 +177,7 @@ class MQTTLog:
         elif 'alarme' in topic:
             print(f'Alarme : {msg}')
             try:
-                if msg == 'list':
+                if msg.lower() in ('list', 'liste'):
                     aff = Page.get_page() == 'mqttlogs'
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
