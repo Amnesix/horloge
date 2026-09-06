@@ -280,7 +280,9 @@ class Horloge:
             self.vector.text(__title__ + " - " + __version__, 380, 475)
             self.vector.text(__python__, 10, 475)
             p = f"Lave linge {self.mqtt.puissance}W"
-            self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]), 10)
+            if p != "0.0":
+                self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
+                                 10)
             # Aiguille des secondes au dessus de l'ensemble
             self.display.set_pen(Color.RED)
             self.tr.rotate(angle_second, (WIDTH // 2, HEIGHT // 2))
