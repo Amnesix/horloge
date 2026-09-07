@@ -165,7 +165,6 @@ class Horloge:
             while self.touch.state:
                 self.touch.poll()
 
-        ret = False
         data = get_touch(self.touch)
         if data is None:
             return False
@@ -192,14 +191,10 @@ class Horloge:
                 time.sleep_ms(10)
                 continue
             self.last_second = second
-            # if (minute % 15) == 0 and second == 0:
-            #     self.temperatures.maj_temp()
 
             self.tr.reset()
             self.display.set_pen(Color.BLACK)
             self.display.clear()
-            """self.display.set_pen(Color.CYAN)
-            self.vector.draw(self.contour)"""
             index = self.alarmes.next_alarme()
             h, m, s = self.alarmes.get_alarme(index).get_time()
             # TODO: si s < 6 il faut tester m-1 !
@@ -224,16 +219,6 @@ class Horloge:
             angle_hour += minute / 2
             angle_second = second * 6
             self.display.set_pen(Color.BLACK)
-            """# Dessin des repères des minutes
-            for a in range(60):
-                self.tr.rotate(360 / 60.0 * a, (x, y))
-                self.vector.draw(self.tick_mark)
-                self.tr.reset()
-            # Dessin des repères des heures
-            for a in range(12):
-                self.tr.rotate(360 / 12.0 * a, (x, y))
-                self.vector.draw(self.hour_mark)
-                self.tr.reset()"""
 
             self.display.set_pen(Color.DARKGREY)
             self.vector.draw(self.date_box)
