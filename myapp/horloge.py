@@ -75,24 +75,13 @@ class Horloge:
         self.hub = Polygon()
         self.hub.circle(int(WIDTH / 2), int(HEIGHT / 2), 7)
 
-        self.contour = Polygon()
-        self.contour.circle(int(WIDTH / 2), int(HEIGHT / 2), int(HEIGHT / 2))
-        self.fg_contour = Color.CYAN
-        self.face = Polygon()
-        self.face.circle(int(WIDTH / 2), int(HEIGHT / 2), int(HEIGHT / 2) - 3)
-
-        self.tick_mark = Polygon()
-        self.tick_mark.rectangle(int(WIDTH / 2) - 3, 10, 6, int(HEIGHT / 48))
-
-        self.hour_mark = Polygon()
-        self.hour_mark.rectangle(int(WIDTH / 2) - 5, 10, 10, int(HEIGHT / 10))
-
         self.minute_hand_length = int(HEIGHT / 2) - int(HEIGHT / 8)
         self.minute_hand = Polygon()
         self.minute_hand.path(
             (-5, -self.minute_hand_length),
-            (-10, int(HEIGHT / 16)),
-            (10, int(HEIGHT / 16)),
+            (-8, int(HEIGHT / 16)),
+            (0, int(HEIGHT / 16) - 2),
+            (8, int(HEIGHT / 16)),
             (5, -self.minute_hand_length),
             (0, -self.minute_hand_length - 5),
         )
@@ -102,6 +91,7 @@ class Horloge:
         self.hour_hand.path(
             (-5, -self.hour_hand_length),
             (-10, int(HEIGHT / 16)),
+            (0, int(HEIGHT / 16) - 2),
             (10, int(HEIGHT / 16)),
             (5, -self.hour_hand_length),
             (0, -self.hour_hand_length - 5),
@@ -156,8 +146,6 @@ class Horloge:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         self.display.set_pen(Color.BLACK)
         self.display.clear()
-        self.display.set_pen(self.fg_contour)
-        self.vector.draw(self.contour)
 
     def gere_touch(self):
 
