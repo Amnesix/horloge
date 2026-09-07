@@ -252,17 +252,28 @@ class Horloge:
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
+            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
+            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
+
+            # Aiguille des secondes au dessus de l'ensemble
+            self.display.set_pen(Color.RED)
+            self.tr.rotate(angle_second, (WIDTH // 2, HEIGHT // 2))
+            self.tr.translate(x, y)
+            self.vector.draw(self.second_hand)
+            self.tr.reset()
+            self.vector.draw(self.hub)
+
+            self.display.set_pen(Color.BLACK)
             self.display.set_pen(Color.LIGHTGREY)
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
             diff = (RETRAITE - datetime.date(year, month, day)).days
             self.vector.text(f"J-{diff:04d}", WIDTH // 2 - 42, 347)
+
             # Affichage des dates et retraite au dessus des aiguilles heures & minutes
             self.display.set_pen(Color.BLACK)
             dehors = self.temperatures.temps["_dehors"]
             bureau = self.temperatures.temps["bureau"]
-            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
-            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
             self.temperatures.get_temp_color(dehors)
             self.vector.text(
                 f"{dehors:.1f}°C" if dehors > -1000 else "  ???",
@@ -283,18 +294,6 @@ class Horloge:
                 p = f"Lave linge {self.mqtt.puissance}W"
                 self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
                                  10)
-            # Aiguille des secondes au dessus de l'ensemble
-            self.display.set_pen(Color.RED)
-            self.tr.rotate(angle_second, (WIDTH // 2, HEIGHT // 2))
-            self.tr.translate(x, y)
-            self.vector.draw(self.second_hand)
-            self.tr.reset()
-            self.vector.draw(self.hub)
-
-            # À priori, demander l'ensemble des états et filtrer est beaucoup
-            # plus long que demander les états séparéments.
-            # if self.local or second in (1, 16, 31, 46):
-            #     self.switches.get_all_states()
             ok = True
             for key in self.key_sw:
                 if ok:
