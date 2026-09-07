@@ -22,9 +22,6 @@ DEMANDE = 5
 
 
 class Temperatures:
-    temps = {}
-    humidity = {}
-    maj = {}
 
     def __init__(self, presto, display, vector, touch, mqtt, loggin,
                  initiale_states):
@@ -44,6 +41,9 @@ class Temperatures:
         self.t_rouge = display.create_pen(132, 32, 32)
         self.t_violet = display.create_pen(132, 32, 132)
         s = time.time()
+        self.temps = dict()
+        self.humidity = dict()
+        self.maj = dict()
         for k, v in CAPTEURS.items():
             self.maj[k] = s
             try:
@@ -57,17 +57,16 @@ class Temperatures:
             try:
                 self.humidity[k] = float(initiale_states["sensor." + v[2]])
             except KeyError:
-                self.humidity = {k: 0 for k in CAPTEURS}
+                self.humidity = {k: 0. for k in CAPTEURS}
             except ValueError:
-                self.humidity[k] = 0
+                self.humidity[k] = 0.
             except Exception as e:
                 print(f"Exception non gérée {e}")
         # Tendances par défaut : idem températures actuelles
         s = time.time()
         self.tdt = {k: [v, s] for k, v in self.temps.items()}
         self.tdh = {k: [v, s] for k, v in self.humidity.items()}
-        self.mqtt.set_callback(self.update_temp)
-        self.mqtt.set_callback(self.update_humidity)
+        self.mqtt.set_callback(self.update)
 
     def get_temp(self, capteur: str) -> float:
         try:
@@ -83,30 +82,24 @@ class Temperatures:
             ret = -1000.
         return ret
 
-    def update_temp(self, topic, value):
-        """Mise à jour de la température via MQTT"""
-        if "temp" not in topic:
-            return
-        room = self.mqtt.get_room(topic)
-        self.maj[room] = time.time()
-        try:
-            if room in self.temps:
-                self.tdt[room] = [self.temps[room], time.time()]
-                self.temps[room] = float(value)
-        except ValueError:
-            self.temps[room] = -1000.
-
-    def update_humidity(self, topic, value):
-        """Mise à jour de la température via MQTT"""
-        if "humidity" not in topic:
-            return
-        room = self.mqtt.get_room(topic)
-        self.maj[room] = time.time()
-        try:
-            if room in self.humidity:
-                self.humidity[room] = float(value)
-        except ValueError:
-            self.humidity[room] = 0
+    def update(self, topic, value):
+        if "temp" in topic:
+            room = self.mqtt.get_room(topic)
+            self.maj[room] = time.time()
+            try:
+                if room in self.temps:
+                    self.tdt[room] = [self.temps[room], time.time()]
+                    self.temps[room] = float(value)
+            except ValueError:
+                self.temps[room] = -1000.
+        elif "humidity" in topic:
+            room = self.mqtt.get_room(topic)
+            self.maj[room] = time.time()
+            try:
+                if room in self.humidity:
+                    self.humidity[room] = float(value)
+            except ValueError:
+                self.humidity[room] = 0
 
     def get_all_temp(self):
         # Récupération de tous les états

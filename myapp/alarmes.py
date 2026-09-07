@@ -16,9 +16,9 @@ class Alarme:
         self.seconde = seconde
         self.jour = jour
         self.oneshot = oneshot
-        print(
+        """print(
             f"Alarme ajouté {self.heure}:{self.minute}:{self.seconde} - jour {self.jour} / {'oneshot' if self.oneshot else ''}"
-        )
+        )"""
 
     def get_time(self):
         return self.heure, self.minute, self.seconde

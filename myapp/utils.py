@@ -212,7 +212,7 @@ def wifi_connect(presto, loggin=None):
     global net_config
 
     def teste_connexion():
-        # Pourquoi ça tombe régulièrement en timeout ?
+        # En cas de reonnexion, j'ai systématiquement un TIMEOUT. Pourquoi ?
         if not presto.wifi.isconnected():
             if loggin:
                 loggin.log("Non connecté !")

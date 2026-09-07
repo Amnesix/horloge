@@ -3,6 +3,7 @@ import gc
 import sys
 import time
 
+import jpegdec
 from picovector import Polygon
 
 from myapp.utils import (
@@ -66,6 +67,8 @@ class Horloge:
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
+        # Pour le décodage de l'image de fond
+        self.jpg = jpegdec.JPEG(self.display)
 
         self.next_update_time = time.time() + 12 * 60 * 60
 
@@ -195,22 +198,24 @@ class Horloge:
             self.tr.reset()
             self.display.set_pen(Color.BLACK)
             self.display.clear()
-            self.display.set_pen(Color.CYAN)
-            self.vector.draw(self.contour)
+            """self.display.set_pen(Color.CYAN)
+            self.vector.draw(self.contour)"""
             index = self.alarmes.next_alarme()
             h, m, s = self.alarmes.get_alarme(index).get_time()
             # TODO: si s < 6 il faut tester m-1 !
             if hour == h and minute == m and second in ((s - 6) % 60,
                                                         (s - 4) % 60,
                                                         (s - 2) % 60, s):
-                self.display.set_pen(Color.RED)
+                # self.display.set_pen(Color.RED)
+                self.jpg.open_file("img/cadran_alarm.jpg")
                 if second == s and self.alarmes.get_alarme(
                         index).get_oneshot():
                     self.alarmes.remove_alarme(index)
             else:
-                self.display.set_pen(Color.LIGHTYELLOW)
-            self.vector.draw(self.face)
-            # self.display.circle(int(WIDTH / 2), int(HEIGHT / 2), int(HEIGHT / 2) - 4)
+                # self.display.set_pen(Color.LIGHTYELLOW)
+                self.jpg.open_file("img/cadran.jpg")
+            self.jpg.decode(0, 0, jpegdec.JPEG_SCALE_FULL, dither=True)
+            # self.vector.draw(self.face)
 
             x, y = (WIDTH // 2, HEIGHT // 2)
             angle_minute = minute * 6
@@ -219,7 +224,7 @@ class Horloge:
             angle_hour += minute / 2
             angle_second = second * 6
             self.display.set_pen(Color.BLACK)
-            # Dessin des repères des minutes
+            """# Dessin des repères des minutes
             for a in range(60):
                 self.tr.rotate(360 / 60.0 * a, (x, y))
                 self.vector.draw(self.tick_mark)
@@ -228,7 +233,7 @@ class Horloge:
             for a in range(12):
                 self.tr.rotate(360 / 12.0 * a, (x, y))
                 self.vector.draw(self.hour_mark)
-                self.tr.reset()
+                self.tr.reset()"""
 
             self.display.set_pen(Color.DARKGREY)
             self.vector.draw(self.date_box)
