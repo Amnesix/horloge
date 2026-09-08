@@ -41,7 +41,7 @@ CAPTEURS = {
     "cyril": ("Chambre Cyril", "th_cyril_temperature", "th_cyril_humidity"),
     "buandrie": ("Arrière cuisine", "th_arriere_cuisine_temperature",
                  "th_arriere_cuisine_humidity"),
-    "cuisine": ("Cuisine", "th_cuisine_temperature", "th_cuisine_humidity"),
+    "cuisine": ("Cuisine", "th_cuisine_temperature", "th_cuisine_humidite"),
     "douche": ("Douche", "th_douche_temperature", "th_douche_humidity"),
     "parents":
     ("Chambre parents", "th_parent_temperature", "th_parent_humidity"),
@@ -87,7 +87,7 @@ HUMIDITY_to_CAPTEURS = {
     "sensor.th_bureau_humidity": "bureau",
     "sensor.th_cyril_humidity": "cyril",
     "sensor.th_arriere_cuisine_humidity": "buandrie",
-    "sensor.th_cuisine_humidity": "cuisine",
+    "sensor.th_cuisine_humidite": "cuisine",
     "sensor.th_douche_humidity": "douche",
     "sensor.th_parent_humidity": "parents",
     "sensor.th_salon_humidity": "salon",
