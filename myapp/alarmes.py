@@ -1,7 +1,54 @@
+import gc
 import json
 import time
 
-from myapp.utils import JOURS, TZ
+import jpegdec
+
+from myapp.utils import JOURS, TZ, Color
+
+LARGEUR = 168
+HAUTEUR = 80
+ABVJ = ['lu', 'ma', 'me', 'je', 've', 'sa', 'di']
+
+
+class MyBtn:
+    """Classe de définition  de boutons perso"""
+
+    def __init__(self, x, y, w, h, name, oneshot):
+        self.name = name
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+        self.w = w
+        self.h = h
+        self.oneshot = oneshot
+
+    def clicked(self, x, y):
+        return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+
+
+BTN = {
+    "btn_p": (10, 75, 94, 47, True),
+    "btn_n": (375, 75, 94, 47, True),
+    "btn_next": (93, 135, 122, 48, True),
+    "btn_del": (262, 135, 122, 48, True),
+    "btn_new": (180, 197, 121, 48, True),
+    "btn_hm": (36, 418, 52, 52, False),
+    "btn_hp": (101, 418, 52, 52, False),
+    "btn_mm": (182, 418, 52, 52, False),
+    "btn_mp": (247, 418, 52, 52, False),
+    "btn_sm": (328, 418, 52, 52, False),
+    "btn_sp": (392, 418, 52, 52, False),
+    "btn_lu": (24, 343, 32, 32, True),
+    "btn_ma": (74, 343, 32, 32, True),
+    "btn_me": (124, 343, 32, 32, True),
+    "btn_je": (174, 343, 32, 32, True),
+    "btn_ve": (224, 343, 32, 32, True),
+    "btn_sa": (274, 343, 32, 32, True),
+    "btn_di": (327, 343, 32, 32, True),
+    "btn_oneshot": (408, 343, 32, 32, True),
+}
 
 
 class Alarme:
@@ -16,9 +63,6 @@ class Alarme:
         self.seconde = seconde
         self.jour = jour
         self.oneshot = oneshot
-        """print(
-            f"Alarme ajouté {self.heure}:{self.minute}:{self.seconde} - jour {self.jour} / {'oneshot' if self.oneshot else ''}"
-        )"""
 
     def get_time(self):
         return self.heure, self.minute, self.seconde
@@ -58,21 +102,22 @@ class Alarme:
 
 
 class Alarmes:
-    alarmes = [
-        # Alarme(11, 59, 40, -1, False),
-        # Alarme(16, 44, 40, -1, False),
-        # Alarme(17, 14, 40, 4, False)
-    ]
+    new_al = None
 
     def __init__(self, presto, display, vector, touch, alerte, loggin):
         loggin.log("Initialisation Alarmes")
+        self.btn = {}
+        self.alarmes = []
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.alerte = alerte
         self.load_alarmes()
-        # Création de la page
+        self.jpg = jpegdec.JPEG(self.display)
+        for k, v in BTN.items():
+            x, y, w, h, oneshot = v
+            self.btn[k] = MyBtn(x, y, w, h, k, oneshot)
 
     def add_alarme(self, heure, minute, seconde, jour=-1, oneshot=True):
         if seconde == 0:
@@ -145,5 +190,62 @@ class Alarmes:
                 h, m, s = t
                 self.alarmes.append(Alarme(h, m, s, d, o))
 
+    def btn_clicked(self, name):
+        if name in map(lambda x: 'btn_' + x, ABVJ + ['oneshot']):
+            print(f"btn {name} clické")
+        elif name == 'btn_new':
+            t = time.time()
+            _, _, _, h, m, s, d, _ = time.gmtime(t + TZ.get_offset(t) * 3600)
+            self.new_al = Alarme(h, m, s)
+        elif name == 'btn_p':
+            return len(self.alarmes) - 1
+        elif name == 'btn_n':
+            return 1
+        elif self.new_al is not None:
+            if name == 'btn_hm':
+                self.new_al.heure = (self.new_al.heure + 23) % 24
+            elif name == 'btn_hp':
+                self.new_al.heure = (self.new_al.heure + 1) % 24
+            elif name == 'btn_mm':
+                self.new_al.minute = (self.new_al.minute + 59) % 60
+            elif name == 'btn_mp':
+                self.new_al.minute = (self.new_al.minute + 1) % 60
+            elif name == 'btn_sm':
+                self.new_al.seconde = (self.new_al.seconde + 59) % 60
+            elif name == 'btn_sp':
+                self.new_al.seconde = (self.new_al.seconde + 1) % 60
+        return 0
+
     def affiche(self):
         """Affichage d'une interface de gestion"""
+        index = self.next_alarme()
+        while True:
+            al = self.get_alarme(index)
+            self.jpg.open_file("img/alarme.jpg")
+            self.jpg.decode(0, 0, jpegdec.JPEG_SCALE_FULL, dither=True)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+            s = f"{al.heure:02d}:{al.minute:02d}:{al.seconde:02d} "
+            s += f"{'*' if al.jour == -1 else ABVJ[al.jour]} "
+            s += f"{'oneshot' if al.oneshot else ''}"
+            self.display.set_pen(Color.LIGHTYELLOW)
+            pos = 240 - int(self.vector.measure_text(s)[2] / 2)
+            self.vector.text(s, pos, 110)
+            if self.new_al is not None:
+                al = self.new_al
+                pos = 240 - int(self.vector.measure_text(s)[2] / 2)
+                s = f"{al.heure:02d}:{al.minute:02d}:{al.seconde:02d} "
+                self.vector.text(s, pos, 280)
+            self.presto.update()
+            self.touch.poll()
+            if self.touch.state:
+                x, y = self.touch.x, self.touch.y
+                if y < 48:
+                    gc.collect()
+                    return
+                for btn in self.btn.values():
+                    if btn.clicked(x, y):
+                        if btn.oneshot:
+                            while self.touch.state:
+                                self.touch.poll()
+                        index = (index + self.btn_clicked(btn.name)) % len(
+                            self.alarmes)

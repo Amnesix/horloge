@@ -1,5 +1,6 @@
 import datetime
 import math
+import random
 import time
 
 import ntptime
@@ -15,7 +16,6 @@ NTPHOST = (
     "1.fr.pool.ntp.org",
     "2.fr.pool.ntp.org",
     "3.fr.pool.ntp.org",
-    "pool.ntp.org",
 )
 
 JOURS = ("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",
@@ -415,7 +415,7 @@ def update_time(loggin, show_log=True):
     # Mise à l'heure
     if show_log:
         loggin.log("Mise à l'heure")
-    server = 0
+    server = random.choice(range(4))
     while True:
         s = f" * Serveur NTP {NTPHOST[server]}"
         if show_log:

@@ -156,20 +156,22 @@ class Calendar:
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         # Dessin du calendrier
-        self.display.set_pen(Color.CYAN)
+        self.display.set_pen(Color.BLUE)
         self.display.rectangle(12, 70, 460, 354)
         self.display.rectangle(13, 71, 458, 352)
         self.display.set_pen(Color.LIGHTGREY)
         self.display.rectangle(14, 72, 355, 350)
         self.display.set_pen(self.color_we)
         self.display.rectangle(356, 72, 114, 350)
-        self.display.set_pen(Color.CYAN)
+        self.display.set_pen(Color.BLUE)
         # 1 ligne vertical tous les 58 pixels
         for x in range(70, 423, 57):
             self.display.line(x, 72, x, 422)
         # 1 ligne horizontale tous les 50 pixels
         for y in range(123, 374, 50):
             self.display.line(14, y, 470, y)
+        self.display.set_pen(Color.BLACK)
+        self.display.rectangle(12, 70, 58, 53)
         # Affichage du text
         self.display.set_pen(Color.LIGHTGREY)
         s = f"{MOIS[self.month - 1]} {self.year}"
@@ -183,6 +185,7 @@ class Calendar:
             self.init_calendar(time.time())
         y = 110
         i = 0
+        change_font = True
         for line in self.calendar:
             x = 16
             first = True
@@ -205,6 +208,11 @@ class Calendar:
                 l = int((50 - self.vector.measure_text(s)[2]) // 2)
                 self.vector.text(s, x + l, y)
                 x += 57
+                self.presto.update()
+            if change_font:
+                change_font = False
+                self.vector.set_font("Roboto-Medium-With-Material-Symbols.af",
+                                     36)
             y += 50
         # self.presto.update()
 
@@ -212,8 +220,9 @@ class Calendar:
         while self.touch.state:
             self.touch.poll()
         self.draw_calendar(True)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         lh = list(map(int, self.vector.measure_text("##:##:##")))
-        last_time = 0
+        last_time = time.time()
         while True:
             if verifier_connexion(self.presto, self.loggin):
                 self.mqtt.reconnect()
@@ -249,6 +258,8 @@ class Calendar:
                 time.sleep(0.1)
                 continue
             elif s - last_time > 5 or Page.get_redraw():
+                if Page.get_redraw():
+                    Page.set_redraw(format)
                 self.draw_calendar(False)
             last_time = s
             self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(

@@ -167,7 +167,7 @@ class MQTTLog:
             color = Color.LIGHTYELLOW
             self.mqtt.lv = time.time()
             self.mqtt.puissance = msg
-        elif 'fincyle' in topic:
+        elif 'fincycle' in topic:
             self.alerte.alerte("Machine terminée")
         else:
             color = Color.LIGHTGREY

@@ -84,6 +84,8 @@ while True:
         temperatures.affiche()
     elif page == 'mqttlogs':
         mqttlogs.affiche()
+    elif page == 'alarme':
+        alarmes.affiche()
     elif Page.get_page() == 'exit':
         break
     new_page = Page.get_page()
