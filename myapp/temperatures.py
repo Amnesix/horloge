@@ -23,7 +23,7 @@ DEMANDE = 5
 
 class Temperatures:
 
-    def __init__(self, presto, display, vector, touch, mqtt, loggin,
+    def __init__(self, presto, display, vector, touch, mqtt, alerte, loggin,
                  initiale_states):
         loggin.log("Initialisation températures")
         self.presto = presto
@@ -31,6 +31,7 @@ class Temperatures:
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.alerte = alerte
         self.loggin = loggin
         self.api = get_api()[0]
         self.t_cyan = display.create_pen(28, 132, 132)
@@ -190,6 +191,8 @@ class Temperatures:
             if get_touch(self.touch) == 'R':
                 Page.clear()
                 return
+            if self.alerte.id_show:
+                self.alerte.show()
             s = time.time()
             offset = 3600 * TZ.get_offset(s)
             if last_time == s:

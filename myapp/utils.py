@@ -561,6 +561,7 @@ class Color:
 
 class Alerte:
     message = []
+    id_show = False
 
     def __init__(self, presto, display, vector, touch, loggin):
         loggin.log("Initialisation alertes")
@@ -586,7 +587,7 @@ class Alerte:
                 self.message.append(word)
             else:
                 self.message[-1] += " " + word
-        self.show()
+        self.id_show = True
 
     def show(self, timeout=10):
         # Fin de l'affichage :
@@ -608,3 +609,4 @@ class Alerte:
                 break
             time.sleep(.25)
         Page.set_redraw(True)
+        self.id_show = False

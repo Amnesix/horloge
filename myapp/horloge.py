@@ -44,6 +44,7 @@ class Horloge:
         switches,
         calendar,
         alarmes,
+        alerte,
         loggin,
         mqttlogs,
     ):
@@ -58,6 +59,7 @@ class Horloge:
         self.switches = switches
         self.calendar = calendar
         self.alarmes = alarmes
+        self.alerte = alerte
         self.loggin = loggin
         self.local = True
         self.mqttlogs = mqttlogs
@@ -179,7 +181,8 @@ class Horloge:
                 time.sleep_ms(10)
                 continue
             self.last_second = second
-
+            if self.alerte.id_show:
+                self.alerte.show()
             self.tr.reset()
             self.display.set_pen(Color.BLACK)
             self.display.clear()

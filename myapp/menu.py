@@ -59,12 +59,13 @@ BTN = {
 
 class Menu:
 
-    def __init__(self, presto, display, vector, touch, mqtt, loggin):
+    def __init__(self, presto, display, vector, touch, mqtt, alerte, loggin):
         self.presto = presto
         self.display = display
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.alerte = alerte
         if loggin is not None:
             loggin.log("Initialisation menu")
         for btn in BTN.values():
@@ -86,6 +87,8 @@ class Menu:
             self.mqtt.check_msg()
             if page != Page.get_page():
                 return
+            if self.alerte.id_show:
+                self.alerte.show()
             self.touch.poll()
             if self.touch.state:
                 while self.touch.state:

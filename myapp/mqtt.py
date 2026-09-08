@@ -35,6 +35,7 @@ SOUSCRIPTIONS = {
     "home/switch/lave_linge": "Buandrie",
     # Lave lave_linge
     "home/lave_linge/puissance": "Machine",
+    "home/lave_linge/fincycle": "-",
     # Autres
     "home/page": "-",
     "home/commandes": "-",
@@ -136,7 +137,6 @@ class MQTT:
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")
         if self.lv and time.time() - self.lv > 60 and self.puissance == "0.0":
-            self.alerte.alerte("Machine terminée")
             self.lv = None
 
 
@@ -167,6 +167,8 @@ class MQTTLog:
             color = Color.LIGHTYELLOW
             self.mqtt.lv = time.time()
             self.mqtt.puissance = msg
+        elif 'fincyle' in topic:
+            self.alerte.alerte("Machine terminée")
         else:
             color = Color.LIGHTGREY
         if 'alert' in topic:

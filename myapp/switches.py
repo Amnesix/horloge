@@ -114,7 +114,7 @@ class Switches:
     switches = {}
     capteurs = []
 
-    def __init__(self, presto, display, vector, touch, mqtt, loggin,
+    def __init__(self, presto, display, vector, touch, mqtt, alerte, loggin,
                  initiale_state):
         loggin.log("Initialisation switches")
         self.presto = presto
@@ -122,6 +122,7 @@ class Switches:
         self.vector = vector
         self.touch = touch
         self.mqtt = mqtt
+        self.alerte = alerte
         self.loggin = loggin
         self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
@@ -208,6 +209,8 @@ class Switches:
                 self.mqtt.reconnect()
             if Page.get_page() != 'switches':
                 return
+            if self.alerte.id_show:
+                self.alerte.show()
             self.mqtt.check_msg()
             self.touch.poll()
             if self.btnReturn.is_pressed():
