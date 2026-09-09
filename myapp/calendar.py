@@ -149,6 +149,12 @@ class Calendar:
         self.calendar = monthly_calendar(self.year, self.month)
 
     def set_month(self, month):
+        if month == 0:
+            month = 12
+            self.set_year(self.year - 1)
+        elif month == 13:
+            month = 1
+            self.set_year(self.year + 1)
         self.month = month
         self.calendar = monthly_calendar(self.year, self.month)
 
