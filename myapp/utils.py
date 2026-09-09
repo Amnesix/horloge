@@ -1,4 +1,5 @@
 import datetime
+import json
 import math
 import random
 import time
@@ -228,7 +229,9 @@ def wifi_connect(presto, loggin=None):
             print(f"wifi_connect():Exception ({e})")
         return False
 
-    indice = net_config
+    with open("wifi.json", "rt") as f:
+        d = json.load(f)
+    indice = d["indice"]
     while True:
         if loggin is not None:
             loggin.log(f" * SSID={CONFIG[indice][0]} : ")
@@ -238,9 +241,12 @@ def wifi_connect(presto, loggin=None):
                 loggin.log(f" * SSID={CONFIG[indice][0]} : OK", nl=False)
             net_config = indice
             set_api(indice)
+            d["indice"] = indice
             if loggin is not None:
                 loggin.log(f"IP : {presto.wifi.ipv4()}")
             teste_connexion()
+            with open("wifi.json", "wt") as f:
+                json.dump(d, f)
             return
         if loggin is not None:
             loggin.log(f" * SSID={CONFIG[indice][0]} : NOK", nl=False)

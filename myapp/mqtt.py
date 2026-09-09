@@ -69,7 +69,7 @@ class MQTT:
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
         self.connect()
-        loggin.log(f"Connected to MQTT at {broker}:{port}.")
+        loggin.log(f"Connecté à MQTT à {broker}:{port}.")
 
     def connect(self):
         self.client = MQTTClient(self.client_id, self.broker, port=self.port)
@@ -77,10 +77,15 @@ class MQTT:
         self.set_callback(self.mqtt_commandes)
         try:
             self.client.connect()
-            for k in SOUSCRIPTIONS:
+            self.loggin.log("Client MQTT connecté")
+            t = len(SOUSCRIPTIONS)
+            for n, k in enumerate(SOUSCRIPTIONS):
+                s = f"Souscription : {(n + 1) * 100 / t:.0f}%"
+                self.loggin.log(s, nl=False)
                 self.client.subscribe(k)
         except OSError as e:
             print(f"Erreur de connexion : {e}")
+            self.loggin.log(f"Erreur MQTT : {e}")
 
     def disconnect(self):
         if self.client is not None:
