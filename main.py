@@ -1,5 +1,6 @@
 import time
 
+import machine
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
@@ -86,7 +87,14 @@ while True:
         mqttlogs.affiche()
     elif page == 'alarme':
         alarmes.affiche()
-    elif Page.get_page() == 'exit':
+    elif page == 'reboot':
+        display.set_pen(Color.BLACK)
+        display.clear()
+        presto.update()
+        mqtt.disconnect()
+        machine.reset()
+        break
+    elif page == 'exit':
         break
     new_page = Page.get_page()
     if page == new_page:

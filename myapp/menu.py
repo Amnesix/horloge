@@ -54,6 +54,7 @@ BTN = {
     "mqttlogs": MyBtn(36, 240, LARGEUR, HAUTEUR, "Logs MQTT"),
     "calendrier": MyBtn(256, 240, LARGEUR, HAUTEUR, "Calendrier"),
     "alarme": MyBtn(36, 330, LARGEUR, HAUTEUR, "Alarmes"),
+    "reboot": MyBtn(256, 330, LARGEUR, HAUTEUR, "Reboot"),
 }
 
 

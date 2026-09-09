@@ -80,6 +80,7 @@ class MQTT:
             self.loggin.log("Client MQTT connecté")
             t = len(SOUSCRIPTIONS)
             for n, k in enumerate(SOUSCRIPTIONS):
+                # ATTENTION : Le loggin ralenti l'intialisation du presto…
                 s = f"Souscription : {(n + 1) * 100 / t:.0f}%"
                 self.loggin.log(s, nl=False)
                 self.client.subscribe(k)
@@ -89,6 +90,9 @@ class MQTT:
 
     def disconnect(self):
         if self.client is not None:
+            # Ce module MQTTClient n'a pas de méthode unsubscribe !
+            # for n, k in enumerate(SOUSCRIPTIONS):
+            #     self.client.unsubscribe(k)
             self.client.disconnect()
         self.client = None
 
