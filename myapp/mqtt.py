@@ -42,6 +42,7 @@ SOUSCRIPTIONS = {
     "home/alerte": "-",
     "home/alarme": "-",
     "home/debug": "print('OK, je suis là')",
+    "home/pong": ""
 }
 
 TOPIC_MSG = {
@@ -52,6 +53,7 @@ TOPIC_MSG = {
     "Buandrie": "home/toggle/lave_linge",
     "Multimédia": "home/toggle/multimedia",
     "Ethernet": "home/toggle/eth",
+    "ping": "home/ping",
 }
 
 
@@ -59,6 +61,7 @@ class MQTT:
     callbacks = []
     lv = None
     puissance = "0.0"
+    last_ping = 0
 
     def __init__(self, broker, port, alerte, loggin):
         loggin.log("Initialisation MQTT")
@@ -72,7 +75,10 @@ class MQTT:
         loggin.log(f"Connecté à MQTT à {broker}:{port}.")
 
     def connect(self):
-        self.client = MQTTClient(self.client_id, self.broker, port=self.port)
+        self.client = MQTTClient(self.client_id,
+                                 self.broker,
+                                 port=self.port,
+                                 keepalive=600)
         self.client.set_callback(self.mqtt_callback)
         self.set_callback(self.mqtt_commandes)
         try:
@@ -121,6 +127,11 @@ class MQTT:
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
+        t = time.time()
+        _, _, _, h, m, s, _, _ = time.gmtime(t + 3600 * TZ.get_offset(t))
+        print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+        if 'pong' in topic:
+            return
         # print(topic, msg)
         for fct in self.callbacks:
             try:
@@ -137,6 +148,9 @@ class MQTT:
         return SOUSCRIPTIONS[topic]
 
     def check_msg(self):
+        if time.time() - self.last_ping >= 60:
+            self.send_msg("ping", "")
+            self.last_ping = time.time()
         try:
             if self.client is not None:
                 self.client.check_msg()
@@ -197,6 +211,10 @@ class MQTTLog:
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
+                if 'del' in msg and '#' in msg:
+                    indice = int(msg.split('#')[1])
+                    self.alarmes.remove_alarme(indice)
+                    return
                 cmd, ha, ma, sa, *suite = msg.split()
                 jour, oneshot = '-1', True
                 if len(suite):
@@ -217,7 +235,8 @@ class MQTTLog:
                         color=Color.ORANGE)
                     for index, alarme in enumerate(self.alarmes.get_alarmes()):
                         if (ha, ma, sa) == alarme.get_time():
-                            self.alarmes.remove_alarme(index)
+                            if jour == -1 or jour == alarme.get_day():
+                                self.alarmes.remove_alarme(index)
                             break
             except ValueError as e:
                 print(f"Alarme ValueError : {e}")
