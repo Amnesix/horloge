@@ -20,7 +20,7 @@ SOUSCRIPTIONS = {
     "home/humidity/dehors": "_dehors",
     "home/humidity/buandrie": "buandrie",
     "home/humidity/bureau": "bureau",
-    "home/humidite/cuisine": "cuisine",
+    "home/humidity/cuisine": "cuisine",
     "home/humidity/cyril": "cyril",
     "home/humidity/douche": "douche",
     "home/humidity/parent": "parents",
