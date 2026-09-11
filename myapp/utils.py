@@ -543,6 +543,11 @@ class Color:
     LIGHTYELLOW = None
     GREY = None
     DARKGREY = None
+    DARKRED = None
+    DARKGREEN = None
+    DARKBLUE = None
+    DARKORANGE = None
+    DARKCYAN = None
 
     @classmethod
     def init(cls, display):
@@ -562,6 +567,14 @@ class Color:
         cls.GREY = display.create_pen(96, 96, 96)
         cls.LIGHTGREY = display.create_pen(127, 127, 127)
         cls.DARKGREY = display.create_pen(48, 48, 48)
+        cls.DARKRED = display.create_pen(63, 0, 0)
+        cls.DARKGREEN = display.create_pen(0, 63, 0)
+        cls.DARKBLUE = display.create_pen(0, 0, 63)
+        cls.DARKORANGE = display.create_pen(63, 19, 2)
+        cls.DARKCYAN = display.create_pen(0, 63, 63)
+        cls.DARKVIOLET = display.create_pen(66, 16, 66)
+        cls.DARKJAUNE = display.create_pen(66, 66, 16)
+
         cls._ready = True
 
 

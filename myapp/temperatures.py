@@ -19,6 +19,7 @@ ASK_ALL_TEMP = True
 ASK_VIA_TEMPLATE = True
 # Demande température toutes les X mn
 DEMANDE = 5
+DARK = False
 
 
 class Temperatures:
@@ -34,13 +35,22 @@ class Temperatures:
         self.alerte = alerte
         self.loggin = loggin
         self.api = get_api()[0]
-        self.t_cyan = display.create_pen(28, 132, 132)
-        self.t_bleu = display.create_pen(28, 92, 132)
-        self.t_vert = display.create_pen(28, 132, 32)
-        self.t_jaune = display.create_pen(132, 132, 32)
-        self.t_orange = display.create_pen(132, 92, 32)
-        self.t_rouge = display.create_pen(132, 32, 32)
-        self.t_violet = display.create_pen(132, 32, 132)
+        if DARK:
+            self.t_cyan = display.create_pen(14, 66, 66)
+            self.t_bleu = display.create_pen(14, 46, 66)
+            self.t_vert = display.create_pen(14, 66, 16)
+            self.t_jaune = display.create_pen(66, 66, 16)
+            self.t_orange = display.create_pen(66, 92, 16)
+            self.t_rouge = display.create_pen(66, 16, 16)
+            self.t_violet = display.create_pen(66, 16, 66)
+        else:
+            self.t_cyan = display.create_pen(28, 132, 132)
+            self.t_bleu = display.create_pen(28, 92, 132)
+            self.t_vert = display.create_pen(28, 132, 32)
+            self.t_jaune = display.create_pen(132, 132, 32)
+            self.t_orange = display.create_pen(132, 92, 32)
+            self.t_rouge = display.create_pen(132, 32, 32)
+            self.t_violet = display.create_pen(132, 32, 132)
         s = time.time()
         self.temps = dict()
         self.humidity = dict()

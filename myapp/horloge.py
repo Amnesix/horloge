@@ -109,24 +109,27 @@ class Horloge:
         )
 
         self.date_box = Polygon()
-        self.date_box.rectangle(WIDTH // 2 - 75, 128, 150, 35)
+        self.date_box.rectangle(WIDTH // 2 - 77, 128, 154, 35,
+                                (18, 18, 18, 18))
         self.retraite_box = Polygon()
-        self.retraite_box.rectangle(WIDTH // 2 - 50, 320, 100, 35)
+        self.retraite_box.rectangle(WIDTH // 2 - 52, 320, 104, 35,
+                                    (18, 18, 18, 18))
         self.e_temp_box = Polygon()
-        self.e_temp_box.rectangle(WIDTH // 4 - 45, HEIGHT // 2 - 18, 90, 36)
+        self.e_temp_box.rectangle(WIDTH // 4 - 47, HEIGHT // 2 - 18, 94, 36,
+                                  (18, 18, 18, 18))
         self.b_temp_box = Polygon()
-        self.b_temp_box.rectangle(WIDTH // 4 * 3 - 45, HEIGHT // 2 - 18, 90,
-                                  36)
-        self.sw = {k: Polygon() for k in PRISES.keys()}
+        self.b_temp_box.rectangle(WIDTH // 4 * 3 - 47, HEIGHT // 2 - 18, 94,
+                                  36, (18, 18, 18, 18))
+        self.sw = {k: Polygon() for k in PRISES}
         x, y = 5, 15
-        for k in self.sw.keys():
+        for k in self.sw:
             self.sw[k].circle(x, y, 4)
             x += 10
         self.key_sw = list(self.sw.keys())
         self.id_sw = 0
-        self.tmp = {k: Polygon() for k in CAPTEURS.keys()}
+        self.tmp = {k: Polygon() for k in CAPTEURS}
         x, y = 5, 5
-        for k in self.temperatures.temps.keys():
+        for k in self.temperatures.temps:
             self.tmp[k].circle(x, y, 4)
             x += 10
         self.key_tmp = list(self.tmp.keys())
