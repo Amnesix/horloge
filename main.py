@@ -55,7 +55,7 @@ broker, port = get_api()[1]
 mqtt = MQTT(broker, port, alerte, loggin)
 mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, alerte, loggin)
-initiale_states = get_all_states()
+initiale_states = get_all_states(loggin)
 # Création des différents objets
 temperatures = Temperatures(presto, display, vector, touch, mqtt, alerte,
                             loggin, initiale_states)

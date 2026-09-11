@@ -177,7 +177,7 @@ class Switches:
                     result = True
                 elif result == "off":
                     result = False
-                    """Récupération de l'enseble des états en 1 demande"""
+                    """Récupération de l'ensemble des états en 1 demande"""
                 else:  # unavalaible
                     result = None
                 self.switches[key].state = result

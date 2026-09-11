@@ -340,10 +340,13 @@ def get_switches():
     return result
 
 
-def get_all_states():
+def get_all_states(loggin):
     """Récupération initiale des switches et des températures"""
+    loggin.log("Get temperatures")
     states = get_temperatures()
+    loggin.log("Get humidity")
     states |= get_humidities()
+    loggin.log("Get switches")
     states |= get_switches()
     return states
 

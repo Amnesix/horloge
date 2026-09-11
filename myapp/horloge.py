@@ -27,7 +27,6 @@ WIDTH, HEIGHT = 480, 480
 
 
 class Horloge:
-    pos_jours = []
     last_second = 0
     total = 1
 
@@ -66,6 +65,7 @@ class Horloge:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.fg = Color.LIGHTGREY
         self.titre = f"{__title__} - Version {__version__}"
+        self.pos_jours = []
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
@@ -166,6 +166,26 @@ class Horloge:
             return True
         return False
 
+    def affiche_capteurs(self):
+        ok = True
+        for key in self.key_sw:
+            if ok:
+                state = self.switches.get_state(key, False)
+            else:
+                state = None
+            if state is None:
+                self.display.set_pen(Color.LIGHTGREY)
+                ok = False
+            elif state:
+                self.display.set_pen(Color.GREEN)
+            else:
+                self.display.set_pen(Color.RED)
+            self.vector.draw(self.sw[key])
+            self.id_sw = (self.id_sw + 1) % len(self.key_sw)
+        for key in self.key_tmp:
+            self.temperatures.get_temp_color(self.temperatures.temps[key])
+            self.vector.draw(self.tmp[key])
+
     def affiche(self):
         while True:
             if verifier_connexion(self.presto, self.loggin):
@@ -178,8 +198,8 @@ class Horloge:
             if s == self.next_update_time:
                 update_time(False)
             offset = 3600 * TZ.get_offset(s)
-            year, month, day, hour, minute, second, wd, _ = time.gmtime(s +
-                                                                        offset)
+            year, month, day, hour, minute, second, wd, _ =\
+                time.gmtime(s + offset)
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue
@@ -278,24 +298,7 @@ class Horloge:
                 p = f"Lave linge {self.mqtt.puissance}W"
                 self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
                                  10)
-            ok = True
-            for key in self.key_sw:
-                if ok:
-                    state = self.switches.get_state(key, False)
-                else:
-                    state = None
-                if state is None:
-                    self.display.set_pen(Color.LIGHTGREY)
-                    ok = False
-                elif state:
-                    self.display.set_pen(Color.GREEN)
-                else:
-                    self.display.set_pen(Color.RED)
-                self.vector.draw(self.sw[key])
-                self.id_sw = (self.id_sw + 1) % len(self.key_sw)
-            for key in self.key_tmp:
-                self.temperatures.get_temp_color(self.temperatures.temps[key])
-                self.vector.draw(self.tmp[key])
+            self.affiche_capteurs()
 
             gc.collect()
             t_end = time.ticks_ms()
