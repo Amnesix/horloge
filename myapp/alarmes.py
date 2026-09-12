@@ -236,11 +236,11 @@ class Alarmes:
                 s = f"{al.heure:02d}:{al.minute:02d}:{al.seconde:02d} "
                 self.vector.text(s, pos, 280)
             self.presto.update()
+            gc.collect()
             self.touch.poll()
             if self.touch.state:
                 x, y = self.touch.x, self.touch.y
                 if y < 48:
-                    gc.collect()
                     return
                 for btn in self.btn.values():
                     if btn.clicked(x, y):

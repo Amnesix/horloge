@@ -90,6 +90,7 @@ class Menu:
                 return
             if self.alerte.id_show:
                 self.alerte.show()
+            gc.collect()
             self.touch.poll()
             if self.touch.state:
                 while self.touch.state:
@@ -98,7 +99,6 @@ class Menu:
                 x, y = self.touch.x, self.touch.y
                 for btn, coord in BTN.items():
                     if coord.clicked(x, y):
-                        gc.collect()
                         Page.set_page(btn)
                         return btn
             time.sleep(.1)

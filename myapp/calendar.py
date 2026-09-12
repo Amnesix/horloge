@@ -1,3 +1,4 @@
+import gc
 import time
 
 from myapp.utils import MOIS, TZ, Color, Page, verifier_connexion
@@ -280,3 +281,4 @@ class Calendar:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
             self.vector.text(heure, (480 - lh[2]) // 2, 465)
             self.presto.update()
+            gc.collect()

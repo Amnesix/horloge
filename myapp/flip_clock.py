@@ -228,7 +228,6 @@ class Flip_Clock:
         self.vector.draw(self.month_line)
 
         self.presto.update()
-        gc.collect()
 
     def affiche(self):
         # time.sleep(1)
@@ -244,12 +243,5 @@ class Flip_Clock:
             self.mqtt.check_msg()
             if self.alerte.id_show:
                 self.alerte.show()
-            """if Page.get_page() != 'flip':
-                return
-            self.touch.poll()
-            if self.bg.is_pressed():
-                self.display.set_pen(Color.BLACK)
-                self.display.clear()
-                Page.set_page('horloge')
-                return"""
             self.draw()
+            gc.collect()
