@@ -66,6 +66,9 @@ class Horloge:
         self.fg = Color.LIGHTGREY
         self.titre = f"{__title__} - Version {__version__}"
         self.pos_jours = []
+        self.mqtt.set_callback(self.cb_msg)
+        self.topic = None
+        self.t_msg = 0
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
@@ -153,6 +156,10 @@ class Horloge:
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         self.display.set_pen(Color.BLACK)
         self.display.clear()
+
+    def cb_msg(self, topic, _):
+        self.topic = topic.replace('home', '~')
+        self.t_msg = time.time()
 
     def gere_touch(self):
 
@@ -298,6 +305,11 @@ class Horloge:
                 p = f"Lave linge {self.mqtt.puissance}W"
                 self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
                                  10)
+            if self.topic:
+                log = int(self.vector.measure_text(self.topic)[2])
+                self.vector.text(self.topic, 479 - log, 16)
+                if now - self.t_msg > 5:
+                    self.topic = None
             self.affiche_capteurs(now)
 
             gc.collect()

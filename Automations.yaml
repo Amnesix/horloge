@@ -149,3 +149,43 @@ actions:
     target:
       entity_id: switch.sapin_socket_1
 mode: single
+
+# Détection début cycle lave-linge
+alias: Détection démarrage machine à laver
+description: ""
+triggers:
+  - entity_id: sensor.lave_linge_puissance
+    above: 5
+    trigger: numeric_state
+conditions:
+  - condition: state
+    entity_id: input_boolean.machine_en_cours
+    state: "off"
+actions:
+  - entity_id: input_boolean.machine_en_cours
+    action: input_boolean.turn_on
+
+# Détection fin cycle lave-linge
+alias: Notification fin cycle machine à laver
+triggers:
+  - entity_id: sensor.lave_linge_puissance
+    below: 1
+    for: "00:05:00"
+    trigger: numeric_state
+conditions:
+  - condition: state
+    entity_id: input_boolean.machine_en_cours
+    state: "on"
+actions:
+  - data:
+      title: Machine à laver
+      message: Le cycle est terminé ! Vous pouvez retirer le linge.
+    action: notify.mobile_app_nom_du_smartphone
+  - data:
+      topic: home/lave_linge/fincycle
+      payload: Terminé
+      qos: 0
+      retain: true
+    action: mqtt.publish
+  - entity_id: input_boolean.machine_en_cours
+    action: input_boolean.turn_off
