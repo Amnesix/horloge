@@ -134,6 +134,8 @@ class Horloge:
             x += 10
         self.key_tmp = list(self.tmp.keys())
         self.id_tmp = 0
+        self.id_mqtt = Polygon()
+        self.id_mqtt.circle(5, 25, 4)
 
         self.retraite = ["Retraite", WIDTH, 312]
         self.dehors = ["Dehors", WIDTH // 4, HEIGHT // 2 - 26]
@@ -166,16 +168,11 @@ class Horloge:
             return True
         return False
 
-    def affiche_capteurs(self):
-        ok = True
+    def affiche_capteurs(self, now):
         for key in self.key_sw:
-            if ok:
-                state = self.switches.get_state(key, False)
-            else:
-                state = None
+            state = self.switches.get_state(key, False)
             if state is None:
                 self.display.set_pen(Color.LIGHTGREY)
-                ok = False
             elif state:
                 self.display.set_pen(Color.GREEN)
             else:
@@ -185,6 +182,9 @@ class Horloge:
         for key in self.key_tmp:
             self.temperatures.get_temp_color(self.temperatures.temps[key])
             self.vector.draw(self.tmp[key])
+        if now - self.mqtt.last_msg < 5:
+            self.display.set_pen(Color.CYAN)
+            self.vector.draw(self.id_mqtt)
 
     def affiche(self):
         while True:
@@ -194,12 +194,12 @@ class Horloge:
             if self.gere_touch() or Page.get_page() != 'horloge':
                 return
             t_start = time.ticks_ms()
-            s = time.time()
-            if s == self.next_update_time:
+            now = time.time()
+            if now == self.next_update_time:
                 update_time(False)
-            offset = 3600 * TZ.get_offset(s)
+            offset = 3600 * TZ.get_offset(now)
             year, month, day, hour, minute, second, wd, _ =\
-                time.gmtime(s + offset)
+                time.gmtime(now + offset)
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue
@@ -298,7 +298,7 @@ class Horloge:
                 p = f"Lave linge {self.mqtt.puissance}W"
                 self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
                                  10)
-            self.affiche_capteurs()
+            self.affiche_capteurs(now)
 
             gc.collect()
             t_end = time.ticks_ms()

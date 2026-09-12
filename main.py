@@ -67,6 +67,7 @@ horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
 menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin)
 
 # Lancement de l'affichage principal
+mqtt.set_fin_init()
 loggin.log("Lancement boucle de traitement")
 # Page par défaut
 Page.set_page('horloge')

@@ -58,7 +58,6 @@ TOPIC_MSG = {
 
 
 class MQTT:
-    callbacks = []
     lv = None
     puissance = "0.0"
     last_ping = 0
@@ -69,10 +68,17 @@ class MQTT:
         self.port = port
         self.alerte = alerte
         self.loggin = loggin
+        self.callbacks = []
+        self.pile = []
+        self.fin_init = False
+        self.last_msg = 0
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
         self.connect()
         loggin.log(f"Connecté à MQTT à {broker}:{port}.")
+
+    def set_fin_init(self):
+        self.fin_init = True
 
     def connect(self):
         self.client = MQTTClient(self.client_id,
@@ -127,18 +133,28 @@ class MQTT:
         # message_string = msg.decode('utf-8')  # Decode the MQTT message
         topic = topic.decode()
         msg = msg.decode('utf-8')
-        t = time.time()
-        _, _, _, h, m, s, _, _ = time.gmtime(t + 3600 * TZ.get_offset(t))
-        print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+        self.last_msg = time.time()
+        _, _, _, h, m, s, _, _ = time.gmtime(self.last_msg + 3600 *
+                                             TZ.get_offset(self.last_msg))
         if 'pong' in topic:
+            print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+            if len(self.pile) == 0:
+                return
+        else:
+            print(
+                f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg} --> Empilé"
+            )
+            self.pile.append((topic, msg))
+        if not self.fin_init:
             return
-        # print(topic, msg)
-        for fct in self.callbacks:
-            try:
-                fct(topic, msg)
-            except Exception as e:
-                print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
-                print(fct.__name__)
+        while len(self.pile):
+            topic, msg = self.pile.pop(0)
+            for fct in self.callbacks:
+                try:
+                    fct(topic, msg)
+                except Exception as e:
+                    print(f"Erreur mqtt_callback() : {e} ({topic}, {msg})")
+                    print(fct.__name__)
 
     def mqtt_commandes(self, topic, msg):
         if 'page' in topic:

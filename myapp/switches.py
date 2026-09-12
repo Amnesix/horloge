@@ -69,7 +69,7 @@ class Switch:
             self.state = None
 
     def update_state(self, state):
-        self.state = state == 'on'
+        self.state = None if state == 'unavailable' else state == 'on'
 
     def toggle(self):
         url = self.api + "services/switch/toggle"
