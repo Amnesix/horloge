@@ -310,5 +310,5 @@ class MQTTLog:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
             self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 0, 24)
             self.presto.update()
-            gc.update()
+            gc.collect()
             time.sleep(.1)
