@@ -214,7 +214,8 @@ class MQTTLog:
             else:
                 self.mqtt.puissance_lv = msg
         elif 'fincycle' in topic:
-            self.alerte.alerte("Machine terminée")
+            if self.mqtt.lt is not None:
+                self.alerte.alerte("Machine terminée")
         else:
             color = Color.LIGHTGREY
         if 'alert' in topic:
