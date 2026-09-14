@@ -307,11 +307,16 @@ class Horloge:
                 self.vector.text(self.topic, 479 - log, 10)
                 if now - self.t_msg > 5:
                     self.topic = None
-                ypos = 25
-            if self.mqtt.puissance != "0.0":
-                p = f"Lave linge {self.mqtt.puissance}W"
-                self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
-                                 ypos)
+                ypos += 15
+            if self.mqtt.puissance_lv != "0.0":
+                p = f"Lave linge {self.mqtt.puissance_lv}W"
+                log = int(self.vector.measure_text(p)[2])
+                self.vector.text(p, 479 - log, ypos)
+                ypos += 15
+            if self.mqtt.puissance_dh != "0.0":
+                p = f"déshum. {self.mqtt.puissance_dh}W"
+                log = int(self.vector.measure_text(p)[2])
+                self.vector.text(p, 491 - log, ypos)
             self.affiche_capteurs(now)
 
             gc.collect()

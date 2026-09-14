@@ -189,3 +189,25 @@ actions:
     action: mqtt.publish
   - entity_id: input_boolean.machine_en_cours
     action: input_boolean.turn_off
+
+# Information puissance utilisée
+alias: Publier puissance lave_linge
+description: ""
+triggers:
+  - entity_id:
+      - sensor.lave_linge_puissance
+      - sensor.pc_deshumidificateur_puissance
+    trigger: state
+conditions: []
+actions:
+  - data:
+      topic: >-
+      {% if trigger.entity_id == "sensor.lave_linge_puissance" %}
+      home/puissance/lave_linge
+      {% elif trigger.entity_id == "sensor.pc_deshumidificateur_puissance" %}
+      home/puissance/deshum
+      payload: "{{ states(trigger.entity_id)\_}}"
+      retain: true
+    action: mqtt.publish
+mode: parallel
+

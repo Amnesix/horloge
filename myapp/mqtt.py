@@ -35,7 +35,8 @@ SOUSCRIPTIONS = {
     "home/switch/douche": "Douche",
     "home/switch/lave_linge": "Buandrie",
     # Lave lave_linge
-    "home/lave_linge/puissance": "Machine",
+    "home/puissance/lave_linge": "-",
+    "home/puissance/deshum": "-",
     "home/lave_linge/fincycle": "-",
     # Autres
     "home/page": "-",
@@ -59,8 +60,10 @@ TOPIC_MSG = {
 
 
 class MQTT:
-    lv = None
-    puissance = "0.0"
+    lt = None
+    dh = None
+    puissance_lv = "0.0"
+    puissance_dh = "0.0"
     last_ping = 0
 
     def __init__(self, broker, port, alerte, loggin):
@@ -174,8 +177,10 @@ class MQTT:
             self.connect()
         except Exception as e:
             print(f"Error while waiting for MQTT messages: {e}")
-        if self.lv and time.time() - self.lv > 60 and self.puissance == "0.0":
-            self.lv = None
+        if self.lt and time.time() - self.lt > 60\
+           and self.puissance_lv == "0.0"\
+           and self.puissance_dh == "0.0":
+            self.lt = None
 
 
 class MQTTLog:
@@ -203,8 +208,11 @@ class MQTTLog:
             color = Color.CYAN
         elif 'puissance' in topic:
             color = Color.LIGHTYELLOW
-            self.mqtt.lv = time.time()
-            self.mqtt.puissance = msg
+            self.mqtt.lt = time.time()
+            if 'deshum' in topic:
+                self.mqtt.puissance_dh = msg
+            else:
+                self.mqtt.puissance_lv = msg
         elif 'fincycle' in topic:
             self.alerte.alerte("Machine terminée")
         else:
