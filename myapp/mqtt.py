@@ -142,9 +142,7 @@ class MQTT:
             if len(self.pile) == 0:
                 return
         else:
-            print(
-                f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg} --> Empilé"
-            )
+            print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
             self.pile.append((topic, msg))
         if not self.fin_init:
             return
