@@ -301,15 +301,17 @@ class Horloge:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
             self.vector.text(__title__ + " - " + __version__, 380, 475)
             self.vector.text(__python__, 10, 475)
+            ypos = 10
             if self.topic:
                 log = int(self.vector.measure_text(self.topic)[2])
                 self.vector.text(self.topic, 479 - log, 10)
                 if now - self.t_msg > 5:
                     self.topic = None
-            elif self.mqtt.puissance != "0.0":
+                ypos = 25
+            if self.mqtt.puissance != "0.0":
                 p = f"Lave linge {self.mqtt.puissance}W"
                 self.vector.text(p, 479 - int(self.vector.measure_text(p)[2]),
-                                 10)
+                                 ypos)
             self.affiche_capteurs(now)
 
             gc.collect()
