@@ -137,8 +137,12 @@ class Horloge:
             x += 10
         self.key_tmp = list(self.tmp.keys())
         self.id_tmp = 0
+        self.id_lv = Polygon()
+        self.id_lv.circle(5, 25, 4)
+        self.id_dh = Polygon()
+        self.id_dh.circle(15, 25, 4)
         self.id_mqtt = Polygon()
-        self.id_mqtt.circle(5, 25, 4)
+        self.id_mqtt.circle(25, 25, 4)
 
         self.retraite = ["Retraite", WIDTH, 312]
         self.dehors = ["Dehors", WIDTH // 4, HEIGHT // 2 - 26]
@@ -189,8 +193,14 @@ class Horloge:
         for key in self.key_tmp:
             self.temperatures.get_temp_color(self.temperatures.temps[key])
             self.vector.draw(self.tmp[key])
+        self.display.set_pen(Color.RED if self.mqtt.puissance_lv ==
+                             "0.0" else Color.GREEN)
+        self.vector.draw(self.id_lv)
+        self.display.set_pen(Color.RED if self.mqtt.puissance_dh ==
+                             "0.0" else Color.GREEN)
+        self.vector.draw(self.id_dh)
         if now - self.mqtt.last_msg < 5:
-            self.display.set_pen(Color.CYAN)
+            self.display.set_pen(Color.LIGHTYELLOW)
             self.vector.draw(self.id_mqtt)
 
     def affiche(self):

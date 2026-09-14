@@ -56,21 +56,11 @@ PRISES = {
     "RPi": "rpi",
     "Multimédia": "multimedia_salon_socket_1",
     "Cuisine": "prise_connectee",
-    "Buandrie": "lave_linge",
+    "Lave linge": "lave_linge",
+    "Déshumid.": "pc_deshumidificateur",
     "Douche": "sonoff_s60zbtpf",
     "Ethernet": "eth",
 }
-# Dictionnaires de PRISES connectées
-# Les libellés sont ceux affichés et sont succeptibles de changer.
-"""SWITCH_to_PRISES = {
-    "switch.antela_prise_intelligente_2_socket_1": "Ventilo",
-    "switch.pipmc_net_194_socket_1": "RPi",
-    "switch.multimedia_salon_socket_1": "Multimédia",
-    "switch.prise_connectee": "Cuisine",
-    "switch.eth": "Ethernet",
-    "switch.sonoff_s60zbtpf": "Douche",
-    "switch.lave_linge": "Buandrie",
-}"""
 
 SENSOR_to_CAPTEURS = {
     "sensor.th_dehors_temperature": "_dehors",

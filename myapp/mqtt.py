@@ -33,7 +33,8 @@ SOUSCRIPTIONS = {
     "home/switch/multimedia": "Multimédia",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
-    "home/switch/lave_linge": "Buandrie",
+    "home/switch/lave_linge": "Lave linge",
+    "home/switch/deshum": "Déshumid.",
     # Lave lave_linge
     "home/puissance/lave_linge": "-",
     "home/puissance/deshum": "-",
@@ -52,7 +53,8 @@ TOPIC_MSG = {
     "Douche": "home/toggle/douche",
     "Cuisine": "home/toggle/cuisine",
     "Ventilo": "home/toggle/ventilo",
-    "Buandrie": "home/toggle/lave_linge",
+    "Lave linge": "home/toggle/lave_linge",
+    "Déshumid.": "home/toggle/deshum",
     "Multimédia": "home/toggle/multimedia",
     "Ethernet": "home/toggle/eth",
     "ping": "home/ping",
@@ -216,6 +218,7 @@ class MQTTLog:
         elif 'fincycle' in topic:
             if self.mqtt.lt is not None:
                 self.alerte.alerte("Machine terminée")
+            color = Color.LIGHTGREY
         else:
             color = Color.LIGHTGREY
         if 'alert' in topic:

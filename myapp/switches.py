@@ -126,9 +126,9 @@ class Switches:
         self.loggin = loggin
         self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
-        self.btn_exit = Polygon()
+        """self.btn_exit = Polygon()
         self.btn_exit.rectangle(*self.btnReturn.bounds,
-                                corners=(10, 10, 10, 10))
+                                corners=(10, 10, 10, 10))"""
         for ligne, item in enumerate(sorted(PRISES.items())):
             label, name = item
             try:
@@ -193,10 +193,10 @@ class Switches:
         self.display.clear()
         for switch in self.switches:
             self.switches[switch].display_switch()
-        self.display.set_pen(Color.CYAN)
-        self.vector.draw(self.btn_exit)
-        self.display.set_pen(Color.BLACK)
-        self.vector.text("Exit", 383, 457)
+        # self.display.set_pen(Color.CYAN)
+        # self.vector.draw(self.btn_exit)
+        # self.display.set_pen(Color.BLACK)
+        # self.vector.text("Exit", 383, 457)
         self.presto.update()
         gc.collect()
 
@@ -213,11 +213,19 @@ class Switches:
                 self.alerte.show()
             self.mqtt.check_msg()
             self.touch.poll()
-            if self.btnReturn.is_pressed():
+            """if self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
-                return
-            elif self.on_click() or cmpt % 15 == 0:
+                return"""
+            if self.on_click() or cmpt % 15 == 0:
                 self.update_screen()
+            self.touch.poll()
+            if self.touch.state and self.touch.x < 240:
+                y = self.touch.y
+                while self.touch.state:
+                    self.touch.poll()
+                if abs(self.touch.y - y) > 240:
+                    return
+
             cmpt += 1
             time.sleep(0.1)
