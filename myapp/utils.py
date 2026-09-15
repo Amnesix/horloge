@@ -247,7 +247,7 @@ def verifier_connexion(presto, loggin):
     """En cas de perte de connexion, tentative de reconnexion"""
     if not presto.wifi.isconnected():
         loggin.log("Perte de connexion !")
-        loggin.log("Nouvelle tentative de connexion...")
+        loggin.log("Tentative de reconnexion...")
         wifi_connect(presto, loggin)
         return True
     return False
