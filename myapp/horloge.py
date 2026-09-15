@@ -124,14 +124,20 @@ class Horloge:
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 47, HEIGHT // 2 - 18, 94,
                                   36, (18, 18, 18, 18))
         self.sw = {k: Polygon() for k in PRISES}
-        x, y = 5, 15
+        self.tmp = {k: Polygon() for k in CAPTEURS}
+        if len(self.sw) < len(self.tmp):
+            pos_tmp = 5
+            pos_sw = 15
+        else:
+            pos_tmp = 15
+            pos_sw = 5
+        x, y = 5, pos_sw
         for k in self.sw:
             self.sw[k].circle(x, y, 4)
             x += 10
         self.key_sw = list(self.sw.keys())
         self.id_sw = 0
-        self.tmp = {k: Polygon() for k in CAPTEURS}
-        x, y = 5, 5
+        x, y = 5, pos_tmp
         for k in self.temperatures.temps:
             self.tmp[k].circle(x, y, 4)
             x += 10
@@ -179,7 +185,7 @@ class Horloge:
             return True
         return False
 
-    def affiche_capteurs(self, now):
+    def affiche_capteurs_temperatures(self):
         for key in self.key_sw:
             state = self.switches.get_state(key, False)
             if state is None:
@@ -190,9 +196,15 @@ class Horloge:
                 self.display.set_pen(Color.RED)
             self.vector.draw(self.sw[key])
             self.id_sw = (self.id_sw + 1) % len(self.key_sw)
+
+    def affiche_capteurs_switches(self):
         for key in self.key_tmp:
             self.temperatures.get_temp_color(self.temperatures.temps[key])
             self.vector.draw(self.tmp[key])
+
+    def affiche_capteurs(self, now):
+        self.affiche_capteurs_temperatures()
+        self.affiche_capteurs_switches()
         self.display.set_pen(Color.RED if self.mqtt.puissance_lv ==
                              "0.0" else Color.GREEN)
         self.vector.draw(self.id_lv)
