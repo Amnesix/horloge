@@ -210,11 +210,12 @@ class MQTTLog:
             color = Color.CYAN
         elif 'puissance' in topic:
             color = Color.LIGHTYELLOW
-            self.mqtt.lt = time.time()
-            if 'deshum' in topic:
-                self.mqtt.puissance_dh = msg
-            else:
-                self.mqtt.puissance_lv = msg
+            if self.mqtt.lt is not None or msg != '0.0':
+                self.mqtt.lt = time.time()
+                if 'deshum' in topic:
+                    self.mqtt.puissance_dh = msg
+                else:
+                    self.mqtt.puissance_lv = msg
         elif 'fincycle' in topic:
             if self.mqtt.lt is not None:
                 self.alerte.alerte("Machine terminée")
