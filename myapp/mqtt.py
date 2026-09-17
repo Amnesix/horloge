@@ -81,6 +81,7 @@ class MQTT:
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
         self.connect()
+        self.pong = True
         loggin.log("Connexion au broker MQTT OK.")
 
     def set_fin_init(self):
@@ -144,6 +145,7 @@ class MQTT:
                                              TZ.get_offset(self.last_msg))
         if 'pong' in topic:
             print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+            self.pong = True
             if len(self.pile) == 0:
                 return
         else:
@@ -169,8 +171,12 @@ class MQTT:
 
     def check_msg(self):
         if time.time() - self.last_ping >= 120:
+            if not self.pong:
+                print("Tentative de reconnexion de mqtt")
+                self.reconnect()
             self.send_msg("ping", "")
             self.last_ping = time.time()
+            self.pong = False
         try:
             if self.client is not None:
                 self.client.check_msg()
