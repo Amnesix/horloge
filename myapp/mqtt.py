@@ -81,7 +81,7 @@ class MQTT:
         unique = str(binascii.hexlify(machine.unique_id()))
         self.client_id = f'{unique}'
         self.connect()
-        loggin.log(f"Connecté à MQTT à {broker}:{port}.")
+        loggin.log("Connexion au broker MQTT OK.")
 
     def set_fin_init(self):
         self.fin_init = True
@@ -168,7 +168,7 @@ class MQTT:
         return SOUSCRIPTIONS[topic]
 
     def check_msg(self):
-        if time.time() - self.last_ping >= 60:
+        if time.time() - self.last_ping >= 120:
             self.send_msg("ping", "")
             self.last_ping = time.time()
         try:
