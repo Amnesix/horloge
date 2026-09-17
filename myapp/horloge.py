@@ -244,13 +244,11 @@ class Horloge:
             if hour == h and minute == m and second in ((s - 6) % 60,
                                                         (s - 4) % 60,
                                                         (s - 2) % 60, s):
-                # self.display.set_pen(Color.RED)
                 self.jpg.open_file("img/cadran_alarm.jpg")
                 if second == s and self.alarmes.get_alarme(
                         index).get_oneshot():
                     self.alarmes.remove_alarme(index)
             else:
-                # self.display.set_pen(Color.LIGHTYELLOW)
                 self.jpg.open_file("img/cadran.jpg")
             self.jpg.decode(0, 0, jpegdec.JPEG_SCALE_FULL, dither=True)
             # self.vector.draw(self.face)
@@ -261,14 +259,13 @@ class Horloge:
             angle_hour = (hour % 12) * 30
             angle_hour += minute / 2
             angle_second = second * 6
-            self.display.set_pen(Color.BLACK)
 
             self.display.set_pen(Color.DARKGREY)
             self.vector.draw(self.date_box)
             self.vector.draw(self.retraite_box)
             self.vector.draw(self.b_temp_box)
             self.vector.draw(self.e_temp_box)
-            self.display.set_pen(Color.BLACK)
+            self.display.set_pen(Color.DARKJAUNE)
 
             # Dessin des aiguilles
             self.tr.rotate(angle_minute, (x, y))
@@ -282,6 +279,7 @@ class Horloge:
             self.tr.reset()
 
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+            self.display.set_pen(Color.GREY)
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
@@ -296,7 +294,6 @@ class Horloge:
             self.tr.reset()
             self.vector.draw(self.hub)
 
-            self.display.set_pen(Color.BLACK)
             self.display.set_pen(Color.LIGHTGREY)
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
@@ -304,7 +301,7 @@ class Horloge:
             self.vector.text(f"J-{diff:04d}", WIDTH // 2 - 42, 347)
 
             # Affichage des dates et retraite au dessus des aiguilles heures & minutes
-            self.display.set_pen(Color.BLACK)
+            self.display.set_pen(Color.GREY)
             dehors = self.temperatures.temps["_dehors"]
             bureau = self.temperatures.temps["bureau"]
             self.temperatures.get_temp_color(dehors)
