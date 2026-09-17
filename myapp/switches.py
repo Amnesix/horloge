@@ -11,6 +11,7 @@ from myapp.secret import headers
 from myapp.utils import PRISES, Color, Page, get_api, verifier_connexion
 
 OFFSET = 60
+ONEBTN = True
 
 
 class Switch:
@@ -26,13 +27,18 @@ class Switch:
         self.switch = PRISES[label]
         self.capteur = "switch." + self.switch
         self.ligne = ligne
-        self.on = Button(240, ligne * OFFSET, 100, 50)
-        self.off = Button(360, ligne * OFFSET, 100, 50)
         self.state = initiale_state
-        self.btn_on = Polygon()
-        self.btn_on.rectangle(*self.on.bounds, corners=(10, 10, 10, 10))
-        self.btn_off = Polygon()
-        self.btn_off.rectangle(*self.off.bounds, corners=(10, 10, 10, 10))
+        if ONEBTN:
+            self.switch = Button(10, ligne * OFFSET, 100, 50)
+            self.btn = Polygon()
+            self.btn.rectangle(*self.switch.bounds, corners=(10, 10, 10, 10))
+        else:
+            self.on = Button(240, ligne * OFFSET, 100, 50)
+            self.off = Button(360, ligne * OFFSET, 100, 50)
+            self.btn_on = Polygon()
+            self.btn_on.rectangle(*self.on.bounds, corners=(10, 10, 10, 10))
+            self.btn_off = Polygon()
+            self.btn_off.rectangle(*self.off.bounds, corners=(10, 10, 10, 10))
 
     def get_state(self, maj):
         if not maj:
@@ -85,12 +91,19 @@ class Switch:
 
     def display_switch(self):
         self.display.set_pen(Color.LIGHTGREY)
-        self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
-        self.display.set_pen(Color.GREEN if self.state else Color.LIGHTGREY)
-        self.vector.draw(self.btn_on)
-        self.display.set_pen(Color.RED if self.state is
-                             False else Color.LIGHTGREY)
-        self.vector.draw(self.btn_off)
+        if ONEBTN:
+            self.vector.text(self.label, 130, self.ligne * OFFSET + 40)
+            self.display.set_pen(Color.GREY if self.state is None else Color.
+                                 GREEN if self.state else Color.RED)
+            self.vector.draw(self.btn)
+        else:
+            self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
+            self.display.set_pen(
+                Color.GREEN if self.state else Color.LIGHTGREY)
+            self.vector.draw(self.btn_on)
+            self.display.set_pen(Color.RED if self.state is
+                                 False else Color.LIGHTGREY)
+            self.vector.draw(self.btn_off)
 
     def wait_for_status(self, state):
         while self.state != state:
@@ -99,14 +112,19 @@ class Switch:
 
     def on_click(self):
         ret = False
-        if self.on.is_pressed():  # and not self.state:
-            self.mqtt.send_msg(self.label, "on")
-            # self.set_state(True)
-            ret = True
-        elif self.off.is_pressed():  # and self.state:
-            self.mqtt.send_msg(self.label, "off")
-            # self.set_state(False)
-            ret = True
+        if ONEBTN:
+            if self.switch.is_pressed() and self.state is not None:
+                self.mqtt.send_msg(self.label, "off" if self.state else "on")
+                ret = True
+        else:
+            if self.on.is_pressed():  # and not self.state:
+                self.mqtt.send_msg(self.label, "on")
+                # self.set_state(True)
+                ret = True
+            elif self.off.is_pressed():  # and self.state:
+                self.mqtt.send_msg(self.label, "off")
+                # self.set_state(False)
+                ret = True
         return ret
 
 
@@ -126,9 +144,9 @@ class Switches:
         self.loggin = loggin
         self.api = get_api()[0]
         self.btnReturn = Button(360, 420, 100, 50)
-        """self.btn_exit = Polygon()
+        self.btn_exit = Polygon()
         self.btn_exit.rectangle(*self.btnReturn.bounds,
-                                corners=(10, 10, 10, 10))"""
+                                corners=(10, 10, 10, 10))
         for ligne, item in enumerate(sorted(PRISES.items())):
             label, name = item
             try:
@@ -193,10 +211,11 @@ class Switches:
         self.display.clear()
         for switch in self.switches:
             self.switches[switch].display_switch()
-        # self.display.set_pen(Color.CYAN)
-        # self.vector.draw(self.btn_exit)
-        # self.display.set_pen(Color.BLACK)
-        # self.vector.text("Exit", 383, 457)
+        if ONEBTN:
+            self.display.set_pen(Color.CYAN)
+            self.vector.draw(self.btn_exit)
+        self.display.set_pen(Color.BLACK)
+        self.vector.text("Exit", 383, 457)
         self.presto.update()
         gc.collect()
 
@@ -213,10 +232,10 @@ class Switches:
                 self.alerte.show()
             self.mqtt.check_msg()
             self.touch.poll()
-            """if self.btnReturn.is_pressed():
+            if ONEBTN and self.btnReturn.is_pressed():
                 self.display.set_pen(Color.BLACK)
                 self.display.clear()
-                return"""
+                return
             if self.on_click() or cmpt % 15 == 0:
                 self.update_screen()
             self.touch.poll()
