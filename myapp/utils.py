@@ -566,7 +566,7 @@ class Color:
         cls.DARKORANGE = display.create_pen(63, 19, 2)
         cls.DARKCYAN = display.create_pen(0, 63, 63)
         cls.DARKVIOLET = display.create_pen(66, 16, 66)
-        cls.DARKJAUNE = display.create_pen(66, 66, 16)
+        cls.DARKJAUNE = display.create_pen(86, 86, 26)
 
         cls._ready = True
 
