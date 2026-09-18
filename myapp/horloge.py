@@ -357,6 +357,6 @@ class Horloge:
                 self.local = True
             self.total += 1
             self.display.set_pen(Color.LIGHTGREY)
-            self.vector.text(f"{delai}ms", 10, 460)
+            self.vector.text(f"{delai}ms", 0, 460)
 
             self.presto.update()
