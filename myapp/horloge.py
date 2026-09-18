@@ -64,11 +64,13 @@ class Horloge:
         self.mqttlogs = mqttlogs
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.fg = Color.LIGHTGREY
-        self.titre = f"{__title__} - Version {__version__}"
+        self.titre = f"{__title__} - {__version__}"
         self.pos_jours = []
         self.mqtt.set_callback(self.cb_msg)
         self.topic = None
         self.t_msg = 0
+        self.m_msg = ""
+        self.offset = 0
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
@@ -170,6 +172,8 @@ class Horloge:
     def cb_msg(self, topic, _):
         self.topic = topic.replace('home', '~')
         self.t_msg = time.time()
+        _, _, _, h, m, s, _, _ = time.gmtime(self.t_msg + self.offset)
+        self.m_msg = f"mqttlm {h:02d}:{m:02d}:{s:02d}"
 
     def gere_touch(self):
 
@@ -226,9 +230,9 @@ class Horloge:
             now = time.time()
             if now == self.next_update_time:
                 update_time(False)
-            offset = 3600 * TZ.get_offset(now)
+            self.offset = 3600 * TZ.get_offset(now)
             year, month, day, hour, minute, second, wd, _ =\
-                time.gmtime(now + offset)
+                time.gmtime(now + self.offset)
             if self.last_second == second:
                 time.sleep_ms(10)
                 continue
@@ -318,8 +322,13 @@ class Horloge:
             )
             self.display.set_pen(Color.LIGHTGREY)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
-            self.vector.text(__title__ + " - " + __version__, 380, 475)
-            self.vector.text(__python__, 10, 475)
+            self.vector.text(
+                self.titre, 479 - int(self.vector.measure_text(self.titre)[2]),
+                475)
+            self.vector.text(__python__, 0, 475)
+            self.vector.text(
+                self.m_msg, 479 - int(self.vector.measure_text(self.m_msg)[2]),
+                460)
             ypos = 10
             if self.topic:
                 log = int(self.vector.measure_text(self.topic)[2])
