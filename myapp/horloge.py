@@ -150,7 +150,7 @@ class Horloge:
         self.id_dh = Polygon()
         self.id_dh.circle(15, 25, 4)
         self.id_mqtt = Polygon()
-        self.id_mqtt.circle(25, 25, 4)
+        self.id_mqtt.circle(5, 35, 4)
 
         self.retraite = ["Retraite", WIDTH, 312]
         self.dehors = ["Dehors", WIDTH // 4, HEIGHT // 2 - 26]
