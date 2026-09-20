@@ -26,7 +26,7 @@ from myapp.utils import (
 from myapp.version import __title__, __version__
 
 # Initialisation générale
-presto = presto.Presto(full_res=True)
+presto = presto.Presto(layers=1, full_res=True)
 display = presto.display
 display.set_pen(display.create_pen(0, 0, 0))
 display.clear()

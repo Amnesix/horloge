@@ -211,16 +211,16 @@ class Horloge:
         self.affiche_capteurs_switches()
         self.display.set_pen(Color.RED if self.mqtt.puissance_lv ==
                              "0.0" else Color.BLACK if now
-                             & 1 else Color.GREEN)
+                             & 1 else Color.BLACK)
         self.vector.draw(self.id_lv)
         self.display.set_pen(Color.RED if self.mqtt.puissance_dh ==
                              "0.0" else Color.BLACK if now
-                             & 1 else Color.GREEN)
+                             & 1 else Color.BLACK)
         self.vector.draw(self.id_dh)
         if now - self.mqtt.last_msg < 5:
             self.display.set_pen(Color.LIGHTYELLOW)
             self.vector.draw(self.id_mqtt)
-        # self.presto.update()
+        self.presto.partial_update(0, 0, 90, 30)
 
     def affiche(self):
         while True:
@@ -238,12 +238,12 @@ class Horloge:
                 time.gmtime(now + self.offset)
             if self.last_second == second:
                 time.sleep_ms(10)
-                """self.display.set_pen(Color.GREEN)
+                self.display.set_pen(Color.GREEN)
                 if self.mqtt.puissance_dh != "0.0":
                     self.vector.draw(self.id_dh)
                 if self.mqtt.puissance_lv != "0.0":
                     self.vector.draw(self.id_lv)
-                self.presto.update()"""
+                self.presto.update()
                 continue
             self.last_second = second
             if self.alerte.id_show:

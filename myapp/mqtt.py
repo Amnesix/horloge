@@ -1,6 +1,7 @@
 import binascii
 import gc
 import time
+from secrets import MQTT_PASSWD, MQTT_USER
 
 import machine
 from umqtt.simple import MQTTClient
@@ -93,7 +94,9 @@ class MQTT:
         self.client = MQTTClient(self.client_id,
                                  self.broker,
                                  port=self.port,
-                                 keepalive=600)
+                                 keepalive=600,
+                                 user=MQTT_USER,
+                                 password=MQTT_PASSWD)
         self.client.set_callback(self.mqtt_callback)
         self.set_callback(self.mqtt_commandes)
         try:
