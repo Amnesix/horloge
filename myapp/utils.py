@@ -60,6 +60,7 @@ PRISES = {
     "Déshumid.": "pc_deshumidificateur",
     "Douche": "sonoff_s60zbtpf",
     "Ethernet": "eth",
+    "Informatique": "pc_informatique",
 }
 
 SENSOR_to_CAPTEURS = {

@@ -1,6 +1,7 @@
 import binascii
 import gc
 import time
+from secrets import MQTT_PASSWD, MQTT_USER
 
 import machine
 from umqtt.simple import MQTTClient
@@ -35,6 +36,7 @@ SOUSCRIPTIONS = {
     "home/switch/douche": "Douche",
     "home/switch/lave_linge": "Lave linge",
     "home/switch/deshum": "Déshumid.",
+    "home/switch/info": "Informatique",
     # Lave lave_linge
     "home/puissance/lave_linge": "-",
     "home/puissance/deshum": "-",
@@ -57,6 +59,7 @@ TOPIC_MSG = {
     "Déshumid.": "home/toggle/deshum",
     "Multimédia": "home/toggle/multimedia",
     "Ethernet": "home/toggle/eth",
+    "Informatique": "home/toggle/info",
     "ping": "home/ping",
 }
 
@@ -91,7 +94,9 @@ class MQTT:
         self.client = MQTTClient(self.client_id,
                                  self.broker,
                                  port=self.port,
-                                 keepalive=600)
+                                 keepalive=600,
+                                 user=MQTT_USER,
+                                 password=MQTT_PASSWD)
         self.client.set_callback(self.mqtt_callback)
         self.set_callback(self.mqtt_commandes)
         try:

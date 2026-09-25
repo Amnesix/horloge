@@ -9,7 +9,8 @@ from requests import get, post
 from myapp.secret import headers
 from myapp.utils import PRISES, Color, MyButton, Page, get_api, verifier_connexion
 
-OFFSET = 60
+OFFSET = 53
+HEIGHT = 45
 ONEBTN = True
 
 
@@ -28,15 +29,24 @@ class Switch:
         self.ligne = ligne
         self.state = initiale_state
         if ONEBTN:
+<<<<<<< HEAD
             self.switch = MyButton(self.touch, 10, ligne * OFFSET, 100, 50,
                                    label)
+=======
+            self.switch = Button(10, ligne * OFFSET, 100, HEIGHT)
+>>>>>>> b2340636ccdbbad1f71a7cbaaf35e32116204e98
             self.btn = Polygon()
             self.btn.rectangle(*self.switch.bounds(), corners=(10, 10, 10, 10))
         else:
+<<<<<<< HEAD
             self.on = MyButton(self.touch, 240, ligne * OFFSET, 100, 50,
                                f'{label}_on')
             self.off = MyButton(self.touch, 360, ligne * OFFSET, 100, 50,
                                 f'{label}_off')
+=======
+            self.on = Button(240, ligne * OFFSET, 100, HEIGHT)
+            self.off = Button(360, ligne * OFFSET, 100, HEIGHT)
+>>>>>>> b2340636ccdbbad1f71a7cbaaf35e32116204e98
             self.btn_on = Polygon()
             self.btn_on.rectangle(*self.on.bounds(), corners=(10, 10, 10, 10))
             self.btn_off = Polygon()
@@ -95,12 +105,13 @@ class Switch:
     def display_switch(self):
         self.display.set_pen(Color.LIGHTGREY)
         if ONEBTN:
-            self.vector.text(self.label, 130, self.ligne * OFFSET + 40)
+            self.vector.text(self.label, 130,
+                             self.ligne * OFFSET + HEIGHT - 10)
             self.display.set_pen(Color.GREY if self.state is None else Color.
                                  GREEN if self.state else Color.RED)
             self.vector.draw(self.btn)
         else:
-            self.vector.text(self.label, 10, self.ligne * OFFSET + 40)
+            self.vector.text(self.label, 10, self.ligne * OFFSET + HEIGHT - 10)
             self.display.set_pen(
                 Color.GREEN if self.state else Color.LIGHTGREY)
             self.vector.draw(self.btn_on)
@@ -220,7 +231,7 @@ class Switches:
         gc.collect()
 
     def affiche(self):
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 38)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 35)
         self.update_screen()
         start = time.time()
         while True:
