@@ -389,9 +389,9 @@ def get_touch(touch) -> "tuple[int, int] | str | None":
                     return 'U'
             else:
                 if dx < 0:
-                    return 'L'
-                else:
                     return 'R'
+                else:
+                    return 'L'
         else:
             return (xs, ys)
     return None

@@ -125,8 +125,8 @@ class Horloge:
         self.b_temp_box = Polygon()
         self.b_temp_box.rectangle(WIDTH // 4 * 3 - 47, HEIGHT // 2 - 18, 94,
                                   36, (18, 18, 18, 18))
-        self.sw = {k: Polygon() for k in PRISES}
-        self.tmp = {k: Polygon() for k in CAPTEURS}
+        self.sw = {k: Polygon() for k in sorted(PRISES)}
+        self.tmp = {k: Polygon() for k in sorted(CAPTEURS)}
         if len(self.sw) < len(self.tmp):
             pos_tmp = 5
             pos_sw = 15
@@ -134,13 +134,13 @@ class Horloge:
             pos_tmp = 15
             pos_sw = 5
         x, y = 5, pos_sw
-        for k in self.sw:
+        for k in sorted(self.sw):
             self.sw[k].circle(x, y, 4)
             x += 10
         self.key_sw = list(self.sw.keys())
         self.id_sw = 0
         x, y = 5, pos_tmp
-        for k in self.temperatures.temps:
+        for k in sorted(self.temperatures.temps):
             self.tmp[k].circle(x, y, 4)
             x += 10
         self.key_tmp = list(self.tmp.keys())
@@ -184,7 +184,7 @@ class Horloge:
         data = get_touch(self.touch)
         if data is None:
             return False
-        if data == 'R':
+        if data == 'L':
             Page.clear()
             return True
         return False

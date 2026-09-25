@@ -34,6 +34,8 @@ class Temperatures:
         self.mqtt = mqtt
         self.alerte = alerte
         self.loggin = loggin
+        self.tri = 0
+        self.reverse = True
         self.api = get_api()[0]
         if DARK:
             self.t_cyan = display.create_pen(14, 66, 66)
@@ -198,9 +200,16 @@ class Temperatures:
             self.mqtt.check_msg()
             if Page.get_page() != "temperatures":
                 return
-            if get_touch(self.touch) == 'R':
+            k = get_touch(self.touch)
+            if k == 'L':
                 Page.clear()
                 return
+            if k == 'R':
+                self.tri = (self.tri + 1) % 3
+            if k == 'U':
+                self.reverse = True
+            if k == 'D':
+                self.reverse = False
             if self.alerte.id_show:
                 self.alerte.show()
             s = time.time()
@@ -216,10 +225,37 @@ class Temperatures:
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
             self.vector.text("Températures", (480 - w) // 2, 50)
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+            if self.tri == 0:
+                key = lambda a: self.temps[a]
+                if self.reverse:
+                    self.display.line(260, 70, 270, 80)
+                    self.display.line(270, 80, 280, 70)
+                else:
+                    self.display.line(260, 80, 270, 70)
+                    self.display.line(270, 70, 280, 80)
+            elif self.tri == 1:
+                key = lambda a: self.humidity[a]
+                if self.reverse:
+                    self.display.line(390, 70, 400, 80)
+                    self.display.line(400, 80, 410, 70)
+                else:
+                    self.display.line(390, 80, 400, 70)
+                    self.display.line(400, 70, 410, 80)
+            else:
+                key = lambda a: a
+                if self.reverse:
+                    self.display.line(30, 70, 40, 80)
+                    self.display.line(40, 80, 50, 70)
+                else:
+                    self.display.line(30, 80, 40, 70)
+                    self.display.line(40, 70, 50, 80)
+            self.display.line(0, 70, 479, 70)
+            self.display.line(0, 440, 479, 440)
+
             h = 3
             for name in sorted(self.temps.keys(),
-                               key=lambda a: self.temps[a],
-                               reverse=True):
+                               key=key,
+                               reverse=self.reverse):
                 temp = self.temps[name]
                 ok = self.get_temp_color(temp)
                 if s - self.maj[name] < 10:
@@ -268,10 +304,6 @@ class Temperatures:
                 else:
                     self.vector.text("indisponible", 246, h * 40)
                 h += 1
-
-            self.display.set_pen(fg)
-            self.display.line(0, 70, 479, 70)
-            self.display.line(0, 440, 479, 440)
 
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 28)
             time.sleep(0.1)
