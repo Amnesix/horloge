@@ -1,5 +1,4 @@
 import gc
-import time
 
 from picovector import Polygon
 
@@ -95,13 +94,13 @@ class Menu:
             if self.touch.state:
                 while self.touch.state:
                     self.touch.poll()
-                    time.sleep(.1)
+                    # time.sleep(.1)
                 x, y = self.touch.x, self.touch.y
                 for btn, coord in BTN.items():
                     if coord.clicked(x, y):
                         Page.set_page(btn)
                         return btn
-            time.sleep(.1)
+            # time.sleep(.1)
 
 
 """if __name__ == '__main__':

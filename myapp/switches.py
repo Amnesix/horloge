@@ -4,11 +4,10 @@ import time
 
 from picovector import Polygon
 from requests import get, post
-from touch import Button
 
 # from myapp.mqtt import set_callback
 from myapp.secret import headers
-from myapp.utils import PRISES, Color, Page, get_api, verifier_connexion
+from myapp.utils import PRISES, Color, MyButton, Page, get_api, verifier_connexion
 
 OFFSET = 60
 ONEBTN = True
@@ -29,16 +28,20 @@ class Switch:
         self.ligne = ligne
         self.state = initiale_state
         if ONEBTN:
-            self.switch = Button(10, ligne * OFFSET, 100, 50)
+            self.switch = MyButton(self.touch, 10, ligne * OFFSET, 100, 50,
+                                   label)
             self.btn = Polygon()
-            self.btn.rectangle(*self.switch.bounds, corners=(10, 10, 10, 10))
+            self.btn.rectangle(*self.switch.bounds(), corners=(10, 10, 10, 10))
         else:
-            self.on = Button(240, ligne * OFFSET, 100, 50)
-            self.off = Button(360, ligne * OFFSET, 100, 50)
+            self.on = MyButton(self.touch, 240, ligne * OFFSET, 100, 50,
+                               f'{label}_on')
+            self.off = MyButton(self.touch, 360, ligne * OFFSET, 100, 50,
+                                f'{label}_off')
             self.btn_on = Polygon()
-            self.btn_on.rectangle(*self.on.bounds, corners=(10, 10, 10, 10))
+            self.btn_on.rectangle(*self.on.bounds(), corners=(10, 10, 10, 10))
             self.btn_off = Polygon()
-            self.btn_off.rectangle(*self.off.bounds, corners=(10, 10, 10, 10))
+            self.btn_off.rectangle(*self.off.bounds(),
+                                   corners=(10, 10, 10, 10))
 
     def get_state(self, maj):
         if not maj:
@@ -113,15 +116,15 @@ class Switch:
     def on_click(self):
         ret = False
         if ONEBTN:
-            if self.switch.is_pressed() and self.state is not None:
+            if self.switch.is_clicked() and self.state is not None:
                 self.mqtt.send_msg(self.label, "off" if self.state else "on")
                 ret = True
         else:
-            if self.on.is_pressed():  # and not self.state:
+            if self.on.is_clicked():  # and not self.state:
                 self.mqtt.send_msg(self.label, "on")
                 # self.set_state(True)
                 ret = True
-            elif self.off.is_pressed():  # and self.state:
+            elif self.off.is_clicked():  # and self.state:
                 self.mqtt.send_msg(self.label, "off")
                 # self.set_state(False)
                 ret = True
@@ -143,10 +146,11 @@ class Switches:
         self.alerte = alerte
         self.loggin = loggin
         self.api = get_api()[0]
-        self.btnReturn = Button(360, 420, 100, 50)
+        self.btnReturn = MyButton(self.touch, 360, 420, 100, 50, 'exit')
         self.btn_exit = Polygon()
-        self.btn_exit.rectangle(*self.btnReturn.bounds,
+        self.btn_exit.rectangle(*self.btnReturn.bounds(),
                                 corners=(10, 10, 10, 10))
+        print(f"Btn Exit : {self.btnReturn.bounds()}")
         for ligne, item in enumerate(sorted(PRISES.items())):
             label, name = item
             try:
@@ -163,10 +167,6 @@ class Switches:
         ok = False
         for switch in self.switches:
             ok |= self.switches[switch].on_click()
-        # S'assurer du relaché du bouton
-        while self.touch.state:
-            time.sleep(.1)
-            self.touch.poll()
         return ok
 
     def update_state(self, topic, state):
@@ -222,7 +222,7 @@ class Switches:
     def affiche(self):
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 38)
         self.update_screen()
-        cmpt = 1
+        start = time.time()
         while True:
             if verifier_connexion(self.presto, self.loggin):
                 self.mqtt.reconnect()
@@ -231,20 +231,21 @@ class Switches:
             if self.alerte.id_show:
                 self.alerte.show()
             self.mqtt.check_msg()
+            self.on_click()
             self.touch.poll()
-            if ONEBTN and self.btnReturn.is_pressed():
-                self.display.set_pen(Color.BLACK)
-                self.display.clear()
-                return
-            if self.on_click() or cmpt % 15 == 0:
-                self.update_screen()
-            self.touch.poll()
-            if self.touch.state and self.touch.x < 240:
-                y = self.touch.y
-                while self.touch.state:
-                    self.touch.poll()
-                if abs(self.touch.y - y) > 240:
+            if ONEBTN:
+                if self.btnReturn.is_clicked():
+                    self.display.set_pen(Color.BLACK)
+                    self.display.clear()
                     return
-
-            cmpt += 1
-            time.sleep(0.1)
+            else:
+                if self.touch.state and self.touch.x < 240:
+                    y = self.touch.y
+                    while self.touch.state:
+                        self.touch.poll()
+                    if abs(self.touch.y - y) > 240:
+                        return
+            present = time.time()
+            if start != present:
+                self.update_screen()
+                start = present

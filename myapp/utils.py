@@ -622,3 +622,33 @@ class Alerte:
             time.sleep(.25)
         Page.set_redraw(True)
         self.id_show = False
+
+
+class MyButton:
+
+    def __init__(self, touch, x, y, w, h, name):
+        self.touch = touch
+        self.x1 = x
+        self.y1 = y
+        self.w = w
+        self.h = h
+        self.x2 = x + w
+        self.y2 = y + h
+        self.name = name
+
+    def is_pressed(self):
+        if self.touch.state:
+            x, y = self.touch.x, self.touch.y
+            return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+        return False
+
+    def is_clicked(self):
+        x, y = self.touch.x, self.touch.y
+        if self.is_pressed():
+            while self.touch.state:
+                x, y = self.touch.x, self.touch.y
+                self.touch.poll()
+            return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+
+    def bounds(self) -> tuple[int, int, int, int]:
+        return self.x1, self.y1, self.w, self.h
