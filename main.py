@@ -25,6 +25,8 @@ from myapp.utils import (
 )
 from myapp.version import __title__, __version__
 
+start = time.time()
+
 # Initialisation générale
 presto = presto.Presto(layers=1, full_res=True)
 display = presto.display
@@ -64,7 +66,7 @@ switches = Switches(presto, display, vector, touch, mqtt, alerte, loggin,
 flip = Flip_Clock(presto, display, vector, touch, mqtt, alerte, loggin)
 horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
                   switches, calendar, alarmes, alerte, loggin, mqttlogs)
-menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin)
+menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin, start)
 
 # Lancement de l'affichage principal
 mqtt.set_fin_init()
