@@ -4,3 +4,4 @@ paulmann_vers_yeelight.yaml
 myapp/secret.py
 test.py
 img/*png
+secrets.py

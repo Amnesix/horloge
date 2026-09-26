@@ -29,24 +29,15 @@ class Switch:
         self.ligne = ligne
         self.state = initiale_state
         if ONEBTN:
-<<<<<<< HEAD
             self.switch = MyButton(self.touch, 10, ligne * OFFSET, 100, 50,
                                    label)
-=======
-            self.switch = Button(10, ligne * OFFSET, 100, HEIGHT)
->>>>>>> b2340636ccdbbad1f71a7cbaaf35e32116204e98
             self.btn = Polygon()
             self.btn.rectangle(*self.switch.bounds(), corners=(10, 10, 10, 10))
         else:
-<<<<<<< HEAD
             self.on = MyButton(self.touch, 240, ligne * OFFSET, 100, 50,
                                f'{label}_on')
             self.off = MyButton(self.touch, 360, ligne * OFFSET, 100, 50,
                                 f'{label}_off')
-=======
-            self.on = Button(240, ligne * OFFSET, 100, HEIGHT)
-            self.off = Button(360, ligne * OFFSET, 100, HEIGHT)
->>>>>>> b2340636ccdbbad1f71a7cbaaf35e32116204e98
             self.btn_on = Polygon()
             self.btn_on.rectangle(*self.on.bounds(), corners=(10, 10, 10, 10))
             self.btn_off = Polygon()

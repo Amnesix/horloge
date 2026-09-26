@@ -210,12 +210,10 @@ class Horloge:
         self.affiche_capteurs_temperatures()
         self.affiche_capteurs_switches()
         self.display.set_pen(Color.RED if self.mqtt.puissance_lv ==
-                             "0.0" else Color.BLACK if now
-                             & 1 else Color.BLACK)
+                             "0.0" else Color.BLACK)
         self.vector.draw(self.id_lv)
         self.display.set_pen(Color.RED if self.mqtt.puissance_dh ==
-                             "0.0" else Color.BLACK if now
-                             & 1 else Color.BLACK)
+                             "0.0" else Color.BLACK)
         self.vector.draw(self.id_dh)
         if now - self.mqtt.last_msg < 5:
             self.display.set_pen(Color.LIGHTYELLOW)

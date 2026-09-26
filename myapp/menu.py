@@ -1,4 +1,5 @@
 import gc
+import time
 
 from picovector import Polygon
 
@@ -83,18 +84,25 @@ class Menu:
         self.vector.text("Choix page", 240 - lt // 2, 35)
         for btn in BTN.values():
             btn.affiche()
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 22)
         self.presto.update()
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
         page = Page.get_page()
+        lst = 0
         while True:
-            delai = time.time() - delai
-            j = delai // 86400
-            h = (delai - j * 86400) // 3600
-            m = (delai - j * 86400 - h * 3600) // 60
-            s = delai % 60
-            self.vector.text(f"Démarré depuis {j} j {h} h {m} m {s} s", 50,
-                             475)
-            self.presto.partial_update(50, 455, 420, 480)
+            s = time.time()
+            if lst != s:
+                lst = s
+                delai = s - self.start
+                j = delai // 86400
+                h = (delai - j * 86400) // 3600
+                m = (delai - j * 86400 - h * 3600) // 60
+                s = delai % 60
+                self.display.set_pen(Color.BLACK)
+                self.display.rectangle(50, 455, 370, 24)
+                self.display.set_pen(Color.GREY)
+                self.vector.text(f"Démarré depuis {j} j {h} h {m} m {s} s", 50,
+                                 475)
+                self.presto.partial_update(50, 455, 370, 24)
             self.mqtt.check_msg()
             if page != Page.get_page():
                 return
