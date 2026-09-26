@@ -250,8 +250,11 @@ class Horloge:
             self.display.set_pen(Color.BLACK)
             self.display.clear()
             index = self.alarmes.next_alarme()
-            h, m, s = self.alarmes.get_alarme(index).get_time()
-            # TODO: si s < 6 il faut tester m-1 !
+            if index is not None:
+                h, m, s = self.alarmes.get_alarme(index).get_time()
+                # TODO: si s < 6 il faut tester m-1 !
+            else:
+                h = m = s = -1
             if hour == h and minute == m and second in ((s - 6) % 60,
                                                         (s - 4) % 60,
                                                         (s - 2) % 60, s):

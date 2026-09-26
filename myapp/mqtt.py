@@ -1,11 +1,11 @@
 import binascii
 import gc
 import time
-from secrets import MQTT_PASSWD, MQTT_USER
 
 import machine
 from umqtt.simple import MQTTClient
 
+from myapp.secret import MQTT_PASSWD, MQTT_USER
 from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
 
 SOUSCRIPTIONS = {

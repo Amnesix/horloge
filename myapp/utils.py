@@ -220,8 +220,11 @@ def wifi_connect(presto, loggin=None):
             print(f"wifi_connect():Exception ({e})")
         return False
 
-    with open("wifi.json", "rt") as f:
-        d = json.load(f)
+    try:
+        with open("wifi.json", "rt") as f:
+            d = json.load(f)
+    except OSError:
+        d = {"indice": 0}
     indice = d["indice"]
     while True:
         if loggin is not None:

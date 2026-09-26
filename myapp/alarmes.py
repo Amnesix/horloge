@@ -135,7 +135,9 @@ class Alarmes:
         self.alarmes.sort()
         self.save_alarmes()
 
-    def next_alarme(self) -> int:
+    def next_alarme(self) -> int | None:
+        if len(self.alarmes) == 0:
+            return None
         t = time.time()
         t += TZ.get_offset(t) * 3600
         _, _, _, h, m, s, d, _ = time.gmtime(t)
@@ -182,6 +184,7 @@ class Alarmes:
                 data = json.load(f)
         except Exception as e:
             print(f"load_alarmes() : {e}")
+            self.add_alarme(12, 0, 0)
             self.save_alarmes()
         else:
             self.alarmes.clear()
