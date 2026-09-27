@@ -250,7 +250,7 @@ class MQTTLog:
                         try:
                             s = f"Alarme #{index} : {al}"
                             self.loggin.log(s, aff=aff)
-                            self.publish(TOPIC_MSG["alarme"], s)
+                            self.mqtt.send_msg("alarme", s)
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
