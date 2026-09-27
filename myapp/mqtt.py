@@ -61,6 +61,8 @@ TOPIC_MSG = {
     "Ethernet": "home/toggle/eth",
     "Informatique": "home/toggle/info",
     "ping": "home/ping",
+    "alarme": "cmd/alarme",
+    "alerte": "cmd/alerte",
 }
 
 
@@ -247,8 +249,8 @@ class MQTTLog:
                     for index, al in enumerate(self.alarmes.get_alarmes()):
                         try:
                             s = f"Alarme #{index} : {al}"
-                            # print(s)
                             self.loggin.log(s, aff=aff)
+                            self.publish(TOPIC_MSG["alarme"], s)
                         except ValueError:
                             print(f"List alarmes ValueError : {al}")
                     return
