@@ -25,8 +25,6 @@ from myapp.utils import (
 )
 from myapp.version import __title__, __version__
 
-start = time.time()
-
 # Initialisation générale
 presto = presto.Presto(layers=1, full_res=True)
 display = presto.display
@@ -45,6 +43,7 @@ loggin.log("Connexion Wifi en cours...")
 # Connection / Mise à l'heure
 wifi_connect(presto, loggin)
 update_time(loggin)
+start = time.time()
 TZ.init(loggin)
 s = time.time()
 offset = 3600 * TZ.get_offset(s)
