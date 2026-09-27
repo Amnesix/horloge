@@ -236,7 +236,9 @@ class MQTTLog:
         if 'alert' in topic:
             self.alerte.alerte(msg)
         elif 'debug' in topic:
-            print(exec(msg))
+            # TODO >JMO< À VÉRIFIER !!!
+            # print(exec(msg))
+            exec(msg)
         elif 'alarme' in topic:
             # print(f'Alarme : {msg}')
             try:

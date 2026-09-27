@@ -47,7 +47,7 @@ class MyBtn:
 
 
 BTN = {
-    "temperatures": MyBtn(36, 60, LARGEUR, HAUTEUR, "Temperatures"),
+    "temperatures": MyBtn(36, 60, LARGEUR, HAUTEUR, "Températures"),
     "horloge": MyBtn(256, 60, LARGEUR, HAUTEUR, "Horloge"),
     "switches": MyBtn(36, 150, LARGEUR, HAUTEUR, "Interrupteurs"),
     "flip": MyBtn(256, 150, LARGEUR, HAUTEUR, "Flip clock"),
@@ -89,10 +89,10 @@ class Menu:
         page = Page.get_page()
         lst = 0
         while True:
-            s = time.time()
-            if lst != s:
-                lst = s
-                delai = s - self.start
+            now = time.time()
+            if lst != now:
+                lst = now
+                delai = now - self.start
                 j = delai // 86400
                 h = (delai - j * 86400) // 3600
                 m = (delai - j * 86400 - h * 3600) // 60
