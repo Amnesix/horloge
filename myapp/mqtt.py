@@ -103,7 +103,8 @@ class MQTT:
         self.set_callback(self.mqtt_commandes)
         try:
             self.client.connect()
-            self.loggin.log("Client MQTT connecté")
+            self.loggin.log(f"Client MQTT connecté id={self.client_id}")
+            self.loggin.log("Souscription : 0%")
             t = len(SOUSCRIPTIONS)
             for n, k in enumerate(SOUSCRIPTIONS):
                 # ATTENTION : Le loggin ralenti l'intialisation du presto…
