@@ -152,7 +152,6 @@ class Switches:
         self.btn_exit = Polygon()
         self.btn_exit.rectangle(*self.btnReturn.bounds(),
                                 corners=(10, 10, 10, 10))
-        print(f"Btn Exit : {self.btnReturn.bounds()}")
         for ligne, item in enumerate(sorted(PRISES.items())):
             label, name = item
             try:
