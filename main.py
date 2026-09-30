@@ -93,7 +93,7 @@ while True:
         display.set_pen(Color.BLACK)
         display.clear()
         presto.update()
-        mqtt.disconnect()
+        mqtt.disconnect(False)
         machine.reset()
         break
     elif page == 'exit':
@@ -108,6 +108,6 @@ print("The end")
 display.set_pen(Color.BLACK)
 display.clear()
 presto.update()
-mqtt.disconnect()
-# presto.wifi.disconnect()
+mqtt.disconnect(False)
+# presto.wifi.disconnect(False)
 # machine.reset()  # reboot

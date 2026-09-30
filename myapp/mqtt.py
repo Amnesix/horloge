@@ -85,6 +85,8 @@ class MQTT:
         self.last_msg = 0
         self.connect()
         self.pong = True
+        # Autoreconnexion par défaut
+        self.autoreco = True
         loggin.log("Connexion au broker MQTT OK.")
 
     def set_fin_init(self):
@@ -115,7 +117,8 @@ class MQTT:
             print(f"Erreur de connexion : {e}")
             self.loggin.log(f"Erreur MQTT : {e}")
 
-    def disconnect(self):
+    def disconnect(self, autoreco=True):
+        self.autoreco = autoreco
         if self.client is not None:
             # Ce module MQTTClient n'a pas de méthode unsubscribe !
             # for n, k in enumerate(SOUSCRIPTIONS):
@@ -179,7 +182,8 @@ class MQTT:
 
     def check_msg(self):
         if time.time() - self.last_ping >= 120:
-            if not self.pong:
+            # S'il s'est écoulé plus de 120s sans pong, on se reconnecte
+            if not self.pong and self.autoreco:
                 print("Tentative de reconnexion de mqtt")
                 self.reconnect()
             self.send_msg("ping", "")
