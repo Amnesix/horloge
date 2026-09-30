@@ -83,8 +83,6 @@ class MQTT:
         self.pile = []
         self.fin_init = False
         self.last_msg = 0
-        unique = str(binascii.hexlify(machine.unique_id()))
-        self.client_id = f'{unique}'
         self.connect()
         self.pong = True
         loggin.log("Connexion au broker MQTT OK.")
@@ -93,6 +91,8 @@ class MQTT:
         self.fin_init = True
 
     def connect(self):
+        unique = str(binascii.hexlify(machine.unique_id()))
+        self.client_id = f'{unique}' + f"_{time.time() %   10000}"
         self.client = MQTTClient(self.client_id,
                                  self.broker,
                                  port=self.port,
@@ -103,7 +103,7 @@ class MQTT:
         self.set_callback(self.mqtt_commandes)
         try:
             self.client.connect()
-            self.loggin.log(f"Client MQTT connecté id={self.client_id}")
+            self.loggin.log(f"MQTT connecté id={self.client_id}")
             self.loggin.log("Souscription : 0%")
             t = len(SOUSCRIPTIONS)
             for n, k in enumerate(SOUSCRIPTIONS):
