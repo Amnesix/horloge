@@ -5,10 +5,9 @@ import random
 import time
 
 import ntptime
+from myapp.secret import APIHA, CONFIG, MQTT_DISTANT, headers
 from picovector import Polygon
 from requests import get, post
-
-from myapp.secret import APIHA, CONFIG, MQTT_DISTANT, headers
 
 RETRAITE = datetime.date(2029, 7, 1)
 
@@ -179,6 +178,10 @@ class Log:
         self.display.set_pen(Color.BLACK)
         self.display.clear()
         self.display.set_pen(Color.LIGHTGREY)
+        t = time.time()
+        _, _, _, h, m, s, _, _ = time.gmtime(s + 3600 * TZ.get_offset(t))
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 20)
+        self.vector.text(f"{h:02d}:{m:02d}:{s:02d}", 10, 20)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.vector.text(self.title, *self.title_coord)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
