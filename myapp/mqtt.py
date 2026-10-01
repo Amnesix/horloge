@@ -3,9 +3,9 @@ import gc
 import time
 
 import machine
+from myapp.secret import MQTT_PASSWD, MQTT_USER
 from umqtt.simple import MQTTClient
 
-from myapp.secret import MQTT_PASSWD, MQTT_USER
 from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
 
 SOUSCRIPTIONS = {
@@ -116,6 +116,7 @@ class MQTT:
         except OSError as e:
             print(f"Erreur de connexion : {e}")
             self.loggin.log(f"Erreur MQTT : {e}")
+            self.client = None
 
     def disconnect(self, autoreco=True):
         self.autoreco = autoreco
@@ -129,8 +130,11 @@ class MQTT:
     def reconnect(self):
         self.loggin.log("Déconnexion client MQTT")
         if self.client is not None:
-            self.client.disconnect()
-        self.loggin.log("Connexion client MQTT")
+            try:
+                self.client.disconnect()
+            except OSError as e:
+                print(f"Erreur de déconnexion : {e}")
+        self.loggin.log("Tentative de reconnexion client MQTT")
         self.connect()
 
     def send_msg(self, what, msg):
@@ -155,12 +159,12 @@ class MQTT:
         _, _, _, h, m, s, _, _ = time.gmtime(self.last_msg + 3600 *
                                              TZ.get_offset(self.last_msg))
         if 'pong' in topic:
-            print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+            print(f"{h:02d}:{m:02d}:{s:02d}:Reception MQTT {topic} : {msg}")
             self.pong = True
             if len(self.pile) == 0:
                 return
         else:
-            print(f"{h:02d}:{m:02d}:{s:02d}:Réception MQTT {topic} : {msg}")
+            print(f"{h:02d}:{m:02d}:{s:02d}:Reception MQTT {topic} : {msg}")
             self.pile.append((topic, msg))
         if not self.fin_init:
             return
