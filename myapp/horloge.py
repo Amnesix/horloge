@@ -294,11 +294,11 @@ class Horloge:
 
             self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
             self.display.set_pen(Color.GREY)
+            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
+            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
             self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
             self.vector.text(self.retraite[0], self.retraite[1],
                              self.retraite[2])
-            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
-            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
 
             # Aiguille des secondes au dessus de l'ensemble
             self.display.set_pen(Color.RED)
@@ -309,13 +309,12 @@ class Horloge:
             self.vector.draw(self.hub)
             self.affiche_capteurs(now)
 
+            # Affichage des dates et retraite au dessus des aiguilles heures & minutes
             self.display.set_pen(Color.LIGHTGREY)
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
             diff = (RETRAITE - datetime.date(year, month, day)).days
             self.vector.text(f"J-{diff:04d}", WIDTH // 2 - 42, 347)
-
-            # Affichage des dates et retraite au dessus des aiguilles heures & minutes
             self.display.set_pen(Color.GREY)
             dehors = self.temperatures.temps["_dehors"]
             bureau = self.temperatures.temps["bureau"]
