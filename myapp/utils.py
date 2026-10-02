@@ -587,9 +587,11 @@ class Alerte:
         self.touch = touch
         self.loggin = loggin
         self.cadre = Polygon()
-        self.cadre.rectangle(98, 78, 284, 154)
+        self.cadre.rectangle(48, 78, 384, 239)
         self.fond = Polygon()
-        self.fond.rectangle(100, 80, 280, 150)
+        self.fond.rectangle(50, 80, 380, 235)
+        self.w = 374  # Largeur affichage max
+        self.h = 235
 
     def alerte(self, msg):
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
@@ -599,7 +601,7 @@ class Alerte:
         while len(words):
             word = words.pop(0)
             w = self.vector.measure_text(f"{self.message[-1]} {word}")[2]
-            if w > 260:
+            if w > self.w:
                 self.message.append(word)
             else:
                 self.message[-1] += " " + word
@@ -614,11 +616,11 @@ class Alerte:
         self.vector.draw(self.fond)
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.display.set_pen(Color.LIGHTYELLOW)
-        hp = 170 - len(self.message) * 15
+        hp = 82 + (self.h - len(self.message) * 16) // 2
         for pos, line in enumerate(self.message):
             dim = self.vector.measure_text(line, x=0, y=0, angle=0)
-            offset = 130 - int(dim[2]) // 2
-            self.vector.text(line, 110 + offset, hp + pos * 32)
+            offset = (self.w - int(dim[2])) // 2
+            self.vector.text(line, 52 + offset, hp + pos * 32)
         self.presto.update()
         while time.time() < s:
             if get_touch(self.touch):
