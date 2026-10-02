@@ -3,9 +3,9 @@ import gc
 import time
 
 import machine
-from myapp.secret import MQTT_PASSWD, MQTT_USER
 from umqtt.simple import MQTTClient
 
+from myapp.secret import MQTT_PASSWD, MQTT_USER
 from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
 
 SOUSCRIPTIONS = {
@@ -93,8 +93,8 @@ class MQTT:
         self.fin_init = True
 
     def connect(self):
-        unique = str(binascii.hexlify(machine.unique_id()))
-        self.client_id = f'{unique}' + f"_{time.time() %   10000}"
+        unique = str(binascii.hexlify(machine.unique_id()))[2:-1]
+        self.client_id = f'{unique}' + f"_{time.time() % 10000}"
         self.client = MQTTClient(self.client_id,
                                  self.broker,
                                  port=self.port,
