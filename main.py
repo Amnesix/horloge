@@ -38,11 +38,11 @@ vector.set_transform(t)
 vector.set_antialiasing(ANTIALIAS_BEST)
 Color.init(display)
 loggin = Log(presto, display, vector, f"{__title__} - {__version__}")
-TZ.init(loggin)
 loggin.log("Connexion Wifi en cours...")
 
 # Connection / Mise à l'heure
 wifi_connect(presto, loggin)
+TZ.init(loggin)
 update_time(loggin)
 start = time.time()
 s = time.time()
