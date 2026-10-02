@@ -488,6 +488,7 @@ class TZ:
         if year is None:
             s = time.time()
             year, _, _, _, _, _, _, _ = time.gmtime(s)
+        # print(f"Init TZ for year {year}")
         cls.start = cls.dst_start(year)
         cls.end = cls.dst_end(year)
         _, ms, js, _, _, _, _, _ = time.gmtime(cls.start)
