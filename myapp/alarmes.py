@@ -156,7 +156,7 @@ class Alarmes:
         self.alarmes.pop(index)
         self.save_alarmes()
 
-    def get_alarme(self, index):
+    def get_alarme(self, index) -> Alarme:
         return self.alarmes[index]
 
     def get_alarmes(self) -> list[Alarme]:
