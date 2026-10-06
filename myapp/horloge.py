@@ -314,7 +314,9 @@ class Horloge:
             self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
                              155)
             diff = (RETRAITE - datetime.date(year, month, day)).days
-            self.vector.text(f"J-{diff:04d}", WIDTH // 2 - 42, 347)
+            days = f"J-{diff:d}"
+            log = int(self.vector.measure_text(days)[2])
+            self.vector.text(days, (WIDTH - log) // 2, 347)
             self.display.set_pen(Color.GREY)
             dehors = self.temperatures.temps["_dehors"]
             bureau = self.temperatures.temps["bureau"]
