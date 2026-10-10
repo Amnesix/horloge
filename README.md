@@ -41,6 +41,3 @@ La clé d'authorisation de l'API est à générer sur HomeAssistant :
   - switche nom 'on|off' -> bascule un switch
   - hadebug 'commande' -> exécute la commande sur le presto
 
-----
-Je pense tout réécrire de telle façon à ce que chaque objet se contente d'afficher sa page de rend la main immédiatement à un ordonnateur qui se charge de la gestion de tous les messages.
-----Pour le moment, prochaine étape, protection du broker MQTT.

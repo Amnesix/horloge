@@ -71,6 +71,7 @@ class Horloge:
         self.t_msg = 0
         self.m_msg = ""
         self.offset = 0
+        self.first_lave_linge = True
         # len = int(self.vector.measure_text(self.titre)[2])
         self.loggin.log(f"Initialisation {self.titre}")
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
@@ -230,7 +231,7 @@ class Horloge:
             t_start = time.ticks_ms()
             now = time.time()
             if now == self.next_update_time:
-                update_time(False)
+                update_time(self.loggin, False)
             self.offset = 3600 * TZ.get_offset(now)
             year, month, day, hour, minute, second, wd, _ =\
                 time.gmtime(now + self.offset)
@@ -349,10 +350,15 @@ class Horloge:
                     self.topic = None
                 ypos += 15
             if self.mqtt.puissance_lv != "0.0":
+                if self.first_lave_linge:
+                    self.alerte.alerte("Lave ligne en route")
+                    self.first_lave_linge = False
                 p = f"Lave linge {self.mqtt.puissance_lv}W"
                 log = int(self.vector.measure_text(p)[2])
                 self.vector.text(p, 479 - log, ypos)
                 ypos += 15
+            else:
+                self.first_lave_linge = True
             if self.mqtt.puissance_dh != "0.0":
                 p = f"déshum. {self.mqtt.puissance_dh}W"
                 log = int(self.vector.measure_text(p)[2])
