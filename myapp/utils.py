@@ -53,14 +53,15 @@ CAPTEURS = {
 # Les libellés sont ceux affichés et sont succeptibles de changer.
 PRISES = {
     "Ventilo": "antela_prise_intelligente_2_socket_1",
-    "RPi": "rpi",
-    "Multimédia": "multimedia_salon_socket_1",
+    "2nd écran": "rpi",
+    "PC LENOVO": "lenovo",
     "Cuisine": "prise_connectee",
     "Lave linge": "lave_linge",
     "Déshumid.": "pc_deshumidificateur",
     "Douche": "sonoff_s60zbtpf",
     "Ethernet": "eth",
-    "Informatique": "pc_informatique",
+    "PC Bureau": "pc_informatique",
+    "PC NOUS RFU": "pc_rfu",
 }
 
 SENSOR_to_CAPTEURS = {
@@ -258,6 +259,7 @@ def verifier_connexion(presto, loggin):
 
 
 def get_all_states_old():
+    """Fonction obsolète - Je garde pour l'historique."""
     global FILTRES
     FILTRES = ["sensor." + v[1] for v in CAPTEURS.values()]
     FILTRES += ["switch." + v for v in PRISES.values()]
@@ -330,7 +332,8 @@ def get_switches():
     for state in states:
         entity = state['entity_id']
         if entity.split('.')[1] in PRISES.values():
-            result[entity] = state['state'] == 'on'
+            result[entity] = None if state[
+                'state'] == 'unavailable' else state['state'] == 'on'
     return result
 
 

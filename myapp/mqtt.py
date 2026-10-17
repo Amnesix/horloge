@@ -29,14 +29,15 @@ SOUSCRIPTIONS = {
     "home/humidity/salon": "salon",
     # Interrupteurs
     "home/switch/ventilo": "Ventilo",
-    "home/switch/rpi": "RPi",
+    "home/switch/rpi": "2nd écran",
     "home/switch/eth": "Ethernet",
-    "home/switch/multimedia": "Multimédia",
+    "home/switch/lenovo": "PC LENOVO",
     "home/switch/cuisine": "Cuisine",
     "home/switch/douche": "Douche",
     "home/switch/lave_linge": "Lave linge",
     "home/switch/deshum": "Déshumid.",
-    "home/switch/info": "Informatique",
+    "home/switch/info": "PC Bureau",
+    "home/switch/pc_rfu": "PC NOUS RFU",
     # Lave lave_linge
     "home/puissance/lave_linge": "-",
     "home/puissance/deshum": "-",
@@ -51,15 +52,16 @@ SOUSCRIPTIONS = {
 }
 
 TOPIC_MSG = {
-    "RPi": "home/toggle/rpi",
+    "2nd écran": "home/toggle/rpi",
     "Douche": "home/toggle/douche",
     "Cuisine": "home/toggle/cuisine",
     "Ventilo": "home/toggle/ventilo",
     "Lave linge": "home/toggle/lave_linge",
     "Déshumid.": "home/toggle/deshum",
-    "Multimédia": "home/toggle/multimedia",
+    "PC LENOVO": "home/toggle/lenovo",
     "Ethernet": "home/toggle/eth",
-    "Informatique": "home/toggle/info",
+    "PC Bureau": "home/toggle/info",
+    "PC NOUS RFU": "home/toggle/pc_rfu",
     "ping": "home/ping",
     "alarme": "cmd/alarme",
     "alerte": "cmd/alerte",
@@ -141,6 +143,7 @@ class MQTT:
         # print(f"Send {what}: {TOPIC_MSG[what]}:'{msg}'")
         try:
             if self.client is not None:
+                print(f"publish({TOPIC_MSG[what]}, {msg})")
                 self.client.publish(TOPIC_MSG[what], msg)
         except KeyError:
             print(f"Erreur de clé send_msg({what}, {msg})")

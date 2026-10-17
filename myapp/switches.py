@@ -9,8 +9,8 @@ from requests import get, post
 from myapp.secret import headers
 from myapp.utils import PRISES, Color, MyButton, Page, get_api, verifier_connexion
 
-OFFSET = 53
-HEIGHT = 45
+OFFSET = 48
+HEIGHT = 40
 ONEBTN = True
 
 
@@ -29,14 +29,14 @@ class Switch:
         self.ligne = ligne
         self.state = initiale_state
         if ONEBTN:
-            self.switch = MyButton(self.touch, 10, ligne * OFFSET, 100, 50,
+            self.switch = MyButton(self.touch, 10, ligne * OFFSET, 100, HEIGHT,
                                    label)
             self.btn = Polygon()
             self.btn.rectangle(*self.switch.bounds(), corners=(10, 10, 10, 10))
         else:
-            self.on = MyButton(self.touch, 240, ligne * OFFSET, 100, 50,
+            self.on = MyButton(self.touch, 240, ligne * OFFSET, 100, HEIGHT,
                                f'{label}_on')
-            self.off = MyButton(self.touch, 360, ligne * OFFSET, 100, 50,
+            self.off = MyButton(self.touch, 360, ligne * OFFSET, 100, HEIGHT,
                                 f'{label}_off')
             self.btn_on = Polygon()
             self.btn_on.rectangle(*self.on.bounds(), corners=(10, 10, 10, 10))
@@ -67,6 +67,7 @@ class Switch:
         return result
 
     def set_state(self, state):
+        """Fonction obsolète"""
         url = self.api + "services/switch/turn_" + ("on" if state else "off")
         data = {"entity_id": "switch." + self.switch}
         try:
@@ -82,6 +83,7 @@ class Switch:
         self.state = None if state == 'unavailable' else state == 'on'
 
     def toggle(self):
+        """Fonction obsolète"""
         url = self.api + "services/switch/toggle"
         data = {"entity_id": "switch." + self.switch}
         try:
@@ -119,6 +121,9 @@ class Switch:
         ret = False
         if ONEBTN:
             if self.switch.is_clicked() and self.state is not None:
+                print(
+                    f'Send MQTT message {self.label} : {"off" if self.state else "on"}'
+                )
                 self.mqtt.send_msg(self.label, "off" if self.state else "on")
                 ret = True
         else:
