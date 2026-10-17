@@ -10,8 +10,6 @@ from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
 from myapp.menu import Menu
 from myapp.mqtt import MQTT, MQTTLog
-from myapp.switches import Switches
-from myapp.temperatures import Temperatures
 from myapp.utils import (
     TZ,
     Alerte,
@@ -58,13 +56,9 @@ mqtt = MQTT(broker, port, alerte, loggin)
 mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, alerte, loggin)
 initiale_states = get_all_states(loggin)
-temperatures = Temperatures(presto, display, vector, touch, mqtt, alerte,
-                            loggin, initiale_states)
-switches = Switches(presto, display, vector, touch, mqtt, alerte, loggin,
-                    initiale_states)
 flip = Flip_Clock(presto, display, vector, touch, mqtt, alerte, loggin)
-horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
-                  switches, calendar, alarmes, alerte, loggin, mqttlogs)
+horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, calendar,
+                  alarmes, alerte, loggin)
 menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin, start)
 
 # Lancement de l'affichage principal
@@ -73,6 +67,9 @@ loggin.log("Lancement boucle de traitement")
 # Page par défaut
 Page.set_page('horloge')
 page = Page.get_page()
+display.set_pen(Color.BLACK)
+display.rectangle(0, 0, 480, 480)
+presto.update()
 while True:
     # Page.set_page(page)
     if page == 'horloge':

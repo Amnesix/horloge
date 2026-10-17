@@ -8,7 +8,7 @@ from umqtt.simple import MQTTClient
 from myapp.secret import MQTT_PASSWD, MQTT_USER
 from myapp.utils import TZ, Color, Log, Page, get_touch, verifier_connexion
 
-SOUSCRIPTIONS = {
+_SOUSCRIPTIONS = {
     # Températures
     "home/temp/dehors": "_dehors",
     "home/temp/buandrie": "buandrie",
@@ -43,6 +43,8 @@ SOUSCRIPTIONS = {
     "home/puissance/deshum": "-",
     "home/lave_linge/fincycle": "-",
     # Autres
+}
+SOUSCRIPTIONS = {
     "home/page": "-",
     "home/commandes": "-",
     "home/alerte": "-",
@@ -114,9 +116,10 @@ class MQTT:
                 # ATTENTION : Le loggin ralenti l'intialisation du presto…
                 s = f"Souscription : {(n + 1) * 100 / t:.0f}%"
                 self.loggin.log(s, nl=False)
+                print(k)
                 self.client.subscribe(k)
         except OSError as e:
-            print(f"Erreur de connexion : {e}")
+            print(f">> Erreur de connexion : {e}")
             self.loggin.log(f"Erreur MQTT : {e}")
             self.client = None
 
@@ -135,7 +138,7 @@ class MQTT:
             try:
                 self.client.disconnect()
             except OSError as e:
-                print(f"Erreur de déconnexion : {e}")
+                print(f"> Erreur de déconnexion : {e}")
         self.loggin.log("Tentative de reconnexion client MQTT")
         self.connect()
 

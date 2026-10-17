@@ -1,4 +1,3 @@
-import datetime
 import gc
 import sys
 import time
@@ -7,10 +6,8 @@ import jpegdec
 from picovector import Polygon
 
 from myapp.utils import (
-    CAPTEURS,
     JOURS,
-    PRISES,
-    RETRAITE,
+    MOIS,
     TZ,
     Color,
     Page,
@@ -39,13 +36,10 @@ class Horloge:
         touch,
         flip,
         mqtt,
-        temperatures,
-        switches,
         calendar,
         alarmes,
         alerte,
         loggin,
-        mqttlogs,
     ):
         self.presto = presto
         self.display = display
@@ -54,14 +48,11 @@ class Horloge:
         self.touch = touch
         self.flip = flip
         self.mqtt = mqtt
-        self.temperatures = temperatures
-        self.switches = switches
         self.calendar = calendar
         self.alarmes = alarmes
         self.alerte = alerte
         self.loggin = loggin
         self.local = True
-        self.mqttlogs = mqttlogs
         self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
         self.fg = Color.LIGHTGREY
         self.titre = f"{__title__} - {__version__}"
@@ -81,92 +72,39 @@ class Horloge:
         self.next_update_time = time.time() + 12 * 60 * 60
 
         self.hub = Polygon()
-        self.hub.circle(int(WIDTH / 2), int(HEIGHT / 2), 7)
+        self.hub.circle(int(WIDTH / 4), int(HEIGHT / 4), 5)
 
-        self.minute_hand_length = int(HEIGHT / 2) - int(HEIGHT / 8)
+        self.minute_hand_length = int(HEIGHT / 4) - int(HEIGHT / 16)
         self.minute_hand = Polygon()
         self.minute_hand.path(
-            (-5, -self.minute_hand_length),
-            (-8, int(HEIGHT / 16)),
-            (0, int(HEIGHT / 16) - 2),
-            (8, int(HEIGHT / 16)),
-            (5, -self.minute_hand_length),
-            (0, -self.minute_hand_length - 5),
+            (-3, -self.minute_hand_length),
+            (-4, int(HEIGHT / 32)),
+            (0, int(HEIGHT / 32) - 1),
+            (4, int(HEIGHT / 32)),
+            (3, -self.minute_hand_length),
+            (0, -self.minute_hand_length - 3),
         )
 
-        self.hour_hand_length = int(HEIGHT / 2) - int(HEIGHT / 4.5)
+        self.hour_hand_length = int(HEIGHT / 4) - int(HEIGHT / 9)
         self.hour_hand = Polygon()
         self.hour_hand.path(
-            (-5, -self.hour_hand_length),
-            (-10, int(HEIGHT / 16)),
-            (0, int(HEIGHT / 16) - 2),
-            (10, int(HEIGHT / 16)),
-            (5, -self.hour_hand_length),
-            (0, -self.hour_hand_length - 5),
+            (-4, -self.hour_hand_length),
+            (-5, int(HEIGHT / 32)),
+            (0, int(HEIGHT / 32) - 1),
+            (5, int(HEIGHT / 32)),
+            (3, -self.hour_hand_length),
+            (0, -self.hour_hand_length - 3),
         )
 
-        self.second_hand_length = int(HEIGHT / 2) - int(HEIGHT / 8)
+        self.second_hand_length = int(HEIGHT / 4) - int(HEIGHT / 16)
         self.second_hand = Polygon()
         self.second_hand.path(
-            (-2, -self.second_hand_length),
-            (-2, int(HEIGHT / 8)),
-            (2, int(HEIGHT / 8)),
-            (2, -self.second_hand_length),
+            (-1, -self.second_hand_length),
+            (-1, int(HEIGHT / 16)),
+            (1, int(HEIGHT / 16)),
+            (1, -self.second_hand_length),
         )
 
-        self.date_box = Polygon()
-        self.date_box.rectangle(WIDTH // 2 - 77, 128, 154, 35,
-                                (18, 18, 18, 18))
-        self.retraite_box = Polygon()
-        self.retraite_box.rectangle(WIDTH // 2 - 52, 320, 104, 35,
-                                    (18, 18, 18, 18))
-        self.e_temp_box = Polygon()
-        self.e_temp_box.rectangle(WIDTH // 4 - 47, HEIGHT // 2 - 18, 94, 36,
-                                  (18, 18, 18, 18))
-        self.b_temp_box = Polygon()
-        self.b_temp_box.rectangle(WIDTH // 4 * 3 - 47, HEIGHT // 2 - 18, 94,
-                                  36, (18, 18, 18, 18))
-        self.sw = {k: Polygon() for k in sorted(PRISES)}
-        self.tmp = {k: Polygon() for k in sorted(CAPTEURS)}
-        if len(self.sw) < len(self.tmp):
-            pos_tmp = 5
-            pos_sw = 15
-        else:
-            pos_tmp = 15
-            pos_sw = 5
-        x, y = 5, pos_sw
-        for k in sorted(self.sw):
-            self.sw[k].circle(x, y, 4)
-            x += 10
-        self.key_sw = list(self.sw.keys())
-        self.id_sw = 0
-        x, y = 5, pos_tmp
-        for k in sorted(self.temperatures.temps):
-            self.tmp[k].circle(x, y, 4)
-            x += 10
-        self.key_tmp = list(self.tmp.keys())
-        self.id_tmp = 0
-        self.id_lv = Polygon()
-        self.id_lv.circle(5, 25, 4)
-        self.id_dh = Polygon()
-        self.id_dh.circle(15, 25, 4)
-        self.id_mqtt = Polygon()
-        self.id_mqtt.circle(5, 35, 4)
-
-        self.retraite = ["Retraite", WIDTH, 312]
-        self.dehors = ["Dehors", WIDTH // 4, HEIGHT // 2 - 26]
-        self.bureau = ["Bureau", WIDTH // 4 * 3, HEIGHT // 2 - 26]
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-        r = self.vector.measure_text(self.retraite[0])[2]
-        self.retraite[1] = int((self.retraite[1] - r) / 2)
-        d = self.vector.measure_text(self.dehors[0])[2]
-        self.dehors[1] = int(self.dehors[1] - d / 2)
-        b = self.vector.measure_text(self.bureau[0])[2]
-        self.bureau[1] = int(self.bureau[1] - b / 2)
-        for txt in JOURS:
-            self.pos_jours.append(
-                int((WIDTH - self.vector.measure_text(txt)[2]) / 2))
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 25)
         self.display.set_pen(Color.BLACK)
         self.display.clear()
 
@@ -190,45 +128,14 @@ class Horloge:
             return True
         return False
 
-    def affiche_capteurs_temperatures(self):
-        for key in self.key_sw:
-            state = self.switches.get_state(key, False)
-            if state is None:
-                self.display.set_pen(Color.LIGHTGREY)
-            elif state:
-                self.display.set_pen(Color.GREEN)
-            else:
-                self.display.set_pen(Color.RED)
-            self.vector.draw(self.sw[key])
-            self.id_sw = (self.id_sw + 1) % len(self.key_sw)
-
-    def affiche_capteurs_switches(self):
-        for key in self.key_tmp:
-            self.temperatures.get_temp_color(self.temperatures.temps[key])
-            self.vector.draw(self.tmp[key])
-
-    def affiche_capteurs(self, now):
-        self.affiche_capteurs_temperatures()
-        self.affiche_capteurs_switches()
-        self.display.set_pen(Color.RED if self.mqtt.puissance_lv ==
-                             "0.0" else Color.BLACK)
-        self.vector.draw(self.id_lv)
-        self.display.set_pen(Color.RED if self.mqtt.puissance_dh ==
-                             "0.0" else Color.BLACK)
-        self.vector.draw(self.id_dh)
-        if now - self.mqtt.last_msg < 5:
-            self.display.set_pen(Color.LIGHTYELLOW)
-            self.vector.draw(self.id_mqtt)
-        self.presto.partial_update(0, 0, 90, 30)
-
     def affiche(self):
+        self.first = True
         while True:
             if verifier_connexion(self.presto, self.loggin):
                 self.mqtt.reconnect()
             self.mqtt.check_msg()
             if self.gere_touch() or Page.get_page() != 'horloge':
                 return
-            t_start = time.ticks_ms()
             now = time.time()
             if now == self.next_update_time:
                 update_time(self.loggin, False)
@@ -237,49 +144,26 @@ class Horloge:
                 time.gmtime(now + self.offset)
             if self.last_second == second:
                 time.sleep_ms(10)
-                self.display.set_pen(Color.GREEN)
-                if self.mqtt.puissance_dh != "0.0":
-                    self.vector.draw(self.id_dh)
-                if self.mqtt.puissance_lv != "0.0":
-                    self.vector.draw(self.id_lv)
-                self.presto.update()
                 continue
+            if self.first:
+                self.calendar.affiche()
+                self.first = False
             self.last_second = second
             if self.alerte.id_show:
                 self.alerte.show()
             self.tr.reset()
             self.display.set_pen(Color.BLACK)
             self.display.clear()
-            index = self.alarmes.next_alarme()
-            if index is not None:
-                h, m, s = self.alarmes.get_alarme(index).get_time()
-                # TODO: si s < 6 il faut tester m-1 !
-            else:
-                h = m = s = -1
-            if hour == h and minute == m and second in ((s - 6) % 60,
-                                                        (s - 4) % 60,
-                                                        (s - 2) % 60, s):
-                self.jpg.open_file("img/cadran_alarm.jpg")
-                if second == s and self.alarmes.get_alarme(
-                        index).get_oneshot():
-                    self.alarmes.remove_alarme(index)
-            else:
-                self.jpg.open_file("img/cadran.jpg")
-            self.jpg.decode(0, 0, jpegdec.JPEG_SCALE_FULL, dither=True)
-            # self.vector.draw(self.face)
+            self.jpg.open_file("img/cadran_240.jpg")
+            self.jpg.decode(0, 0, jpegdec.JPEG_SCALE_HALF, dither=True)
 
-            x, y = (WIDTH // 2, HEIGHT // 2)
+            x, y = (WIDTH // 4, HEIGHT // 4)
             angle_minute = minute * 6
             angle_minute += second / 10.0
             angle_hour = (hour % 12) * 30
             angle_hour += minute / 2
             angle_second = second * 6
 
-            self.display.set_pen(Color.DARKGREY)
-            self.vector.draw(self.date_box)
-            self.vector.draw(self.retraite_box)
-            self.vector.draw(self.b_temp_box)
-            self.vector.draw(self.e_temp_box)
             self.display.set_pen(Color.DARKJAUNE)
 
             # Dessin des aiguilles
@@ -293,87 +177,33 @@ class Horloge:
             self.vector.draw(self.hour_hand)
             self.tr.reset()
 
-            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
-            self.display.set_pen(Color.GREY)
-            self.vector.text(self.dehors[0], self.dehors[1], self.dehors[2])
-            self.vector.text(self.bureau[0], self.bureau[1], self.bureau[2])
-            self.vector.text(JOURS[wd], self.pos_jours[wd], 122)
-            self.vector.text(self.retraite[0], self.retraite[1],
-                             self.retraite[2])
-
-            # Aiguille des secondes au dessus de l'ensemble
             self.display.set_pen(Color.RED)
-            self.tr.rotate(angle_second, (WIDTH // 2, HEIGHT // 2))
+            self.tr.rotate(angle_second, (x, y))
             self.tr.translate(x, y)
             self.vector.draw(self.second_hand)
             self.tr.reset()
             self.vector.draw(self.hub)
-            self.affiche_capteurs(now)
 
-            # Affichage des dates et retraite au dessus des aiguilles heures & minutes
-            self.display.set_pen(Color.LIGHTGREY)
-            self.vector.text(f"{day:02d}/{month:02d}/{year}", WIDTH // 2 - 68,
-                             155)
-            diff = (RETRAITE - datetime.date(year, month, day)).days
-            days = f"J-{diff:d}"
-            log = int(self.vector.measure_text(days)[2])
-            self.vector.text(days, (WIDTH - log) // 2, 347)
             self.display.set_pen(Color.GREY)
-            dehors = self.temperatures.temps["_dehors"]
-            bureau = self.temperatures.temps["bureau"]
-            self.temperatures.get_temp_color(dehors)
-            self.vector.text(
-                f"{dehors:.1f}°C" if dehors > -1000 else "  ???",
-                WIDTH // 4 - 38,
-                HEIGHT // 2 + 10,
-            )
-            self.temperatures.get_temp_color(bureau)
-            self.vector.text(
-                f"{bureau:.1f}°C" if bureau > -1000 else "  ???",
-                WIDTH // 4 * 3 - 38,
-                HEIGHT // 2 + 10,
-            )
-            self.display.set_pen(Color.LIGHTGREY)
-            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
-            self.vector.text(
-                self.titre, 479 - int(self.vector.measure_text(self.titre)[2]),
-                475)
-            self.vector.text(__python__, 0, 475)
-            self.vector.text(
-                self.m_msg, 479 - int(self.vector.measure_text(self.m_msg)[2]),
-                460)
-            ypos = 10
-            if self.topic:
-                log = int(self.vector.measure_text(self.topic)[2])
-                self.vector.text(self.topic, 479 - log, 10)
-                if now - self.t_msg > 5:
-                    self.topic = None
-                ypos += 15
-            if self.mqtt.puissance_lv != "0.0":
-                if self.first_lave_linge:
-                    self.alerte.alerte("Lave ligne en route")
-                    self.first_lave_linge = False
-                p = f"Lave linge {self.mqtt.puissance_lv}W"
-                log = int(self.vector.measure_text(p)[2])
-                self.vector.text(p, 479 - log, ypos)
-                ypos += 15
-            else:
-                self.first_lave_linge = True
-            if self.mqtt.puissance_dh != "0.0":
-                p = f"déshum. {self.mqtt.puissance_dh}W"
-                log = int(self.vector.measure_text(p)[2])
-                self.vector.text(p, 491 - log, ypos)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 40)
+            jour = f"{JOURS[wd]}"
+            dim = self.vector.measure_text(jour)
+            self.vector.text(jour, 360 - int(dim[2] // 2), 40)
+            date = f"{day}"
+            dim = self.vector.measure_text(date)
+            self.vector.text(date, 360 - int(dim[2] // 2), 80)
+            mois = f"{MOIS[month]}"
+            dim = self.vector.measure_text(mois)
+            self.vector.text(mois, 360 - int(dim[2] // 2), 120)
+            annee = f"{year}"
+            dim = self.vector.measure_text(annee)
+            self.vector.text(annee, 360 - int(dim[2] // 2), 160)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 64)
+            heure = f"{hour}:{minute:02d}"
+            dim = self.vector.measure_text(heure)
+            self.vector.text(heure, 360 - int(dim[2] // 2), 230)
 
             gc.collect()
-            t_end = time.ticks_ms()
-            delai = t_end - t_start
-            if delai > 1500:
-                # print(f"Boucle : {delai}ms")
-                self.local = False
-            elif not self.local and second == 1:
-                self.local = True
             self.total += 1
-            self.display.set_pen(Color.LIGHTGREY)
-            self.vector.text(f"{delai}ms", 0, 460)
 
-            self.presto.update()
+            self.presto.partial_update(0, 0, 480, 240)
