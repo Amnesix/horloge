@@ -1,12 +1,10 @@
 import time
 
-import machine
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
 from myapp.alarmes import Alarmes
 from myapp.calendar import Calendar
-from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
 from myapp.menu import Menu
 from myapp.mqtt import MQTT, MQTTLog
@@ -56,9 +54,8 @@ mqtt = MQTT(broker, port, alerte, loggin)
 mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, alerte, loggin)
 initiale_states = get_all_states(loggin)
-flip = Flip_Clock(presto, display, vector, touch, mqtt, alerte, loggin)
-horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, calendar,
-                  alarmes, alerte, loggin)
+horloge = Horloge(presto, display, vector, t, touch, mqtt, calendar, alarmes,
+                  alerte, loggin)
 menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin, start)
 
 # Lancement de l'affichage principal
@@ -68,38 +65,10 @@ loggin.log("Lancement boucle de traitement")
 Page.set_page('horloge')
 page = Page.get_page()
 display.set_pen(Color.BLACK)
-display.rectangle(0, 0, 480, 480)
+display.clear()
 presto.update()
 while True:
-    # Page.set_page(page)
-    if page == 'horloge':
-        horloge.affiche()
-    elif page == 'calendrier':
-        calendar.affiche()
-    elif page == 'flip':
-        flip.affiche()
-    elif page == 'switches':
-        switches.affiche()
-    elif page == 'temperatures':
-        temperatures.affiche()
-    elif page == 'mqttlogs':
-        mqttlogs.affiche()
-    elif page == 'alarme':
-        alarmes.affiche()
-    elif page == 'reboot':
-        display.set_pen(Color.BLACK)
-        display.clear()
-        presto.update()
-        mqtt.disconnect(False)
-        machine.reset()
-        break
-    elif page == 'exit':
-        break
-    new_page = Page.get_page()
-    if page == new_page:
-        page = menu.affiche()
-    else:
-        page = new_page
+    horloge.affiche()
 
 print("The end")
 display.set_pen(Color.BLACK)

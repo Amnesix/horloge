@@ -34,7 +34,6 @@ class Horloge:
         vector,
         tr,
         touch,
-        flip,
         mqtt,
         calendar,
         alarmes,
@@ -46,7 +45,6 @@ class Horloge:
         self.vector = vector
         self.tr = tr
         self.touch = touch
-        self.flip = flip
         self.mqtt = mqtt
         self.calendar = calendar
         self.alarmes = alarmes
