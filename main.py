@@ -1,13 +1,17 @@
 import time
 
+import machine
 import presto
 from picovector import ANTIALIAS_BEST, PicoVector, Transform
 
 from myapp.alarmes import Alarmes
 from myapp.calendar import Calendar
+from myapp.flip_clock import Flip_Clock
 from myapp.horloge import Horloge
 from myapp.menu import Menu
 from myapp.mqtt import MQTT, MQTTLog
+from myapp.switches import Switches
+from myapp.temperatures import Temperatures
 from myapp.utils import (
     TZ,
     Alerte,
@@ -54,8 +58,13 @@ mqtt = MQTT(broker, port, alerte, loggin)
 mqttlogs = MQTTLog(presto, display, vector, touch, mqtt, alerte, alarmes)
 calendar = Calendar(presto, display, vector, touch, mqtt, alerte, loggin)
 initiale_states = get_all_states(loggin)
-horloge = Horloge(presto, display, vector, t, touch, mqtt, calendar, alarmes,
-                  alerte, loggin)
+temperatures = Temperatures(presto, display, vector, touch, mqtt, alerte,
+                            loggin, initiale_states)
+switches = Switches(presto, display, vector, touch, mqtt, alerte, loggin,
+                    initiale_states)
+flip = Flip_Clock(presto, display, vector, touch, mqtt, alerte, loggin)
+horloge = Horloge(presto, display, vector, t, touch, flip, mqtt, temperatures,
+                  switches, calendar, alarmes, alerte, loggin, mqttlogs)
 menu = Menu(presto, display, vector, touch, mqtt, alerte, loggin, start)
 
 # Lancement de l'affichage principal
@@ -64,11 +73,36 @@ loggin.log("Lancement boucle de traitement")
 # Page par défaut
 Page.set_page('horloge')
 page = Page.get_page()
-display.set_pen(Color.BLACK)
-display.clear()
-presto.update()
 while True:
-    horloge.affiche()
+    # Page.set_page(page)
+    if page == 'horloge':
+        horloge.affiche()
+    elif page == 'calendrier':
+        calendar.affiche()
+    elif page == 'flip':
+        flip.affiche()
+    elif page == 'switches':
+        switches.affiche()
+    elif page == 'temperatures':
+        temperatures.affiche()
+    elif page == 'mqttlogs':
+        mqttlogs.affiche()
+    elif page == 'alarme':
+        alarmes.affiche()
+    elif page == 'reboot':
+        display.set_pen(Color.BLACK)
+        display.clear()
+        presto.update()
+        mqtt.disconnect(False)
+        machine.reset()
+        break
+    elif page == 'exit':
+        break
+    new_page = Page.get_page()
+    if page == new_page:
+        page = menu.affiche()
+    else:
+        page = new_page
 
 print("The end")
 display.set_pen(Color.BLACK)

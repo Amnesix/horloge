@@ -1,7 +1,7 @@
 import gc
 import time
 
-from myapp.utils import MOIS, TZ, Color
+from myapp.utils import MOIS, TZ, Color, Page, verifier_connexion
 
 
 def is_leap_year(year):
@@ -134,7 +134,6 @@ class Calendar:
         self.alerte = alerte
         self.loggin = loggin
         self.color_we = display.create_pen(118, 118, 118)
-        self.yoffset = 10
         # Initialisation de l'affichage
         self.init_calendar(time.time())
 
@@ -162,50 +161,124 @@ class Calendar:
 
     def draw_calendar(self, maj):
         self.display.set_pen(Color.BLACK)
-        self.display.rectangle(0, 240, 240, 240)  # (12, 70, 58, 53)
+        self.display.clear()
+        # Dessin du calendrier
+        self.display.set_pen(Color.BLUE)
+        self.display.rectangle(12, 70, 460, 354)
+        self.display.rectangle(13, 71, 458, 352)
+        self.display.set_pen(Color.LIGHTGREY)
+        self.display.rectangle(14, 72, 355, 350)
+        self.display.set_pen(self.color_we)
+        self.display.rectangle(356, 72, 114, 350)
+        self.display.set_pen(Color.BLUE)
+        # 1 ligne vertical tous les 58 pixels
+        for x in range(70, 423, 57):
+            self.display.line(x, 72, x, 422)
+        # 1 ligne horizontale tous les 50 pixels
+        for y in range(123, 374, 50):
+            self.display.line(14, y, 470, y)
+        self.display.set_pen(Color.BLACK)
+        self.display.rectangle(12, 70, 58, 53)
         # Affichage du text
         self.display.set_pen(Color.LIGHTGREY)
         s = f"{MOIS[self.month - 1]} {self.year}"
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 24)
-        x, y = int(120 - self.vector.measure_text(s)[2] // 2), 274
-        self.vector.text(s, x, y + self.yoffset)
-        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 16)
-        self.display.set_pen(Color.GREY)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 48)
+        x, y = int(250 - self.vector.measure_text(s)[2] // 2), 48
+        self.vector.text(s, x, y)
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+        self.display.set_pen(Color.BLACK)
+        self.presto.update()
         if maj:
             self.init_calendar(time.time())
-        y = 55 + self.yoffset
+        y = 110
         i = 0
         change_font = True
         for line in self.calendar:
-            x = 8
+            x = 16
             first = True
             for s in line:
                 if first:
                     first = False
                     self.display.set_pen(Color.ORANGE)
                 else:
-                    if s == "1" and x != 7:
+                    if s == "1" and x != 14:
                         i += 1
-                    if i == 1 or y == 55:
+                    if i == 1 or y == 110:
                         if str(
                                 self.mday
                         ) == s and self.year == self.ny and self.month == self.nm:
                             self.display.set_pen(Color.ORANGE)
                         else:
-                            self.display.set_pen(Color.GREY)
+                            self.display.set_pen(Color.BLACK)
                     else:
                         self.display.set_pen(Color.GREY)
-                l = int((25 - self.vector.measure_text(s)[2]) // 2)
-                self.vector.text(s, x + l, 240 + y + self.yoffset)
-                x += 28
+                l = int((50 - self.vector.measure_text(s)[2]) // 2)
+                self.vector.text(s, x + l, y)
+                x += 57
                 self.presto.update()
             if change_font:
                 change_font = False
                 self.vector.set_font("Roboto-Medium-With-Material-Symbols.af",
-                                     18)
-            y += 25
-        self.presto.partial_update(0, 240, 240, 240)
+                                     36)
+            y += 50
+        # self.presto.update()
 
     def affiche(self):
+        while self.touch.state:
+            self.touch.poll()
         self.draw_calendar(True)
-        gc.collect()
+        self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+        lh = list(map(int, self.vector.measure_text("##:##:##")))
+        last_time = time.time()
+        while True:
+            if verifier_connexion(self.presto, self.loggin):
+                self.mqtt.reconnect()
+            self.mqtt.check_msg()
+            if Page.get_page() != 'calendrier':
+                return
+            if self.alerte.id_show:
+                self.alerte.show()
+            self.touch.poll()
+            if self.touch.state:
+                if self.touch.y > 400:
+                    while self.touch.state:
+                        self.touch.poll()
+                    return
+                xs, ys = self.touch.x, self.touch.y
+                while self.touch.state:
+                    self.touch.poll()
+                dx, dy = xs - self.touch.x, ys - self.touch.y
+                if abs(dx) < abs(dy):
+                    if dy > 0:
+                        self.set_year(self.year + 1)
+                    else:
+                        self.set_year(self.year - 1)
+                else:
+                    if dx > 0:
+                        self.set_month(self.month + 1)
+                    else:
+                        self.set_month(self.month - 1)
+                self.draw_calendar(False)
+            s = time.time()
+            self.offset = 3600 * TZ.get_offset(s)
+            if last_time == s:
+                time.sleep(0.1)
+                continue
+            elif s - last_time > 5 or Page.get_redraw():
+                if Page.get_redraw():
+                    Page.set_redraw(format)
+                self.draw_calendar(False)
+            last_time = s
+            self.ny, self.nm, d, hour, minute, second, _, _ = time.gmtime(
+                s + self.offset)
+            if self.mday != d:
+                self.init_calendar(s)
+            # Affichage de l'heure
+            heure = f"{hour:02d}:{minute:02d}:{second:02d}"
+            self.display.set_pen(Color.BLACK)
+            self.display.rectangle(96, 430, 304, 479)
+            self.display.set_pen(Color.LIGHTGREY)
+            self.vector.set_font("Roboto-Medium-With-Material-Symbols.af", 32)
+            self.vector.text(heure, (480 - lh[2]) // 2, 465)
+            self.presto.update()
+            gc.collect()
